@@ -36,6 +36,23 @@ spring:
           filters:
             - RewritePath=${service-url}/basic/(?<path>.*),/$\{path}
 
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+
+  webjars:
+    prefix: ${service-url}
+  swagger-ui:
+    operations-sorter: alpha
+    use-root-path: false
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service
+      - url: ${service-url}/basic/v3/api-docs
+        name: Basic
+
+
+
 
 
 
