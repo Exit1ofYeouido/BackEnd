@@ -3,22 +3,18 @@ package com.example.Basic.Controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/basics")
+@RequestMapping("/basic2")
 @RestController
-@Tag(name="기본 API")
-public class BasicController {
+@Tag(name="기본 2")
+public class Basic2Controller {
 
-    @GetMapping("/hi")
-    @Operation(description = "이건 swagger 설명임 ㅇㅇ 그냥 보면됨 ㅇㅇㅇ")
-    public ResponseEntity<?> gethi(){
-
-        return ResponseEntity.ok("hi");
+    @GetMapping
+    @Operation(description = "오~ 데스페라도 ~ why dont u ~")
+    public void eagles(){
+        System.out.println("이글스의 호텔 켈리포니아.");
     }
-
-
 }
