@@ -1,0 +1,29 @@
+service-url: /api/basic
+
+server:
+  port: 8090
+  shutdown: graceful
+
+spring:
+  application:
+    name: basic
+  datasource:
+    driver-class-name: ${DRIVER_CLASS_NAME}
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_URL}
+    password: ${DATASOURCE_PASSWORD}
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show-sql: true
+        highlight_sql: true
+        use_sql_comments: true
+        format_sql: true
+    defer-datasource-initialization: true
+
+

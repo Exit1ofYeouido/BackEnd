@@ -1,0 +1,5 @@
+rootProject.name = 'StockCraft'
+include 'application'
+include 'application:api-gateway'
+include 'application:basic'
+include 'util'
