@@ -1,7 +1,6 @@
 service-url: /api/basic
 
 server:
-  port: 8090
   port: 8081
   shutdown: graceful
 
