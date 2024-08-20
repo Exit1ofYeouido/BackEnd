@@ -4,4 +4,5 @@ include 'application:api-gateway'
 include 'application:basic'
 include 'application:reward'
 include 'application:mypage'
+include 'application:search'
 
