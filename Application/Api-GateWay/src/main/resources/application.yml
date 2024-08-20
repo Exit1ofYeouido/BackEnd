@@ -6,6 +6,8 @@ server:
     context-path: ${service-url}
 
 spring:
+  token:
+    secret: ${SECRET}
   application:
     name: api-gateway
   cloud:
