@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/basics")
 @RestController
-@Tag(name="기본 API")
 public class BasicController {
 
     @GetMapping("/hi")

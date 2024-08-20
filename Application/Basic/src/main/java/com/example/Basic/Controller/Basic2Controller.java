@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/basic2")
 @RestController
-@Tag(name="기본 2")
 public class Basic2Controller {
 
     @GetMapping
