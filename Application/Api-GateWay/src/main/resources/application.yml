@@ -47,6 +47,12 @@ spring:
             - Path= ${service-url}/reward/**
           filters:
             - RewritePath=${service-url}/reward/(?<path>.*),/$\{path}
+        - id: auth
+          uri: http://localhost:8085
+          predicates:
+            - Path= ${service-url}/auth/**
+          filters:
+            - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
 
 
 springdoc:
@@ -67,7 +73,8 @@ springdoc:
         name: Mypage
       - url: ${service-url}/reward/v3/api-docs
         name: Reward
-
+      - url: ${service-url}/auth/v3/api-docs
+        name: Auth
 
 
 
