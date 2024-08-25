@@ -6,15 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Body {
+@Getter
+public class ResultDto {
 
-    private String grantType;
+    private int cost;
 
-    private String appKey;
-
-    private String appSecret;
-
+    private double amount;
 }

@@ -11,11 +11,13 @@ public class KafkaOutputService {
     private final KafkaTemplate<String,Object> kafkaTemplate;
 
 
-    public void giveStock(Long memId, double stockAmount,String code) {
+    public void giveStock(Long memId, double stockAmount, String code, String enterpriseName, int cost) {
 
         kafkaTemplate.send("give-stock",GiveStockDto.builder()
                 .memId(memId)
+                .price(cost)
                 .amount(stockAmount)
+                .enterpriseName(enterpriseName)
                 .code(code).build());
     }
 

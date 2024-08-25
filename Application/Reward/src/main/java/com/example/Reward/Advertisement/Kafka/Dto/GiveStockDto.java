@@ -15,9 +15,12 @@ public class GiveStockDto {
 
     private Long memId;
 
+    private String enterpriseName;
+
+    private int price;
+
     private double amount;
 
     private String code;
-
 
 }

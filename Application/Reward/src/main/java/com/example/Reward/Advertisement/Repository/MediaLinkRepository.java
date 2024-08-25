@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface MediaLinkRepository extends JpaRepository<MediaLink,Long> {
 
-    @Query(nativeQuery = true,value="SELECT * FROM MediaLink as m where m.enterprise_name NOT IN (:enterprises) AND m.id NOT IN (:medialinks)")
+    @Query(nativeQuery = true,value="SELECT * FROM Media_Link as m where m.enterprise_name NOT IN (:enterprises) AND m.id NOT IN (:medialinks)")
     List<MediaLink> findmedialink(@Param("medialinks") List<Long> mediaLinkIdList,@Param("enterprises") List<String> enterpriseNoneList);
 }
 

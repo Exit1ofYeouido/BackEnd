@@ -1,7 +1,6 @@
 package com.example.Reward.Advertisement.Dto.out;
 
 
-import com.example.Reward.Advertisement.Dto.in.GiveStockRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,9 +11,9 @@ public class GiveStockResponseDto {
 
     private double amount;
 
-    public static GiveStockResponseDto givetostock(String enterprisename) {
+    public static GiveStockResponseDto givetostock(String enterprisename, double amount) {
 
-        return GiveStockResponseDto.builder().name(enterprisename).amount(0.2).build();
+        return GiveStockResponseDto.builder().name(enterprisename).amount(amount).build();
 
 
     }

@@ -14,6 +14,7 @@ import com.example.Reward.Advertisement.Repository.MediaHistoryRepository;
 import com.example.Reward.Advertisement.Repository.MediaLinkRepository;
 import com.example.Reward.Advertisement.Repository.QuizRepository;
 import com.example.Reward.Advertisement.Webclient.ApiService;
+import com.example.Reward.Advertisement.Webclient.ResultDto;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,23 +49,24 @@ public class AdService {
             enterpriseNoneList.add(check.getEnterpriseName());
         }
 
+
         for (MediaHistory media:mediaHistory){
             mediaLinkIdList.add(media.getMediaLink().getId());
         }
 
         List<MediaLink> mediaLinks=mediaLinkRepository.findmedialink(mediaLinkIdList,enterpriseNoneList);
 
-
         List<GetInfoResponseDto> getInfoResponseDtos=new ArrayList<>();
 
         for (MediaLink medialink:mediaLinks){
-            GetInfoResponseDto getInfoResponseDto=new GetInfoResponseDto();
-
-            getInfoResponseDto.builder().name(medialink.getEnterpriseName())
+            GetInfoResponseDto getInfoResponseDto=GetInfoResponseDto
+                    .builder()
+                    .name(medialink.getEnterpriseName())
                     .thumbnail(medialink.getThumnail())
                     .mediaId(medialink.getId())
                     .thumbnailName(medialink.getThumnailName())
                     .build();
+
             getInfoResponseDtos.add(getInfoResponseDto);
         }
 
@@ -94,16 +96,23 @@ public class AdService {
         Long memId= 1L;
 
 
-        //미디어 시청내역 체크
+        //미디어 시청내역 체크  (중복제외 로직 포함)
 
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
-        MediaHistory mediaHistory=MediaHistory.builder().memberId(memId).mediaLink(mediaLink.get()).build();
-        mediaHistoryRepository.save(mediaHistory);
 
-        //오늘봤던 checkToday 체크
+        MediaHistory mediaHistory=mediaHistoryRepository.findByMemberIdAndMediaId(memId,mediaLink.get().getId());
+        if (mediaHistory ==null) {
+            MediaHistory new_mediaHistory = MediaHistory.builder().memberId(memId).mediaLink(mediaLink.get()).build();
+            mediaHistoryRepository.save(new_mediaHistory);
+        }
 
-        CheckToday checkToday=CheckToday.builder().enterpriseName(giveStockRequestDto.getEnterpriseName()).memberId(memId).build();
-        checkTodayRepository.save(checkToday);
+
+        //오늘봤던 checkToday 체크 (중복제외 로직 포함)
+        CheckToday checkToday=checkTodayRepository.findByEnterpriseNameANDMemberId(giveStockRequestDto.getEnterpriseName(),memId);
+        if (checkToday ==null) {
+            CheckToday new_checkToday = CheckToday.builder().enterpriseName(giveStockRequestDto.getEnterpriseName()).memberId(memId).build();
+            checkTodayRepository.save(new_checkToday);
+        }
 
         //만일 된다면 주식 가격을 불러오고 주식 100원마치 0.x주를 줘야함+event 삭제
 
@@ -113,14 +122,17 @@ public class AdService {
         if (event.getRewardAmount()<=0){
             throw new NoStockException();
         }
-        double stockAmount=apiservice.getPrise(event.getStockCode());
-        event.setRewardAmount(event.getRewardAmount()-stockAmount);
+
+        ResultDto resultDto=apiservice.getPrise(event.getStockCode());
+        event.setRewardAmount(event.getRewardAmount()-resultDto.getAmount());
+        eventRepository.save(event);
+
 
         //카프카로 멤버한테 요청해서 stock을 줌(완)
 
-        kafkaOutputService.giveStock(memId,stockAmount,event.getStockCode());
+        kafkaOutputService.giveStock(memId,resultDto.getAmount(),event.getStockCode(),event.getEnterpriseName(),resultDto.getCost());
 
-        return GiveStockResponseDto.givetostock(giveStockRequestDto.getEnterpriseName());
+        return GiveStockResponseDto.givetostock(giveStockRequestDto.getEnterpriseName(),resultDto.getAmount());
 
     }
 

@@ -23,13 +23,15 @@ public class ApiService {
     WebClient client=WebClient.create();
 
     @Value("${app.key}")
-    public String APPKEY ;
+    private String APPKEY;
 
     @Value("${app.secretkey}")
-    public String APPSECRET ;
-    public double getPrise(String code) {
+    private String APPSECRET;
+
+    public ResultDto getPrise(String code) {
 
 
+        System.out.println("서제호 메롱");
         String url=REST_BASE_URL+"/uapi/domestic-stock/v1/quotations/inquire-price?fid_cond_mrkt_div_code=" +
                 "J&fid_input_iscd=" + code;
         Mono<ResponseDto> response=client.get()
@@ -46,9 +48,14 @@ public class ApiService {
             ResponseDto result=response.block();
 
         int cost= Integer.parseInt(result.getOutput().getStck_prpr());
-        double resultCost=Math.round(((150/cost)*1000000)/1000000);
+        double resultCost=Math.round((150.0 /cost) * 1000000) / 1000000.0;
 
-        return resultCost;
+        System.out.println(resultCost);
+        ResultDto resultDto=ResultDto.builder()
+                .cost(cost)
+                .amount(resultCost)
+                .build();
+        return resultDto;
     }
 
 

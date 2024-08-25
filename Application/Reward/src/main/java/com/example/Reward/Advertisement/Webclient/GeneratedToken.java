@@ -2,6 +2,7 @@ package com.example.Reward.Advertisement.Webclient;
 
 
 import com.example.Reward.Common.Repository.TokenInfoRepository;
+import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,43 +18,59 @@ public class GeneratedToken {
     private final TokenInfoRepository tokenInfoRepository;
 
     @Value("${app.key}")
-    public static String APPKEY ;
+    private String APPKEY ;
 
     @Value("${app.secretkey}")
-    public static String APPSECRET ;
+    private String APPSECRET ;
+
+    public static String ACCESS_TOKEN;
 
     WebClient client=WebClient.create();
 
     public String getAccessToken() {
 
         List<TokenInfo> tokenInfos=tokenInfoRepository.findAll();
-        String ACCESS_TOKEN=tokenInfos.get(0).getAccessToken();
-        if (ACCESS_TOKEN == null) {
-            ACCESS_TOKEN = generateAccessToken();
-        }
 
-        return ACCESS_TOKEN;
+        if (tokenInfos.isEmpty()) {
+            ACCESS_TOKEN = generateAccessToken();
+            System.out.println(ACCESS_TOKEN);
+            TokenInfo tokenInfo = TokenInfo
+                    .builder()
+                    .accessToken(ACCESS_TOKEN)
+                    .build();
+            tokenInfoRepository.save(tokenInfo);
+            return ACCESS_TOKEN;
+        }
+        String Is_ACCESS_TOKEN = tokenInfos.get(0).getAccessToken();
+
+        return Is_ACCESS_TOKEN;
     }
 
     public String generateAccessToken(){
 
         String url = "https://openapi.koreainvestment.com:9443" + "/oauth2/tokenP";
-        Body body=new Body(APPKEY,APPSECRET,"client_credentials");
+        OauthInfo bodyOauthInfo=OauthInfo.builder()
+                .grant_type("client_credentials")
+                .appkey(APPKEY)
+                .appsecret(APPSECRET)
+                .build();
 
-        Mono<TokenInfo> mono = client.post()
+        System.out.println(bodyOauthInfo.getAppsecret());
+
+        Mono<Token> mono = client.post()
                 .uri(url)
                 .header("content-type", "application/json")
-                .bodyValue(body)
+                .bodyValue(bodyOauthInfo)
                 .retrieve()
-                .bodyToMono(TokenInfo.class);
+                .bodyToMono(Token.class);
 
-        TokenInfo tokenInfo = mono.block();
-
-        if (tokenInfo == null) {
+        Token token = mono.block();
+        System.out.println(token);
+        if (token == null) {
             throw new RuntimeException("액세스 토큰을 가져올 수 없습니다.");
         }
 
-        String ACCESS_TOKEN = tokenInfo.getAccessToken();
+        ACCESS_TOKEN = token.getAccess_token();
 
         return ACCESS_TOKEN;
 

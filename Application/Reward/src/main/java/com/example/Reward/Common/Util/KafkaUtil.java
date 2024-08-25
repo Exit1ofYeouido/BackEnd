@@ -10,6 +10,8 @@ public class KafkaUtil {
             sb.append(",");
         }
 
+        sb.setLength(sb.length()-1);
+
         return sb.toString();
     }
 }
