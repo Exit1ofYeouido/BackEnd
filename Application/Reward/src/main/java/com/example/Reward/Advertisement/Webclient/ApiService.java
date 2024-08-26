@@ -30,8 +30,6 @@ public class ApiService {
 
     public ResultDto getPrise(String code) {
 
-
-        System.out.println("서제호 메롱");
         String url=REST_BASE_URL+"/uapi/domestic-stock/v1/quotations/inquire-price?fid_cond_mrkt_div_code=" +
                 "J&fid_input_iscd=" + code;
         Mono<ResponseDto> response=client.get()
