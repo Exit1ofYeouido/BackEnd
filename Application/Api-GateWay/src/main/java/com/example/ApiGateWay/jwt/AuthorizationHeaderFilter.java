@@ -39,12 +39,17 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 return onError(exchange, "No authorization Header", HttpStatus.UNAUTHORIZED);
             }
 
-            //헤더에서 토큰 추출
             String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
+
             String jwt = authorizationHeader.replace("Bearer ", "");
             if (!isJwtValid(jwt)) {
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
+
+            String memberId = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(jwt).getPayload()
+                    .get("memberId", String.class);
+
+            exchange.getRequest().mutate().header("memberId", memberId).build();
             return chain.filter(exchange);
         };
     }
@@ -60,12 +65,12 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         String subject = null;
 
         try {
-            //JWT secret 설정해주기
             subject = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(jwt)
-                    .getPayload().get("username", String.class);
+                    .getPayload().get("memberId", String.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return !Strings.isBlank(subject);
     }
+
 }
