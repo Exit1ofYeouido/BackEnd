@@ -3,10 +3,13 @@ package com.example.Mypage.Mypage.Service;
 
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
+import com.example.Mypage.Common.Entity.PopupCheck;
 import com.example.Mypage.Common.Repository.MemberRepostory;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
+import com.example.Mypage.Common.Repository.PopupCheckRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
+import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
 import com.example.Mypage.Mypage.Webclient.ApiService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class MyService {
     private final MemberRepostory memberRepostory;
     private final MemberStockRepository memberStockRepository;
     private final ApiService apiService;
+    private final PopupCheckRepository popupCheckRepository;
 
 
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
@@ -119,5 +123,24 @@ public class MyService {
     }
 
 
+    public GetTutorialCheckResponseDto getTutorialCheck(String type, Long memId) {
 
+        PopupCheck popupCheck=popupCheckRepository.findByTypeAndMemId(type,memId);
+
+        if (popupCheck !=null) {
+            return GetTutorialCheckResponseDto.of(true);
+        }
+        return GetTutorialCheckResponseDto.of(false);
+    }
+
+    public void saveTutorialCheck(String type, Long memId) {
+
+        PopupCheck popupCheck=PopupCheck
+                .builder()
+                .popupType(type)
+                .memberId(memId)
+                .build();
+        popupCheckRepository.save(popupCheck);
+
+    }
 }
