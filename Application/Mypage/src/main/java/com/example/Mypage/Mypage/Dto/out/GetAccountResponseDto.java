@@ -10,7 +10,6 @@ public class GetAccountResponseDto {
 
     private String accountId;
 
-
     public GetAccountResponseDto(){
         this.accountName="신한투자증권 S-Lite ";
         this.accountId="270-534-290-59";
