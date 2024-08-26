@@ -5,6 +5,8 @@ server:
   shutdown: graceful
 
 spring:
+  token:
+    secret: ${SECRET}
   application:
     name: auth
   datasource:
@@ -17,7 +19,7 @@ spring:
       mode: always
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show-sql: true
