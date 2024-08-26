@@ -32,3 +32,4 @@ springdoc:
   packages-to-scan: com.example
 bootstrap:
   server: ${BOOTSTRAP_SERVER}
+
