@@ -32,4 +32,6 @@ springdoc:
   packages-to-scan: com.example
 bootstrap:
   server: ${BOOTSTRAP_SERVER}
+  key: ${APP_KEY}
+  secretkey: ${APP_SECRETKEY}
 
