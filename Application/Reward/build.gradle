@@ -1,5 +1,8 @@
 project(":application:reward") {
-    bootJar { enabled = true }
+    bootJar {
+        enabled = true
+        mainClass = 'com.example.Reward.RewardApplication'
+    }
     jar { enabled = false }
 
     ext {
