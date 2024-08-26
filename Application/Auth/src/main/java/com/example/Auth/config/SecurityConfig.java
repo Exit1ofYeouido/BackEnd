@@ -3,6 +3,7 @@ package com.example.Auth.config;
 import com.example.Auth.jwt.JWTUtil;
 import com.example.Auth.jwt.LoginFilter;
 import com.example.Auth.repository.AuthRepository;
+import com.example.Auth.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
     private final AuthRepository authRepository;
+    private final TokenService tokenService;
 
 
     @Bean
@@ -57,7 +59,7 @@ public class SecurityConfig {
         http
                 .addFilterAt(
                         new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper,
-                                authRepository),
+                                authRepository, tokenService),
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

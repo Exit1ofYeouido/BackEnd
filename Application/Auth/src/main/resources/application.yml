@@ -7,6 +7,11 @@ server:
 spring:
   token:
     secret: ${SECRET}
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    id: ${REDIS_ID}
+    pw: ${REDIS_PW}
   application:
     name: auth
   datasource:
@@ -32,5 +37,3 @@ springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   packages-to-scan: com.example
-
-

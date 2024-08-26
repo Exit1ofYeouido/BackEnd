@@ -31,24 +31,6 @@ public class JWTUtil {
         return null;
     }
 
-    public String getUsername(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
-                .get("username", String.class);
-    }
-
-    public String getUserRole(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseClaimsJws(token).getBody().get("role", String.class);
-    }
-
-    public Boolean isExpired(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration()
-                .before(new Date());
-    }
-
-    public String getTokenType(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
-                .get("type", String.class);
-    }
 
     public String createJwt(String tokenType, String memberId, String role, Long expriedMs) {
         return Jwts.builder()
