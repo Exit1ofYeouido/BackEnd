@@ -1,6 +1,7 @@
 project(":application:mypage") {
-	bootJar{enabled = true}
-	jar {enabled = false}
+
+	bootJar { enabled = true}
+	jar { enabled = false }
 
 	ext {
 		set('springCloudVersion', "2023.0.2")

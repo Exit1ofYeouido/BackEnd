@@ -1,5 +1,6 @@
 project(":application:reward") {
-    bootJar { enabled = true }
+
+    bootJar { enabled = false}
     jar { enabled = false }
 
     ext {
