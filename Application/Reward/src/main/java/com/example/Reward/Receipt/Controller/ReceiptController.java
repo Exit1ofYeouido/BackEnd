@@ -26,4 +26,9 @@ public class ReceiptController {
         return ResponseEntity.ok(getEnterpriseResponseDTO);
     }
 
+
+    @PostMapping("check")
+    @Operation(description = "영수증 업로드, 해당 가게가 상장돼있는지 확인")
+    public ResponseEntity<OCRResponseDTO> checkReceipt(@RequestPart("receiptImg") MultipartFile receiptImg) throws IOException {
+        String receiptURL = receiptService.uploadReceiptToS3(receiptImg);
 }
