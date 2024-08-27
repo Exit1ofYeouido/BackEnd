@@ -13,6 +13,6 @@ public interface MemberStockRepository extends JpaRepository<MemberStock,Long> {
     List<MemberStock> findByMemberId(Long memId);
 
 
-    @Query(nativeQuery = true, value = "SELECT * FROM Member_stock m WHERE :enterpriseName = m.stock_name AND m.member_id = :memId")
+    @Query(nativeQuery = true, value = "SELECT * FROM member_stock m WHERE :enterpriseName = m.stock_name AND m.member_id = :memId")
     MemberStock findByStockNameAndMember(@Param("enterpriseName") String enterpriseName,@Param("memId") Long memId);
 }
