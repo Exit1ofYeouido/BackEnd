@@ -19,7 +19,7 @@ jobs:
         username: ${{ secrets.MYPAGE_EC2_USER}}
         key: ${{ secrets.MYPAGE_EC2_KEY}}
         port: 22
-        script:
+        script: |
           git pull origin feat/member/#6
           docker-compose down
           docker-compose up --build -d
