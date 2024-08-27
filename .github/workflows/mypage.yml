@@ -1,0 +1,40 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - feat/member/#6
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v2
+
+    - name: Setp up Jdk 17
+      uses: actions/setup-java@v1
+      with:
+        java-version: 17
+
+    - name: Build Gradle
+      run: ./gradlew build
+
+    - name: JAR Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: mypage
+        path: Application/Mypage/build/libs/*.jar
+
+    - name: Deploy Ec2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.MYPAGE_EC2_HOST}}
+        username: ${{ secrets.MYPAGE_EC2_USER}}
+        key: ${{ secrets.MYPAGE_EC2_KEY}}
+        port: 22
+        script:
+          git pull origin feat/member/#6
+          docker-compose down
+          docker-compose up --build -d
+          
