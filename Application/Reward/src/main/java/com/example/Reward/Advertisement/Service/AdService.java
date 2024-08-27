@@ -56,18 +56,23 @@ public class AdService {
 
         List<MediaLink> mediaLinks=mediaLinkRepository.findmedialink(mediaLinkIdList,enterpriseNoneList);
 
+        Collections.shuffle(mediaLinks);
         List<GetInfoResponseDto> getInfoResponseDtos=new ArrayList<>();
 
+        List<String> lists=new ArrayList<>();
         for (MediaLink medialink:mediaLinks){
-            GetInfoResponseDto getInfoResponseDto=GetInfoResponseDto
-                    .builder()
-                    .name(medialink.getEnterpriseName())
-                    .thumbnail(medialink.getThumnail())
-                    .mediaId(medialink.getId())
-                    .thumbnailName(medialink.getThumnailName())
-                    .build();
+            if (!lists.contains(medialink.getEnterpriseName())) {
+                GetInfoResponseDto getInfoResponseDto = GetInfoResponseDto
+                        .builder()
+                        .name(medialink.getEnterpriseName())
+                        .thumbnail(medialink.getThumnail())
+                        .mediaId(medialink.getId())
+                        .thumbnailName(medialink.getThumnailName())
+                        .build();
 
-            getInfoResponseDtos.add(getInfoResponseDto);
+                lists.add(medialink.getEnterpriseName());
+                getInfoResponseDtos.add(getInfoResponseDto);
+            }
         }
 
         Collections.shuffle(getInfoResponseDtos);
