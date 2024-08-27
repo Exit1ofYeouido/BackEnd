@@ -20,7 +20,8 @@ public class ReceiptService {
     public GetEnterpriseResponseDTO findEnterprises() {
         String popupType = "영수증";
         Long memberId = 1L;
-        Boolean popupChecked = popupRepository.exists(popupType, memberId);
+        Long checked = popupRepository.exists(popupType, memberId);
+        Boolean popupChecked = checked > 0;
 
         List<String> enterpriseList = new ArrayList<>();
         List<Event> eventEnterprises = eventRepository.findEventIdAndEnterpriseNameByRewardAmount();
@@ -28,12 +29,10 @@ public class ReceiptService {
             enterpriseList.add(event.getEnterpriseName());
         }
 
-        GetEnterpriseResponseDTO getEnterpriseResponseDTO = GetEnterpriseResponseDTO
+        return GetEnterpriseResponseDTO
                 .builder()
                 .popupChecked(popupChecked)
                 .enterprises(enterpriseList)
                 .build();
-
-        return getEnterpriseResponseDTO;
     }
 }
