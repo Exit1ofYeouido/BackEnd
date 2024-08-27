@@ -1,6 +1,9 @@
 project(":application:mypage") {
 
-	bootJar { enabled = true}
+	bootJar {
+		enabled = true
+		mainClass = 'com.example.Mypage.MypageApplication'
+	}
 	jar { enabled = false }
 
 	ext {
