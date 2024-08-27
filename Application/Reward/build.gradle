@@ -2,7 +2,8 @@ project(":application:reward") {
     tasks.named("bootJar") {
         mainClass.set("com.example.Reward.RewardApplication")
     }
-    jar { enabled = false }
+    bootJar { enabled = true }
+    jar { enabled = true }
 
     ext {
         set('springCloudVersion', "2023.0.2")
