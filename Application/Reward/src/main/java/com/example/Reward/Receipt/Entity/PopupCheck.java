@@ -11,7 +11,7 @@ class PopupCheckKey implements Serializable {
     private String popup_type;
 
     @Column
-    private long mem_id;
+    private long member_id;
 }
 
 
