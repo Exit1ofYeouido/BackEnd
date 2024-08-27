@@ -1,8 +1,7 @@
 project(":application:reward") {
-//    tasks.named("bootJar") {
-//        mainClass.set("com.example.Reward.RewardApplication")
-//    }
-    bootJar { enabled = true }
+    tasks.named("bootJar") {
+        mainClass.set("com.example.Reward.RewardApplication")
+    }
     jar { enabled = false }
 
     ext {
