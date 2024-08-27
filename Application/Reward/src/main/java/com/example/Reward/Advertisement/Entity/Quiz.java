@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-
+@Table(name="quiz")
 public class Quiz {
 
 

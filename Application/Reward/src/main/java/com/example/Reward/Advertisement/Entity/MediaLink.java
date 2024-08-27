@@ -8,6 +8,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
+@Table(name="media_link")
 public class MediaLink {
 
     @Id
