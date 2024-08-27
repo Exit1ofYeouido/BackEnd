@@ -6,6 +6,10 @@ plugins {
 
 bootJar.enabled = false
 
+repositories {
+	mavenCentral() // 또는 필요한 다른 리포지토리
+}
+
 subprojects {
 	group = 'com.stockcraft'
 	version = '0.0.1-SNAPSHOT'
