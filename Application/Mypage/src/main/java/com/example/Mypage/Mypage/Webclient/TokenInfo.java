@@ -20,6 +20,6 @@ public class TokenInfo {
     @GeneratedValue
     private Long id;
 
-    @Size(max=100000)
+    @Size(max=10000)
     private String accessToken;
 }
