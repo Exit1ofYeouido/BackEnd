@@ -1,5 +1,6 @@
 package com.example.Mypage.Mypage.Webclient;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -20,6 +21,6 @@ public class TokenInfo {
     @GeneratedValue
     private Long id;
 
-    @Size(max=10000)
+    @Column(columnDefinition = "TEXT")
     private String accessToken;
 }
