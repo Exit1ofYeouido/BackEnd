@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReceiptController {
     private ReceiptService receiptService;
 
-//    public ReceiptController receiptController(ReceiptService receiptService) {
-//        this.receiptService = receiptService;
-//    }
+    public ReceiptController(ReceiptService receiptService) {
+        this.receiptService = receiptService;
+    }
 
     @GetMapping("/enterprise")
     @Operation(description = "영수증 리워드를 받을 수 있는 기업들의 목록")
