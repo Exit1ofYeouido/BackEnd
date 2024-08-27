@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -52,4 +53,10 @@ public class ReceiptService {
         amazonS3.putObject(bucket, fileKey, inputStream, metadata);
         return fileKey;
     }
+
+    public String convertImage(MultipartFile receiptImg) throws IOException {
+        byte[] fileBytes = receiptImg.getBytes();
+        return Base64.getEncoder().encodeToString(fileBytes);
+    }
+
 }
