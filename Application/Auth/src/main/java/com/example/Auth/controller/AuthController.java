@@ -16,7 +16,7 @@ public class AuthController {
 
     @PostMapping("/reissue")
     @Operation(description = "Access, Refresh 토큰 재발급")
-    public ResponseEntity<?> test(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> reissueTokens(HttpServletRequest request, HttpServletResponse response) {
         HttpServletResponse res = tokenService.reissueRefreshToken(request, response);
         return ResponseEntity.status(res.getStatus()).build();
     }
