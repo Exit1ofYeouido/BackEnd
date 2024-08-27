@@ -100,7 +100,9 @@ public class MyService {
     public void giveStock(GiveStockDto giveStockDto) {
 
         Optional<Member> member=memberRepostory.findById(giveStockDto.getMemId());
-        MemberStock memberStock=memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName(),giveStockDto.getMemId());
+        MemberStock memberStock=memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
+                ,giveStockDto.getMemId());
+
         if (memberStock !=null){
             memberStock.setCount(memberStock.getCount()+giveStockDto.getAmount());
             memberStock.setUpdateAt(LocalDateTime.now());
