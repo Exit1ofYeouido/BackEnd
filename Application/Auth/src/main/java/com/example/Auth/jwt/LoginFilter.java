@@ -2,7 +2,9 @@ package com.example.Auth.jwt;
 
 import com.example.Auth.dto.LoginRequestDTO;
 import com.example.Auth.entity.MemberAuth;
+import com.example.Auth.entity.RefreshToken;
 import com.example.Auth.repository.AuthRepository;
+import com.example.Auth.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,13 +31,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
     private final AuthRepository authRepository;
+    private final TokenService tokenService;
 
     public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, ObjectMapper objectMapper,
-                       AuthRepository authRepository) {
+                       AuthRepository authRepository, TokenService tokenService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.objectMapper = objectMapper;
         this.authRepository = authRepository;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -69,22 +73,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority grantedAuthority = iterator.next();
         String role = grantedAuthority.getAuthority();
 
-        //MemberId 가져오기
         MemberAuth memberAuth = authRepository.findByMemberName(username).orElse(null);
         String memberId = memberAuth.getMemberId().toString();
 
-        //토큰 생성
-        String access = jwtUtil.createJwt("access", memberId, role, 1000 * 60 * 60 * 12L);
-        String refresh = jwtUtil.createJwt("refresh", memberId, role, 1000 * 60 * 60 * 72L);
+        String access = jwtUtil.createJwt("access", memberId, role, TokenExpiration.ACCESS.getExpiredTime());
+        String refresh = jwtUtil.createJwt("refresh", memberId, role, TokenExpiration.REFRESH.getExpiredTime());
 
-        //Refresh 토큰 저장
-        //addRefreshToken(username, refresh, 1000 * 60 * 24L);
+        addRefreshToken(memberId, refresh);
 
-        //응답 생성
-        response.setHeader("access", access);
-        response.addCookie(createCookie("refresh", refresh));
+        response.setHeader("accessToken", access);
+        response.addCookie(createCookie("refreshToken", refresh));
         response.setStatus(HttpStatus.OK.value());
-
     }
 
     @Override
@@ -102,22 +101,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         return cookie;
     }
 
-//    private void addRefreshToken(String username, String refreshToken, Long expiredMs) {
-//
-//        Date date = new Date(System.currentTimeMillis() + expiredMs);
-//
-//        Refresh refresh = new Refresh();
-//        refresh.setUsername(username);
-//        refresh.setRefresh(refreshToken);
-//        refresh.setExpiration(date.toString());
-//
-//        RedisRefresh redisRefresh = new RedisRefresh();
-//        redisRefresh.setId(username);
-//        redisRefresh.setToken(refreshToken);
-//        redisRefresh.setTtl(3600L);
-//
-//        refreshRepository.save(refresh);
-//        tokenRedisRepository.save(redisRefresh);
-//
-//    }
+    private void addRefreshToken(String memberId, String refreshToken) {
+
+        RefreshToken refresh = RefreshToken.builder()
+                .id(memberId)
+                .token(refreshToken)
+                .build();
+
+        if (tokenService.saveRefreshToken(refresh)) {
+            log.info("Refresh token successful saved");
+        } else {
+            log.info("Refresh token failed to save");
+        }
+
+    }
 }

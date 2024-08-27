@@ -31,14 +31,32 @@ public class JWTUtil {
         return null;
     }
 
+    public String getMemberId(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .get("memberId", String.class);
+    }
 
-    public String createJwt(String tokenType, String memberId, String role, Long expriedMs) {
+    public String getMemberRole(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseClaimsJws(token).getBody().get("role", String.class);
+    }
+
+    public Boolean isExpired(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration()
+                .before(new Date());
+    }
+
+    public String getTokenType(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .get("type", String.class);
+    }
+
+    public String createJwt(String tokenType, String memberId, String role, Long expiredMs) {
         return Jwts.builder()
                 .claim("type", tokenType)
                 .claim("memberId", memberId)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expriedMs))
+                .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
     }

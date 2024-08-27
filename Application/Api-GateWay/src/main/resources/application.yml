@@ -37,6 +37,7 @@ spring:
             - Path= ${service-url}/basic/**
           filters:
             - RewritePath=${service-url}/basic/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
         - id: mypage
           uri: http://localhost:8082
           predicates:
@@ -77,8 +78,6 @@ springdoc:
         name: Reward
       - url: ${service-url}/auth/v3/api-docs
         name: Auth
-
-
 
 
 
