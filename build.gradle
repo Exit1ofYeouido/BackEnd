@@ -6,6 +6,10 @@ plugins {
 
 //bootJar.enabled = false
 
+repositories {
+	mavenCentral()
+}
+
 subprojects {
 	group = 'com.stockcraft'
 	version = '0.0.1-SNAPSHOT'
