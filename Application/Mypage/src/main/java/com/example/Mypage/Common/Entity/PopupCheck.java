@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 public class PopupCheck {
     @Id
     @GeneratedValue
+    private Long id;
+
     private String popupType;
 
     private Long memberId;

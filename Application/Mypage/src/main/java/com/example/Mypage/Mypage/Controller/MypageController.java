@@ -45,7 +45,7 @@ public class MypageController {
 
     }
 
-    @PostMapping("notuto")
+    @PostMapping("/notuto")
     public ResponseEntity<?> postTutorialCheck(@RequestParam("type") String type){
 
         //가정

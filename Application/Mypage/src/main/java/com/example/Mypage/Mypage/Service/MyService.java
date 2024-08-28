@@ -151,7 +151,7 @@ public class MyService {
 
     public GetTutorialCheckResponseDto getTutorialCheck(String type, Long memId) {
 
-        PopupCheck popupCheck=popupCheckRepository.findByTypeAndMemId(type,memId);
+        PopupCheck popupCheck=popupCheckRepository.findByPopupTypeAndMemberId(type,memId);
 
         if (popupCheck !=null) {
             return GetTutorialCheckResponseDto.of(true);
