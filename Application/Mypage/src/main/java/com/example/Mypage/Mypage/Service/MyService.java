@@ -13,9 +13,9 @@ import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
 import com.example.Mypage.Mypage.Webclient.ApiService;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.admin.MemberToRemove;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,31 +36,50 @@ public class MyService {
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
         Optional<Member> member = memberRepostory.findById(memId);
         List<MemberStock> memberStock=memberStockRepository.findByMemberId(memId);
-        double calcAssetsEarningRate=CalcAllAsssets(memberStock);
+        String calcAssetsEarningRate=CalcAllAsssets(memberStock);
         List<EarningRate> earningRates=Top3EarningRateAssets(memberStock);
+        int allCost=AllAssetsCount(memberStock);
 
-        return GetAllMyPageResponseDto.of(member.get().getPoint(),calcAssetsEarningRate,earningRates);
+        return GetAllMyPageResponseDto.of(member.get().getPoint(),calcAssetsEarningRate,earningRates,allCost);
 
     }
 
-    private double CalcAllAsssets(List<MemberStock> memberStocks){
+    private String CalcAllAsssets(List<MemberStock> memberStocks){
         double allCost = 0;
         double currentAllCost = 0;
 
         for (MemberStock memberStock: memberStocks){
             double stockcount=memberStock.getCount();
-            int stockprice=memberStock.getAveragePrice();
-            int currentprice=apiService.getPrise(memberStock.getStockCode());
+            double stockprice=memberStock.getAveragePrice();
+            double currentprice=apiService.getPrise(memberStock.getStockCode());
 
-            allCost = allCost + (stockprice) * stockcount;
-            currentAllCost = currentAllCost + (currentprice) *stockcount;
+            allCost = allCost + (stockprice * stockcount);
+            currentAllCost = currentAllCost + (currentprice *stockcount);
 
         }
+
 
         if (allCost>currentAllCost){
-            return -Math.round(((1-(currentAllCost/allCost))*10000)/100);
+            double value = (1 - (currentAllCost / allCost)) * 100;
+            DecimalFormat df=new DecimalFormat("-#.##");
+            return df.format(value);
         }
-        return Math.round(((1-(allCost/currentAllCost))*10000)/100);
+        double value = (1 - (allCost/currentAllCost)) * 100;
+        DecimalFormat df=new DecimalFormat("#.##");
+        return df.format(value);
+    }
+
+    private int AllAssetsCount(List<MemberStock> memberStocks){
+        int allCost = 0;
+
+        for (MemberStock memberStock: memberStocks){
+            double stockcount=memberStock.getCount();
+            int stockprice=memberStock.getAveragePrice();
+            allCost = (int) (allCost + (stockprice * stockcount));
+
+
+        }
+        return allCost;
     }
 
     private List<EarningRate> Top3EarningRateAssets(List<MemberStock> memberStocks) {
@@ -73,12 +92,17 @@ public class MyService {
 
             double stock = stockCount * stockPrice;
             double currentStock = stockCount * currentPrice;
-            double finalEarningRate = 0;
+            String finalEarningRate = null;
 
             if (stock > currentStock) {
-                finalEarningRate = -Math.round(((1 - (currentStock / stock)) * 10000.0) / 100.0);
+                double value = (1 - (currentStock / stock)) * 100;
+                DecimalFormat df=new DecimalFormat("-#.##");
+                finalEarningRate=df.format(value);
+
             } else {
-                finalEarningRate = -Math.round(((1 - (stock / currentStock)) * 10000.0) / 100.0);
+                double value = (1 - (stock/currentStock)) * 100;
+                DecimalFormat df=new DecimalFormat("#.##");
+                finalEarningRate=df.format(value);
             }
 
             EarningRate earningRate=EarningRate.builder()

@@ -10,7 +10,7 @@ public class EarningRate {
 
     private String enterpriseName;
 
-    private double earningRate;
+    private String earningRate;
 
 
 }

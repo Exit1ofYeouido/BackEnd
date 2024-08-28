@@ -11,7 +11,9 @@ import java.util.List;
 @Builder
 public class GetAllMyPageResponseDto {
 
-    private double earningRate;
+    private String earningRate;
+
+    private int allCost;
 
     private String accountName;
 
@@ -22,10 +24,12 @@ public class GetAllMyPageResponseDto {
     private List<EarningRate> earningRates;
 
 
-    public static GetAllMyPageResponseDto of(Long totalPoint, double calcAssetsEarningRate, List<EarningRate> earningRates){
+
+    public static GetAllMyPageResponseDto of(Long totalPoint, String calcAssetsEarningRate, List<EarningRate> earningRates, int allCost){
         GetAccountResponseDto getAccountResponseDto=new GetAccountResponseDto();
 
         return GetAllMyPageResponseDto.builder()
+                .allCost(allCost)
                 .earningRate(calcAssetsEarningRate)
                 .accountName(getAccountResponseDto.getAccountName())
                 .accountId(getAccountResponseDto.getAccountId())
