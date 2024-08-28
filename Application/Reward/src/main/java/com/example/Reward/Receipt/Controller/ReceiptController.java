@@ -34,7 +34,7 @@ public class ReceiptController {
     @Operation(description = "영수증 업로드, 해당 가게가 상장돼있는지 확인")
     public ResponseEntity<CheckReceiptResponseDTO> checkReceipt(@RequestPart("receiptImg") MultipartFile receiptImg) throws IOException {
         String extension = receiptService.getExtension(receiptImg);
-        String receiptURL = receiptService.uploadReceiptToS3(receiptImg, extension);
+        String receiptURL = receiptService.uploadReceiptToS3(receiptImg);
         String receiptData = receiptService.convertImage(receiptImg);
         CheckReceiptResponseDTO checkReceiptResponseDTO = receiptService.analyzeReceipt(receiptData);
         return ResponseEntity.ok(checkReceiptResponseDTO);
