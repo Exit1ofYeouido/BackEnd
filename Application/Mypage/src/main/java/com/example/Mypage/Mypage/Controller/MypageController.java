@@ -24,35 +24,22 @@ public class MypageController {
 
     @GetMapping("/all")
     @Operation(description = "마이페이지 종합")
-    public ResponseEntity<GetAllMyPageResponseDto> getAllMypage(){
-
-        Long memid=1L;
-        GetAllMyPageResponseDto getAllMyPageResponseDto =myService.getAllMyPage(memid);
-
+    public ResponseEntity<GetAllMyPageResponseDto> getAllMypage(@RequestHeader("memberId") String memberId){
+        GetAllMyPageResponseDto getAllMyPageResponseDto =myService.getAllMyPage(Long.valueOf(memberId));
         return ResponseEntity.ok(getAllMyPageResponseDto);
-
-
     }
     @GetMapping("/check")
-    public ResponseEntity<?> getTutorialCheck(@RequestParam("type") String type){
-
-        //가정
-        Long memId=1L;
-        GetTutorialCheckResponseDto getTutorialCheckResponseDto=myService.getTutorialCheck(type,memId);
-
+    @Operation()
+    public ResponseEntity<?> getTutorialCheck(@RequestParam("type") String type,@RequestHeader("memberId") String memberId){
+        GetTutorialCheckResponseDto getTutorialCheckResponseDto=myService.getTutorialCheck(type,Long.valueOf(memberId));
         return ResponseEntity.ok(getTutorialCheckResponseDto);
-
-
     }
 
     @PostMapping("/notuto")
-    public ResponseEntity<?> postTutorialCheck(@RequestParam("type") String type){
-
-        //가정
-        Long memid=1L;
-        myService.saveTutorialCheck(type,memid);
+    public ResponseEntity<?> postTutorialCheck(@RequestParam("type") String type,@RequestHeader("memberId") String memberId){
 
 
+        myService.saveTutorialCheck(type,Long.valueOf(memberId));
         return ResponseEntity.ok("");
     }
 
