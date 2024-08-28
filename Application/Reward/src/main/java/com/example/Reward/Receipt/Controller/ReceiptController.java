@@ -1,16 +1,15 @@
 package com.example.Reward.Receipt.Controller;
 
 import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
+import com.example.Reward.Receipt.Dto.out.AnalyzeReceiptDTO;
 import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
-import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
-import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
+import com.example.Reward.Receipt.Dto.out.GetEnterpriseListDTO;
 import com.example.Reward.Receipt.Service.ReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -26,9 +25,9 @@ public class ReceiptController {
 
     @GetMapping("/enterprise")
     @Operation(description = "영수증 리워드를 받을 수 있는 기업들의 목록")
-    public ResponseEntity<GetEnterpriseResponseDTO> getEnterprise() {
-        GetEnterpriseResponseDTO getEnterpriseResponseDTO = receiptService.getEnterpriseList();
-        return ResponseEntity.ok(getEnterpriseResponseDTO);
+    public ResponseEntity<GetEnterpriseListDTO> getEnterprise() {
+        GetEnterpriseListDTO getEnterpriseListDTO = receiptService.getEnterpriseList();
+        return ResponseEntity.ok(getEnterpriseListDTO);
     }
 
     @PostMapping("/check")
@@ -37,16 +36,18 @@ public class ReceiptController {
         String extension = receiptService.getExtension(receiptImg);
         String receiptURL = receiptService.uploadReceiptToS3(receiptImg);
         String receiptData = receiptService.convertImage(receiptImg);
-        CheckReceiptResponseDTO checkReceiptResponseDTO = receiptService.analyzeReceipt(receiptData, extension);
-        GetEnterpriseResponseDTO getEnterpriseResponseDTO = receiptService.getEnterpriseList();
-        String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseResponseDTO.getEnterprises(), checkReceiptResponseDTO.getStoreName());
-        if(checkedEnterpriseName.equals("")) {
-            checkReceiptResponseDTO.setFind(false);
-        } else {
-            checkReceiptResponseDTO.setFind(true);
-            checkReceiptResponseDTO.setEnterpriseName(checkedEnterpriseName);
-        }
-        checkReceiptResponseDTO.setImgURL(receiptURL);
+        AnalyzeReceiptDTO analyzeReceiptDTO = receiptService.analyzeReceipt(receiptData, extension);
+        GetEnterpriseListDTO getEnterpriseListDTO = receiptService.getEnterpriseList();
+        String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseListDTO.getEnterprises(), analyzeReceiptDTO.getStoreName());
+        CheckReceiptResponseDTO checkReceiptResponseDTO = CheckReceiptResponseDTO.builder()
+                .find(checkedEnterpriseName.isEmpty() ? false:true)
+                .storeName(analyzeReceiptDTO.getStoreName())
+                .price(analyzeReceiptDTO.getPrice())
+                .dealTime(analyzeReceiptDTO.getDealTime())
+                .approvalNum(analyzeReceiptDTO.getApprovalNum())
+                .imgURL(receiptURL)
+                .enterpriseName(checkedEnterpriseName)
+                .build();
         return ResponseEntity.ok(checkReceiptResponseDTO);
     }
 

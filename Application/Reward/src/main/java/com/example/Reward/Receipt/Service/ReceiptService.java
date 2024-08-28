@@ -2,9 +2,9 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
+import com.example.Reward.Receipt.Dto.out.AnalyzeReceiptDTO;
 import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
-import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
+import com.example.Reward.Receipt.Dto.out.GetEnterpriseListDTO;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.Event;
 import com.example.Reward.Receipt.Repository.EventRepository;
@@ -39,14 +39,14 @@ public class ReceiptService {
     @Value("${appSecret}")
     private String appSecret;
 
-    public GetEnterpriseResponseDTO getEnterpriseList() {
+    public GetEnterpriseListDTO getEnterpriseList() {
         List<String> enterpriseList = new ArrayList<>();
         List<Event> eventEnterprises = eventRepository.findEventIdAndEnterpriseNameByRewardAmount();
         for(Event event : eventEnterprises) {
             enterpriseList.add(event.getEnterpriseName());
         }
 
-        return GetEnterpriseResponseDTO
+        return GetEnterpriseListDTO
                 .builder()
                 .enterprises(enterpriseList)
                 .build();
@@ -86,7 +86,7 @@ public class ReceiptService {
         return Base64.getEncoder().encodeToString(fileBytes);
     }
 
-    public CheckReceiptResponseDTO analyzeReceipt(String receiptData, String extension) {
+    public AnalyzeReceiptDTO analyzeReceipt(String receiptData, String extension) {
         String url = OCR_BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
         List<Map<String, String>> imageDataList = new ArrayList<>();
         Map<String, String> imageData = new HashMap<>();
@@ -124,7 +124,7 @@ public class ReceiptService {
         String dealTime = dealTimeBuilder.toString();
         String approvalNum = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getConfirmNum().getText();
 
-        return CheckReceiptResponseDTO.builder()
+        return AnalyzeReceiptDTO.builder()
                 .storeName(storeName)
                 .price(price)
                 .dealTime(dealTime)
@@ -153,7 +153,6 @@ public class ReceiptService {
                 .retrieve()
                 .bodyToMono(PresentPriceDTO.class);
         PresentPriceDTO result = response.block();
-        System.out.println("======================"+result.getOutput().getStck_prpr());
         return result.getOutput().getStck_prpr();
     }
 }

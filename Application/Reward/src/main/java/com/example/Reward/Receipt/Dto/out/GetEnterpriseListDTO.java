@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GetEnterpriseResponseDTO {
+public class GetEnterpriseListDTO {
 
     private List<String> enterprises;
 
