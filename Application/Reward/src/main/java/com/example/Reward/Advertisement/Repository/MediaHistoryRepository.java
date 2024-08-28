@@ -11,7 +11,6 @@ import java.util.List;
 public interface MediaHistoryRepository extends JpaRepository<MediaHistory,Long> {
     List<MediaHistory> findBymemberId(Long memId);
 
-    @Query(nativeQuery = true,value="SELECT * FROM media_history as m WHERE :memId =m.member_id AND :id=m.media_link_id")
-    MediaHistory findByMemberIdAndMediaId(@Param("memId") Long memId,@Param("id") Long id);
+    MediaHistory findByMemberIdAndMediaLinkId( Long memId, Long id);
 }
 

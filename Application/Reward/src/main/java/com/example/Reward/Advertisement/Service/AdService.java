@@ -60,6 +60,7 @@ public class AdService {
         Collections.shuffle(mediaLinks);
         List<GetInfoResponseDto> getInfoResponseDtos=new ArrayList<>();
 
+
         List<String> lists=new ArrayList<>();
         for (MediaLink medialink:mediaLinks){
             if (!lists.contains(medialink.getEnterpriseName())) {
@@ -106,7 +107,7 @@ public class AdService {
 
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
 
-        MediaHistory mediaHistory=mediaHistoryRepository.findByMemberIdAndMediaId(memId,mediaLink.get().getId());
+        MediaHistory mediaHistory=mediaHistoryRepository.findByMemberIdAndMediaLinkId(memId,mediaLink.get().getId());
         if (mediaHistory ==null) {
             MediaHistory new_mediaHistory = MediaHistory.builder().memberId(memId).mediaLink(mediaLink.get()).build();
             mediaHistoryRepository.save(new_mediaHistory);
@@ -115,13 +116,16 @@ public class AdService {
 
         //오늘봤던 checkToday 체크 (중복제외 로직 포함)
         CheckToday checkToday=checkTodayRepository.findByEnterpriseNameAndMemberId(giveStockRequestDto.getEnterpriseName(),memId);
-        if (checkToday.getEnterpriseName()!=giveStockRequestDto.getEnterpriseName()){
-            throw new NotMatchedEnterpriseName(checkToday.getEnterpriseName(),giveStockRequestDto.getEnterpriseName());
-        }
         if (checkToday ==null) {
+            System.out.println("하하");
             CheckToday new_checkToday = CheckToday.builder().enterpriseName(giveStockRequestDto.getEnterpriseName()).memberId(memId).build();
             checkTodayRepository.save(new_checkToday);
+            checkToday=new_checkToday;
         }
+        if (!checkToday.getEnterpriseName().equals(giveStockRequestDto.getEnterpriseName())){
+            throw new NotMatchedEnterpriseName(checkToday.getEnterpriseName(),giveStockRequestDto.getEnterpriseName());
+        }
+
 
         //만일 된다면 주식 가격을 불러오고 주식 100원마치 0.x주를 줘야함+event 삭제
 
