@@ -19,6 +19,9 @@ project(":application:auth") {
         implementation "io.jsonwebtoken:jjwt-jackson:0.12.3"
 
         implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.3.0'
+
+        implementation 'org.springframework.kafka:spring-kafka'
+        testImplementation 'org.springframework.kafka:spring-kafka-test'
     }
 
     dependencyManagement {
