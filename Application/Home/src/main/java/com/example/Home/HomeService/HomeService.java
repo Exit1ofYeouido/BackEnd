@@ -97,7 +97,6 @@ public class HomeService {
             System.out.println("내가 샀을 때 평균가 : "+ totalPurchaseValue);
         }
         double earningRate = ((totalCurrentValue - totalPurchaseValue) / totalPurchaseValue) * 100;
-
         return Math.round(earningRate*100.0) / 100.0;
     }
 }
