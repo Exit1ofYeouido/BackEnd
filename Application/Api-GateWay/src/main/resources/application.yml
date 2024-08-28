@@ -53,6 +53,12 @@ spring:
             - Path= ${service-url}/search/**
           filters:
             - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
+        - id: home
+          uri: http://localhost:8085
+          predicates:
+            - Path= ${service-url}/home/**
+          filters:
+            - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
 
 
 springdoc:
@@ -75,6 +81,8 @@ springdoc:
         name: Reward
       - url: ${service-url}/search/v3/api-docs
         name: Search
+      - url: ${service-url}/home/v3/api-docs
+        name: Home
 
 
 

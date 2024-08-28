@@ -5,4 +5,5 @@ include 'application:basic'
 include 'application:reward'
 include 'application:mypage'
 include 'application:search'
+include 'application:home'
 
