@@ -7,7 +7,6 @@ import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
 import com.example.Reward.Receipt.Entity.Event;
 import com.example.Reward.Receipt.Repository.EventRepository;
-import com.example.Reward.Receipt.Repository.PopupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import java.util.*;
 public class ReceiptService {
 
     private final EventRepository eventRepository;
-    private final PopupRepository popupRepository;
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -34,11 +32,6 @@ public class ReceiptService {
     private static final String BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
 
     public GetEnterpriseResponseDTO findEnterprises() {
-        String popupType = "영수증";
-        Long memberId = 1L;
-        Long checked = popupRepository.exists(popupType, memberId);
-        Boolean popupChecked = checked > 0;
-
         List<String> enterpriseList = new ArrayList<>();
         List<Event> eventEnterprises = eventRepository.findEventIdAndEnterpriseNameByRewardAmount();
         for(Event event : eventEnterprises) {
@@ -47,11 +40,9 @@ public class ReceiptService {
 
         return GetEnterpriseResponseDTO
                 .builder()
-                .popupChecked(popupChecked)
                 .enterprises(enterpriseList)
                 .build();
     }
-
 
     public String getExtension(MultipartFile receiptImg) {
         String originalFileName = receiptImg.getOriginalFilename();
