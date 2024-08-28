@@ -40,5 +40,17 @@ public class AdExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(NotMatchedEnterpriseName.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    private ResponseEntity<AdResponse> handler(NotMatchedEnterpriseName e) {
+
+        AdResponse response = AdResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .data(e.getCurrentName())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
 
 }

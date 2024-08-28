@@ -8,6 +8,7 @@ import com.example.Reward.Advertisement.Entity.MediaHistory;
 import com.example.Reward.Advertisement.Entity.MediaLink;
 import com.example.Reward.Advertisement.Entity.Quiz;
 import com.example.Reward.Advertisement.Exception.NoStockException;
+import com.example.Reward.Advertisement.Exception.NotMatchedEnterpriseName;
 import com.example.Reward.Advertisement.Kafka.Service.KafkaOutputService;
 import com.example.Reward.Advertisement.Repository.CheckTodayRepository;
 import com.example.Reward.Advertisement.Repository.MediaHistoryRepository;
@@ -114,6 +115,9 @@ public class AdService {
 
         //오늘봤던 checkToday 체크 (중복제외 로직 포함)
         CheckToday checkToday=checkTodayRepository.findByEnterpriseNameANDMemberId(giveStockRequestDto.getEnterpriseName(),memId);
+        if (checkToday.getEnterpriseName()!=giveStockRequestDto.getEnterpriseName()){
+            throw new NotMatchedEnterpriseName(checkToday.getEnterpriseName(),giveStockRequestDto.getEnterpriseName());
+        }
         if (checkToday ==null) {
             CheckToday new_checkToday = CheckToday.builder().enterpriseName(giveStockRequestDto.getEnterpriseName()).memberId(memId).build();
             checkTodayRepository.save(new_checkToday);
