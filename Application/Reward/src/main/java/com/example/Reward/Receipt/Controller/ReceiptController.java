@@ -28,14 +28,23 @@ public class ReceiptController {
         return ResponseEntity.ok(getEnterpriseResponseDTO);
     }
 
-
     @PostMapping("check")
     @Operation(description = "영수증 업로드, 해당 가게가 상장돼있는지 확인")
     public ResponseEntity<CheckReceiptResponseDTO> checkReceipt(@RequestPart("receiptImg") MultipartFile receiptImg) throws IOException {
         String extension = receiptService.getExtension(receiptImg);
         String receiptURL = receiptService.uploadReceiptToS3(receiptImg);
         String receiptData = receiptService.convertImage(receiptImg);
-        CheckReceiptResponseDTO checkReceiptResponseDTO = receiptService.analyzeReceipt(receiptData);
+        CheckReceiptResponseDTO checkReceiptResponseDTO = receiptService.analyzeReceipt(receiptData, extension);
+        GetEnterpriseResponseDTO getEnterpriseResponseDTO = receiptService.getEnterpriseList();
+        String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseResponseDTO.getEnterprises(), checkReceiptResponseDTO.getStoreName());
+        if(checkedEnterpriseName.equals("")) {
+            checkReceiptResponseDTO.setFind(false);
+            System.out.println("hi");
+        } else {
+            checkReceiptResponseDTO.setFind(true);
+            checkReceiptResponseDTO.setEnterpriseName(checkedEnterpriseName);
+        }
+        checkReceiptResponseDTO.setImgURL(receiptURL);
         return ResponseEntity.ok(checkReceiptResponseDTO);
     }
 }

@@ -77,11 +77,11 @@ public class ReceiptService {
         return Base64.getEncoder().encodeToString(fileBytes);
     }
 
-    public CheckReceiptResponseDTO analyzeReceipt(String receiptData) {
+    public CheckReceiptResponseDTO analyzeReceipt(String receiptData, String extension) {
         String url = BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
         List<Map<String, String>> imageDataList = new ArrayList<>();
         Map<String, String> imageData = new HashMap<>();
-        imageData.put("format", "jpg");
+        imageData.put("format", extension);
         imageData.put("data", receiptData);
         imageData.put("name", "receipt4");
 
@@ -121,5 +121,14 @@ public class ReceiptService {
                 .dealTime(dealTime)
                 .approvalNum(approvalNum)
                 .build();
+    }
+
+    public String checkEnterpriseName(List<String> enterprises, String storeName) {
+        for(String name : enterprises) {
+            if(storeName.contains(name)) {
+                return name;
+            }
+        }
+        return "";
     }
 }

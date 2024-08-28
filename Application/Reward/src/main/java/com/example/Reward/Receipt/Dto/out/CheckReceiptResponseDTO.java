@@ -2,11 +2,13 @@ package com.example.Reward.Receipt.Dto.out;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Builder
 public class CheckReceiptResponseDTO {
 
+    @Setter
     private boolean find;
 
     private String storeName;
@@ -17,7 +19,9 @@ public class CheckReceiptResponseDTO {
 
     private String approvalNum;
 
+    @Setter
     private String imgURL;
 
+    @Setter
     private String enterpriseName;
 }
