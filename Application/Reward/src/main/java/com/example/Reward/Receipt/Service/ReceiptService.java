@@ -52,9 +52,30 @@ public class ReceiptService {
                 .build();
     }
 
-    public String uploadReceiptToS3(MultipartFile receiptImg) throws IOException {
+
+    public String getExtension(MultipartFile receiptImg) {
+        String originalFileName = receiptImg.getOriginalFilename();
+        if(originalFileName != null && originalFileName.contains(".")) {
+            return originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        }
+        else  {
+            String contentType = receiptImg.getContentType();
+            if(contentType != null) {
+                return switch (contentType) {
+                    case "image/jpeg", "image/jpg" -> "jpg";
+                    case "image/png" -> "png";
+                    default -> null;
+                };
+            }
+            return null;
+        }
+    }
+
+    public String uploadReceiptToS3(MultipartFile receiptImg, String extension) throws IOException {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(receiptImg.getSize());
+        String contentType = new StringBuilder().append("image/").append(extension).toString();
+        metadata.setContentType(contentType);
         InputStream inputStream = receiptImg.getInputStream();
         String fileKey = receiptImg.getOriginalFilename();
         amazonS3.putObject(bucket, fileKey, inputStream, metadata);
