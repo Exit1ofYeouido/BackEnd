@@ -1,5 +1,10 @@
 package com.example.Reward.Receipt.Dto.out;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
 public class CheckReceiptResponseDTO {
 
     private boolean find;

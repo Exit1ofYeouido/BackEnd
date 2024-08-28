@@ -1,5 +1,6 @@
 package com.example.Reward.Receipt.Controller;
 
+import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
 import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
 import com.example.Reward.Receipt.Service.ReceiptService;
@@ -31,10 +32,10 @@ public class ReceiptController {
 
     @PostMapping("check")
     @Operation(description = "영수증 업로드, 해당 가게가 상장돼있는지 확인")
-    public ResponseEntity<OCRResponseDTO> checkReceipt(@RequestPart("receiptImg") MultipartFile receiptImg) throws IOException {
+    public ResponseEntity<CheckReceiptResponseDTO> checkReceipt(@RequestPart("receiptImg") MultipartFile receiptImg) throws IOException {
         String receiptURL = receiptService.uploadReceiptToS3(receiptImg);
         String receiptData = receiptService.convertImage(receiptImg);
-        OCRResponseDTO ocrResponseDTO = receiptService.analyzeReceipt(receiptData);
-        return ResponseEntity.ok(ocrResponseDTO);
+        CheckReceiptResponseDTO checkReceiptResponseDTO = receiptService.analyzeReceipt(receiptData);
+        return ResponseEntity.ok(checkReceiptResponseDTO);
     }
 }

@@ -2,6 +2,7 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
 import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
 import com.example.Reward.Receipt.Entity.Event;
@@ -65,7 +66,7 @@ public class ReceiptService {
         return Base64.getEncoder().encodeToString(fileBytes);
     }
 
-    public OCRResponseDTO analyzeReceipt(String receiptData) {
+    public CheckReceiptResponseDTO analyzeReceipt(String receiptData) {
         String url = BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
         List<Map<String, String>> imageDataList = new ArrayList<>();
         Map<String, String> imageData = new HashMap<>();
@@ -90,6 +91,24 @@ public class ReceiptService {
                 .retrieve()
                 .bodyToMono(OCRResponseDTO.class);
 
-        return response.block();
+        OCRResponseDTO ocrResponseDTO = response.block();
+
+        String storeName = ocrResponseDTO.getImages()[0].getReceipt().getResult().getStoreInfo().getName().getText();
+        String price = ocrResponseDTO.getImages()[0].getReceipt().getResult().getTotalPrice().getPrice().getText();
+        String date = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getDate().getText();
+        String time = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getTime().getText();
+        StringBuilder dealTimeBuilder = new StringBuilder();
+        dealTimeBuilder.append(date)
+                .append(" ")
+                .append(time);
+        String dealTime = dealTimeBuilder.toString();
+        String approvalNum = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getConfirmNum().getText();
+
+        return CheckReceiptResponseDTO.builder()
+                .storeName(storeName)
+                .price(price)
+                .dealTime(dealTime)
+                .approvalNum(approvalNum)
+                .build();
     }
 }
