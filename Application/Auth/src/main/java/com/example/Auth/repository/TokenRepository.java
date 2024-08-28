@@ -21,4 +21,9 @@ public class TokenRepository {
         redisTemplate.opsForValue().set(refreshToken.getId(), refreshToken);
         redisTemplate.expire(refreshToken.getId(), TokenExpiration.REFRESH.getExpiredTime(), TimeUnit.SECONDS);
     }
+
+    public void deleteById(String key) {
+        //TODO: 반환타입 수정
+        redisTemplate.delete(key);
+    }
 }
