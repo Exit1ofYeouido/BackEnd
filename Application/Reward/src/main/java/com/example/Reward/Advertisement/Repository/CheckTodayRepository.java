@@ -10,6 +10,6 @@ import java.util.List;
 public interface CheckTodayRepository extends JpaRepository<CheckToday,Long> {
     List<CheckToday> findBymemberId(Long memId);
 
-    @Query("SELECT c FROM check_today c WHERE :enterpriseName =c.enterprise_name AND c.member_id =:memId")
-    CheckToday findByEnterpriseNameANDMemberId(@Param("enterpriseName") String enterpriseName,@Param("memId") Long memId);
+    @Query(nativeQuery = true,value= "SELECT * FROM check_today as c WHERE :enterpriseName =c.enterprise_name AND c.member_id =:memId")
+    CheckToday findByEnterpriseNameAndMemberId(@Param("enterpriseName") String enterpriseName,@Param("memId") Long memId);
 }
