@@ -97,10 +97,8 @@ public class AdService {
     }
 
 
-    public GiveStockResponseDto giveStock(Long mediaId, GiveStockRequestDto giveStockRequestDto) {
+    public GiveStockResponseDto giveStock(Long mediaId, GiveStockRequestDto giveStockRequestDto,Long memId) {
 
-        //토큰화 되면 memid 받을예정(미완)
-        Long memId= 1L;
 
 
         //미디어 시청내역 체크  (중복제외 로직 포함)

@@ -6,6 +6,8 @@ import com.example.Reward.Advertisement.Service.AdService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -18,11 +20,11 @@ public class AdController {
 
 
     private final AdService adService;
+
     @GetMapping("/info")
     @Operation(description = "광고 의뢰한 기업들의 목록")
-    public ResponseEntity<List<GetInfoResponseDto>> getInfo(){
-        Long memId=1L;
-        List<GetInfoResponseDto> getInfoResponseDtos=adService.getAdInfo(memId);
+    public ResponseEntity<List<GetInfoResponseDto>> getInfo(@RequestHeader("memberId") String memberId){
+        List<GetInfoResponseDto> getInfoResponseDtos=adService.getAdInfo(Long.valueOf(memberId));
         return ResponseEntity.ok(getInfoResponseDtos);
     }
 
@@ -42,10 +44,9 @@ public class AdController {
 
     @PostMapping("/{media_id}/quiz")
     @Operation(description = "퀴즈 맞추고 주식 제공")
-    public ResponseEntity<GiveStockResponseDto > saveQuiz(@PathVariable Long media_id, @RequestBody GiveStockRequestDto giveStockRequestDto){
-
+    public ResponseEntity<GiveStockResponseDto > saveQuiz(@PathVariable Long media_id, @RequestBody GiveStockRequestDto giveStockRequestDto,@RequestHeader("memberId") String memberId){
         //멤버 아이디 추가
-        GiveStockResponseDto giveStockResponseDto =adService.giveStock(media_id,giveStockRequestDto);
+        GiveStockResponseDto giveStockResponseDto =adService.giveStock(media_id,giveStockRequestDto,Long.valueOf(memberId));
         return ResponseEntity.ok(giveStockResponseDto);
 
     }
