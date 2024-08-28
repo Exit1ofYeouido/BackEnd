@@ -13,8 +13,6 @@ import java.util.List;
 @Builder
 public class GetEnterpriseResponseDTO {
 
-    private boolean popupChecked;
-
     private List<String> enterprises;
 
 }
