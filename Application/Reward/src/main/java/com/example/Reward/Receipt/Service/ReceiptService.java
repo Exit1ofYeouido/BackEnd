@@ -2,16 +2,18 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
 import com.example.Reward.Receipt.Entity.Event;
 import com.example.Reward.Receipt.Repository.EventRepository;
 import com.example.Reward.Receipt.Repository.PopupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -25,6 +27,10 @@ public class ReceiptService {
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+    private final WebClient webClient;
+    @Value("${x-ocr-secret}")
+    private String ocrSecret;
+    private static final String BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
 
     public GetEnterpriseResponseDTO findEnterprises() {
         String popupType = "영수증";
@@ -59,4 +65,31 @@ public class ReceiptService {
         return Base64.getEncoder().encodeToString(fileBytes);
     }
 
+    public OCRResponseDTO analyzeReceipt(String receiptData) {
+        String url = BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
+        List<Map<String, String>> imageDataList = new ArrayList<>();
+        Map<String, String> imageData = new HashMap<>();
+        imageData.put("format", "jpg");
+        imageData.put("data", receiptData);
+        imageData.put("name", "receipt4");
+
+        imageDataList.add(imageData);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("images", imageDataList);
+        requestBody.put("lang", "ko");
+        requestBody.put("requestId", "string");
+        requestBody.put("timestamp", System.currentTimeMillis());
+        requestBody.put("version", "V2");
+
+        Mono<OCRResponseDTO> response = webClient.post()
+                .uri(url)
+                .header("X-OCR-SECRET", ocrSecret)
+                .header("Content-Type", "application/json")
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(OCRResponseDTO.class);
+
+        return response.block();
+    }
 }

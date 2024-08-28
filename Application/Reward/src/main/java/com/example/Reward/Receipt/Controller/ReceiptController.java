@@ -1,13 +1,15 @@
 package com.example.Reward.Receipt.Controller;
 
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
+import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
 import com.example.Reward.Receipt.Service.ReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/receipt")
@@ -31,5 +33,8 @@ public class ReceiptController {
     @Operation(description = "영수증 업로드, 해당 가게가 상장돼있는지 확인")
     public ResponseEntity<OCRResponseDTO> checkReceipt(@RequestPart("receiptImg") MultipartFile receiptImg) throws IOException {
         String receiptURL = receiptService.uploadReceiptToS3(receiptImg);
+        String receiptData = receiptService.convertImage(receiptImg);
         OCRResponseDTO ocrResponseDTO = receiptService.analyzeReceipt(receiptData);
+        return ResponseEntity.ok(ocrResponseDTO);
+    }
 }
