@@ -1,13 +1,16 @@
 package com.example.Reward.Receipt.Controller;
 
+import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
+import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Service.ReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -28,7 +31,7 @@ public class ReceiptController {
         return ResponseEntity.ok(getEnterpriseResponseDTO);
     }
 
-    @PostMapping("check")
+    @PostMapping("/check")
     @Operation(description = "영수증 OCR 요청 후 해당 가게가 상장돼 있는지 확인")
     public ResponseEntity<CheckReceiptResponseDTO> checkReceipt(@RequestPart("receiptImg") MultipartFile receiptImg) throws IOException {
         String extension = receiptService.getExtension(receiptImg);
@@ -39,7 +42,6 @@ public class ReceiptController {
         String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseResponseDTO.getEnterprises(), checkReceiptResponseDTO.getStoreName());
         if(checkedEnterpriseName.equals("")) {
             checkReceiptResponseDTO.setFind(false);
-            System.out.println("hi");
         } else {
             checkReceiptResponseDTO.setFind(true);
             checkReceiptResponseDTO.setEnterpriseName(checkedEnterpriseName);
@@ -47,4 +49,17 @@ public class ReceiptController {
         checkReceiptResponseDTO.setImgURL(receiptURL);
         return ResponseEntity.ok(checkReceiptResponseDTO);
     }
+
+    @PostMapping("/")
+    @Operation(description = "사용자 확인 후 영수증 정보 저장 및 리워드 제공")
+    public ResponseEntity<Integer> rewardStock(@RequestBody RewardRequestDTO rewardRequestDTO) {
+        Long memberId = 1L;
+        Integer priceOfStock = receiptService.getPrice(rewardRequestDTO.getEnterpriseName());
+//        double amountOfStock = receiptService.calDecimal(priceOfStock);
+//        receiptService.giveStock();
+//        receiptService.saveReceipt();
+        return ResponseEntity.ok(priceOfStock);
+
+    }
+
 }

@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
 import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
+import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.Event;
 import com.example.Reward.Receipt.Repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,14 @@ public class ReceiptService {
     private final WebClient webClient;
     @Value("${x-ocr-secret}")
     private String ocrSecret;
-    private static final String BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
+    private static final String OCR_BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
+    private static final String STOCK_BASE_URL = "https://openapi.koreainvestment.com:9443";
+    @Value("${authorization}")
+    private String authorization;
+    @Value("${appKey}")
+    private String appKey;
+    @Value("${appSecret}")
+    private String appSecret;
 
     public GetEnterpriseResponseDTO getEnterpriseList() {
         List<String> enterpriseList = new ArrayList<>();
@@ -79,7 +87,7 @@ public class ReceiptService {
     }
 
     public CheckReceiptResponseDTO analyzeReceipt(String receiptData, String extension) {
-        String url = BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
+        String url = OCR_BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
         List<Map<String, String>> imageDataList = new ArrayList<>();
         Map<String, String> imageData = new HashMap<>();
         imageData.put("format", extension);
@@ -131,5 +139,21 @@ public class ReceiptService {
             }
         }
         return "";
+    }
+
+
+    public Integer getPrice(String enterpriseName) {
+        String stockCode = eventRepository.findByEnterpriseName(enterpriseName);
+        Mono<PresentPriceDTO> response = webClient.get()
+                .uri(STOCK_BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-price?FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={param}", stockCode)
+                .header("authorization", "Bearer " + authorization)
+                .header("appkey", appKey)
+                .header("appsecret", appSecret)
+                .header("tr_id", "FHKST01010100")
+                .retrieve()
+                .bodyToMono(PresentPriceDTO.class);
+        PresentPriceDTO result = response.block();
+        System.out.println("======================"+result.getOutput().getStck_prpr());
+        return result.getOutput().getStck_prpr();
     }
 }

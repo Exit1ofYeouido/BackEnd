@@ -40,3 +40,7 @@ cloud:
         static: ${CLOUD_AWS_REGION_STATIC}
       s3:
         bucket: ${CLOUD_AWS_S3_BUCKET}
+
+authorization: ${AUTHORIZATION}
+appKey: ${APPKEY}
+appSecret: ${APPSECRET}
