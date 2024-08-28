@@ -2,7 +2,6 @@ package com.example.Reward.Receipt.Controller;
 
 import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseResponseDTO;
-import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
 import com.example.Reward.Receipt.Service.ReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +24,7 @@ public class ReceiptController {
     @GetMapping("/enterprise")
     @Operation(description = "영수증 리워드를 받을 수 있는 기업들의 목록")
     public ResponseEntity<GetEnterpriseResponseDTO> getEnterprise() {
-        GetEnterpriseResponseDTO getEnterpriseResponseDTO = receiptService.findEnterprises();
+        GetEnterpriseResponseDTO getEnterpriseResponseDTO = receiptService.getEnterpriseList();
         return ResponseEntity.ok(getEnterpriseResponseDTO);
     }
 

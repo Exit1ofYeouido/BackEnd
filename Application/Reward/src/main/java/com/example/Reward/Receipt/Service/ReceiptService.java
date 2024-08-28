@@ -31,7 +31,7 @@ public class ReceiptService {
     private String ocrSecret;
     private static final String BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
 
-    public GetEnterpriseResponseDTO findEnterprises() {
+    public GetEnterpriseResponseDTO getEnterpriseList() {
         List<String> enterpriseList = new ArrayList<>();
         List<Event> eventEnterprises = eventRepository.findEventIdAndEnterpriseNameByRewardAmount();
         for(Event event : eventEnterprises) {
