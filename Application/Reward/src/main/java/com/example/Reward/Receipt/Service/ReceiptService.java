@@ -55,6 +55,7 @@ public class ReceiptService {
                 return switch (contentType) {
                     case "image/jpeg", "image/jpg" -> "jpg";
                     case "image/png" -> "png";
+                    case "image/svg" -> "svg";
                     default -> null;
                 };
             }
