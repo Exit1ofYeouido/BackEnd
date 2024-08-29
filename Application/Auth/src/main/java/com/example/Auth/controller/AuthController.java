@@ -2,6 +2,7 @@ package com.example.Auth.controller;
 
 import com.example.Auth.dto.PhoneVerificationRequestDTO;
 import com.example.Auth.dto.PhoneVerificationVerifyRequestDTO;
+import com.example.Auth.service.AuthService;
 import com.example.Auth.service.TokenService;
 import com.example.Auth.service.VerificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,8 @@ import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,15 +28,18 @@ public class AuthController {
     private final TokenService tokenService;
     private final DefaultMessageService messageService;
     private final VerificationService verificationService;
+    private final AuthService authService;
 
     public AuthController(@Value("${coolsms.apikey}") String apiKey,
                           @Value("${coolsms.apisecret}") String apiSecretKey,
                           VerificationService verificationService,
-                          TokenService tokenService) {
+                          TokenService tokenService,
+                          AuthService authService) {
 
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecretKey, "https://api.coolsms.co.kr");
         this.verificationService = verificationService;
         this.tokenService = tokenService;
+        this.authService = authService;
     }
 
     @PostMapping("/reissue")
@@ -72,6 +78,13 @@ public class AuthController {
         }
 
         return new ResponseEntity<>("유효하지 않은 인증번호 입니다.", HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("/check-username/{username}")
+    @Operation(description = "중복된 유저ID가 있는지 확인하는 API")
+    public ResponseEntity<Boolean> checkUsernameExists(@PathVariable String username) {
+        Boolean isExist = authService.checkMembername(username);
+        return new ResponseEntity<>(isExist, HttpStatus.OK);
     }
 
 }

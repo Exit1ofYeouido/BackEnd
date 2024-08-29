@@ -69,7 +69,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             subject = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(jwt)
                     .getPayload().get("memberId", String.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return !Strings.isBlank(subject);
     }

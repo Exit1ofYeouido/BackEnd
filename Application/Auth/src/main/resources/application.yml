@@ -47,3 +47,5 @@ springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   packages-to-scan: com.example
+  show-login-endpoint: true
+
