@@ -131,6 +131,10 @@ public class MyService {
 
         if (memberStock !=null){
             memberStock.setCount(memberStock.getCount()+giveStockDto.getAmount());
+            int avgPrice= (int) ((memberStock.getCount()*memberStock.getAveragePrice()+
+                                giveStockDto.getAmount()*giveStockDto.getPrice())/(memberStock.getCount()+giveStockDto.getAmount()));
+
+            memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdateAt(LocalDateTime.now());
             memberStockRepository.save(memberStock);
         }else {
