@@ -17,7 +17,7 @@ spring:
       mode: always
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show-sql: true
@@ -30,3 +30,22 @@ springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   packages-to-scan: com.example
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
+      region:
+        static: ${CLOUD_AWS_REGION_STATIC}
+      s3:
+        bucket: ${CLOUD_AWS_S3_BUCKET}
+
+authorization: ${AUTHORIZATION}
+
+bootstrap:
+  server: ${BOOTSTRAP_SERVER}
+app:
+  key: ${APP_KEY}
+  secretkey: ${APP_SECRETKEY}
+
