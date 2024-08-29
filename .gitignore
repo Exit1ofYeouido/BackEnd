@@ -1,5 +1,7 @@
 HELP.md
 .gradle
+!Application/Auth/build
+!Application/Api-GateWay/build
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
