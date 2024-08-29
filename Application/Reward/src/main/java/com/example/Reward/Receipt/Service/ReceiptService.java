@@ -173,7 +173,7 @@ public class ReceiptService {
 
     public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
         String stockCode = eventRepository.findByEnterpriseName(rewardRequestDTO.getEnterpriseName());
-         GiveStockDTO giveStockDTO = GiveStockDTO.builder()
+         GiveStockProduceDTO giveStockProduceDTO = GiveStockProduceDTO.builder()
                 .memberId(memberId)
                 .enterpriseName(rewardRequestDTO.getEnterpriseName())
                 .code(stockCode)
@@ -181,7 +181,7 @@ public class ReceiptService {
                 .amount(amountOfStock)
                 .build();
 
-        kafkaTemplate.send("test-mo", giveStockDTO);
+        kafkaTemplate.send("test-mo", giveStockProduceDTO);
     }
 
 }
