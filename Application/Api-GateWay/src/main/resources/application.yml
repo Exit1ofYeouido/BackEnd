@@ -44,12 +44,14 @@ spring:
             - Path= ${service-url}/mypage/**
           filters:
             - RewritePath=${service-url}/mypage/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
         - id: reward
           uri: http://localhost:8083
           predicates:
             - Path= ${service-url}/reward/**
           filters:
             - RewritePath=${service-url}/reward/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
         - id: auth
           uri: http://localhost:8085
           predicates:
