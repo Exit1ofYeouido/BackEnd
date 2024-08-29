@@ -19,23 +19,14 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI(@Value("${service-url}") String url) {
 
-//        List<Tag> tagList = List.of(
-//                createTag("기본 API", "기본임 ㅇㅇ 여기에다가 태그 여러개 붙여놓으셈"),
-//                createTag("기본 2","기본이 두개 ~")
-//                );
+
         return new OpenAPI()
                 .addServersItem(new Server().url(url))
                 .info(new Info()
-                        .title("기본 API")
+                        .title("Reward API")
                         .version("1.0")
-                        .description("api 명세서 한번 보쉴?"));
-//                        ).tags(tagList);
+                        .description("광고 리워드,영수증 리워드,출석체크 리워드 API입니다."));
+
     }
 
-    private Tag createTag(String name, String description) {
-        Tag tag = new Tag();
-        tag.setName(name);
-        tag.setDescription(description);
-        return tag;
-    }
 }
