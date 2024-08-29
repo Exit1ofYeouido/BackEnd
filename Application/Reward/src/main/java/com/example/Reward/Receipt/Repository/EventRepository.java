@@ -2,6 +2,7 @@ package com.example.Reward.Receipt.Repository;
 
 import com.example.Reward.Receipt.Entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -13,5 +14,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findEventIdAndEnterpriseNameByRewardAmount();
 
     @Query(nativeQuery = true, value = "SELECT code FROM event WHERE enterprise_name = ? AND content_id = 2")
-    String findByEnterpriseName(@Param("enterpriseName") String enterpriseName);
+    String findCodeByEnterpriseName(@Param("enterpriseName") String enterpriseName);
+
+    @Query(nativeQuery = true, value = "SELECT event_id, code, enterprise_name, reward_amount FROM event WHERE enterprise_name = ? AND content_id = 2")
+    Event findByEnterpriseName(@Param("enterpriseName") String enterpriseName);
 }

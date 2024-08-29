@@ -7,7 +7,6 @@ import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.Event;
 import com.example.Reward.Receipt.Repository.EventRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -147,7 +146,7 @@ public class ReceiptService {
 
 
     public Integer getPrice(String enterpriseName) {
-        String stockCode = eventRepository.findByEnterpriseName(enterpriseName);
+        String stockCode = eventRepository.findCodeByEnterpriseName(enterpriseName);
         Mono<PresentPriceDTO> response = webClient.get()
                 .uri(STOCK_BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-price?FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={param}", stockCode)
                 .header("authorization", "Bearer " + authorization)
@@ -169,10 +168,15 @@ public class ReceiptService {
     public void giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
 
         giveStock(memberId, rewardRequestDTO, priceOfStock, amountOfStock);
+        Event event = eventRepository.findByEnterpriseName(rewardRequestDTO.getEnterpriseName());
+        event.setRewardAmount(event.getRewardAmount()-amountOfStock);
+        eventRepository.save(event);
+
+//        return saveReceipt(memberId, rewardRequestDTO);
     }
 
     public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-        String stockCode = eventRepository.findByEnterpriseName(rewardRequestDTO.getEnterpriseName());
+        String stockCode = eventRepository.findCodeByEnterpriseName(rewardRequestDTO.getEnterpriseName());
          GiveStockProduceDTO giveStockProduceDTO = GiveStockProduceDTO.builder()
                 .memberId(memberId)
                 .enterpriseName(rewardRequestDTO.getEnterpriseName())
@@ -184,4 +188,7 @@ public class ReceiptService {
         kafkaTemplate.send("test-mo", giveStockProduceDTO);
     }
 
+//    public RewardResponseDTO saveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO) {
+//
+//    }
 }

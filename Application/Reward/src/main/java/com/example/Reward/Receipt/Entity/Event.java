@@ -1,10 +1,7 @@
 package com.example.Reward.Receipt.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Entity
@@ -19,5 +16,11 @@ public class Event {
 
     @Column(unique = true)
     private String enterpriseName;
+
+    @Column(unique = true)
+    private String code;
+
+    @Setter
+    private double rewardAmount;
 
 }

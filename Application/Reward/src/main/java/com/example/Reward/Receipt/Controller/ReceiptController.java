@@ -60,5 +60,4 @@ public class ReceiptController {
         receiptService.giveStockAndSaveReceipt(Long.valueOf(memberId), rewardRequestDTO, priceOfStock, amountOfStock);
         return ResponseEntity.ok(amountOfStock);
     }
-
 }
