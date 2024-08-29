@@ -6,7 +6,10 @@ import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.Event;
+import com.example.Reward.Receipt.Entity.ReceiptLog;
+import com.example.Reward.Receipt.Entity.ReceiptLogKey;
 import com.example.Reward.Receipt.Repository.EventRepository;
+import com.example.Reward.Receipt.Repository.ReceiptLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -26,6 +29,7 @@ import java.util.*;
 public class ReceiptService {
 
     private final EventRepository eventRepository;
+    private final ReceiptLogRepository receiptLogRepository;
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -165,14 +169,31 @@ public class ReceiptService {
     }
 
     @Transactional
-    public void giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
+    public RewardResponseDTO giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
 
         giveStock(memberId, rewardRequestDTO, priceOfStock, amountOfStock);
         Event event = eventRepository.findByEnterpriseName(rewardRequestDTO.getEnterpriseName());
         event.setRewardAmount(event.getRewardAmount()-amountOfStock);
         eventRepository.save(event);
 
-//        return saveReceipt(memberId, rewardRequestDTO);
+        ReceiptLog receiptLog = ReceiptLog.builder()
+                .receiptLogKey(ReceiptLogKey.builder()
+                        .approvalNum(rewardRequestDTO.getApprovalNum())
+                        .dealTime(rewardRequestDTO.getDealTime())
+                        .build())
+                .store(rewardRequestDTO.getStoreName())
+                .price(rewardRequestDTO.getPrice())
+                .imgUrl(rewardRequestDTO.getImgURL())
+                .enterpriseName(rewardRequestDTO.getEnterpriseName())
+                .memberId(memberId)
+                .build();
+        receiptLogRepository.save(receiptLog);
+
+        RewardResponseDTO rewardResponseDTO = RewardResponseDTO.builder()
+                .name(rewardRequestDTO.getEnterpriseName())
+                .amount(amountOfStock)
+                .build();
+        return rewardResponseDTO;
     }
 
     public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
@@ -187,8 +208,4 @@ public class ReceiptService {
 
         kafkaTemplate.send("test-mo", giveStockProduceDTO);
     }
-
-//    public RewardResponseDTO saveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO) {
-//
-//    }
 }

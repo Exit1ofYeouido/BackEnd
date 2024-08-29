@@ -9,5 +9,5 @@ public class RewardResponseDTO {
 
     private String name;
 
-    private Long amount;
+    private double amount;
 }

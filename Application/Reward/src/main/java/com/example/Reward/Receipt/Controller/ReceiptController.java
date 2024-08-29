@@ -4,6 +4,7 @@ import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.out.AnalyzeReceiptDTO;
 import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseListDTO;
+import com.example.Reward.Receipt.Dto.out.RewardResponseDTO;
 import com.example.Reward.Receipt.Service.ReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,10 +55,10 @@ public class ReceiptController {
 
     @PostMapping("/")
     @Operation(description = "사용자 확인 후 영수증 정보 저장 및 리워드 제공")
-    public ResponseEntity<Double> rewardStock(@RequestHeader("memberId") String memberId, @RequestBody RewardRequestDTO rewardRequestDTO) {
+    public ResponseEntity<RewardResponseDTO> rewardStock(@RequestHeader("memberId") String memberId, @RequestBody RewardRequestDTO rewardRequestDTO) {
         Integer priceOfStock = receiptService.getPrice(rewardRequestDTO.getEnterpriseName());
         Double amountOfStock = receiptService.calDecimalStock(priceOfStock);
-        receiptService.giveStockAndSaveReceipt(Long.valueOf(memberId), rewardRequestDTO, priceOfStock, amountOfStock);
-        return ResponseEntity.ok(amountOfStock);
+        RewardResponseDTO rewardResponseDTO = receiptService.giveStockAndSaveReceipt(Long.valueOf(memberId), rewardRequestDTO, priceOfStock, amountOfStock);
+        return ResponseEntity.ok(rewardResponseDTO);
     }
 }
