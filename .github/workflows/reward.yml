@@ -1,0 +1,26 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - feat/reward/#4
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v2
+
+    - name: Deploy Ec2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REWARD_EC2_HOST}}
+        username: ${{ secrets.REWARD_EC2_USER}}
+        key: ${{ secrets.REWARD_EC2_KEY}}
+        port: 22
+        script: |
+          git pull origin feat/reward/#4
+          docker-compose down
+          docker-compose up --build -d
+          

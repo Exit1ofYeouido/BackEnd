@@ -42,7 +42,10 @@ cloud:
         bucket: ${CLOUD_AWS_S3_BUCKET}
 
 authorization: ${AUTHORIZATION}
-appKey: ${APPKEY}
-appSecret: ${APPSECRET}
 
-BOOTSTRAP_SERVERS_CONFIG: ${BOOTSTRAP_SERVERS_CONFIG}
+bootstrap:
+  server: ${BOOTSTRAP_SERVER}
+app:
+  key: ${APP_KEY}
+  secretkey: ${APP_SECRETKEY}
+
