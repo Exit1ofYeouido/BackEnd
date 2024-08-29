@@ -17,7 +17,7 @@ spring:
       mode: always
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show-sql: true
@@ -30,3 +30,9 @@ springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   packages-to-scan: com.example
+bootstrap:
+  server: ${BOOTSTRAP_SERVER}
+app:
+  key: ${APP_KEY}
+  secretkey: ${APP_SECRETKEY}
+

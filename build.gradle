@@ -16,6 +16,10 @@ allprojects {
 	}
 }
 
+repositories {
+	mavenCentral()
+}
+
 subprojects {
 	group = 'com.stockcraft'
 	version = '0.0.1-SNAPSHOT'
@@ -40,6 +44,4 @@ subprojects {
 		annotationProcessor 'org.projectlombok:lombok'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	}
-
-
 }

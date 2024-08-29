@@ -6,6 +6,7 @@ project(":application:reward") {
     ext {
         set('springCloudVersion', "2023.0.2")
     }
+    
 
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -14,6 +15,10 @@ project(":application:reward") {
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
         implementation 'com.mysql:mysql-connector-j'
+        implementation 'org.springframework.kafka:spring-kafka'
+        implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+
     }
 
     dependencyManagement {
@@ -22,4 +27,7 @@ project(":application:reward") {
         }
     }
 }
+
+
+
 
