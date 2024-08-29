@@ -76,8 +76,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         MemberAuth memberAuth = authRepository.findByMemberName(username).orElse(null);
         String memberId = memberAuth.getMemberId().toString();
 
-        String access = jwtUtil.createJwt("access", memberId, role, TokenExpiration.ACCESS.getExpiredTime());
-        String refresh = jwtUtil.createJwt("refresh", memberId, role, TokenExpiration.REFRESH.getExpiredTime());
+        String access = jwtUtil.createJwt("access", memberId, role, TokenExpiration.ACCESS);
+        String refresh = jwtUtil.createJwt("refresh", memberId, role, TokenExpiration.REFRESH);
 
         addRefreshToken(memberId, refresh);
 

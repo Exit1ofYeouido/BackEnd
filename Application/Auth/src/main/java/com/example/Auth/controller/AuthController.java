@@ -83,7 +83,7 @@ public class AuthController {
     @GetMapping("/check-username/{username}")
     @Operation(description = "중복된 유저ID가 있는지 확인하는 API")
     public ResponseEntity<Boolean> checkUsernameExists(@PathVariable String username) {
-        Boolean isExist = authService.checkMembername(username);
+        Boolean isExist = authService.checkMemberName(username);
         return new ResponseEntity<>(isExist, HttpStatus.OK);
     }
 

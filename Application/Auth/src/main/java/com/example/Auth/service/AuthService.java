@@ -11,7 +11,7 @@ public class AuthService {
 
     private final AuthRepository authRepository;
 
-    public boolean checkMembername(String memberName) {
+    public boolean checkMemberName(String memberName) {
         if (memberName.length() < 4 || memberName.matches("\\d+")) {
             throw new MembernameNotValidException();
         }

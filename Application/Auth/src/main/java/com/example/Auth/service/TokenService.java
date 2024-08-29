@@ -53,8 +53,8 @@ public class TokenService {
             return response;
         }
 
-        String newAccessToken = jwtUtil.createJwt("access", memberId, role, TokenExpiration.ACCESS.getExpiredTime());
-        String newRefreshToken = jwtUtil.createJwt("refresh", memberId, role, TokenExpiration.REFRESH.getExpiredTime());
+        String newAccessToken = jwtUtil.createJwt("access", memberId, role, TokenExpiration.ACCESS);
+        String newRefreshToken = jwtUtil.createJwt("refresh", memberId, role, TokenExpiration.REFRESH);
 
         updateRefreshToken(memberId, newAccessToken);
 

@@ -40,19 +40,14 @@ public class RedisConfig {
         RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
-        // 기본 직렬화( JSON 형식) Object <=> JSON
         redisTemplate.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
 
-        // Key 직렬화 (String 형식)
         redisTemplate.setKeySerializer(new StringRedisSerializer());
 
-        // value 직렬화 (JSON 형식)
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-
-        // 해시 데이터 구조 직렬화 (JSON 형식)
+        
         redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         return redisTemplate;
     }
-
 }

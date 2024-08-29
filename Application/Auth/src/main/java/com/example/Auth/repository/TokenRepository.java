@@ -19,7 +19,7 @@ public class TokenRepository {
 
     public void save(RefreshToken refreshToken) {
         redisTemplate.opsForValue().set(refreshToken.getId(), refreshToken);
-        redisTemplate.expire(refreshToken.getId(), TokenExpiration.REFRESH.getExpiredTime(), TimeUnit.SECONDS);
+        redisTemplate.expire(refreshToken.getId(), TokenExpiration.REFRESH, TimeUnit.SECONDS);
     }
 
     public void deleteById(String key) {
