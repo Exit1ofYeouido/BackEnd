@@ -12,8 +12,27 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalException {
 
     @ExceptionHandler(JwtException.class)
-    public ResponseEntity<String> handleJwtException(JwtException e) {
+    public ResponseEntity<ErrorResult> handleJwtException(JwtException e) {
         log.error("JWT 오류 : {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 토큰이 유효하지 않습니다.");
+
+        ErrorResult errorResult = ErrorResult.builder()
+                .error("유효하지 않은 토큰입니다.")
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResult, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(VerificationCodeRequestException.class)
+    public ResponseEntity<ErrorResult> handleVerificationCodeRequestException(VerificationCodeRequestException e) {
+        log.error("인증번호 발급 오류 {}", e.getMessage());
+
+        ErrorResult errorResult = ErrorResult.builder()
+                .error("인증번호 발급 오류")
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResult, HttpStatus.UNAUTHORIZED);
+    }
+
 }

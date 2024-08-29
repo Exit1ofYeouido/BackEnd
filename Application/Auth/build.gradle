@@ -22,6 +22,8 @@ project(":application:auth") {
 
         implementation 'org.springframework.kafka:spring-kafka'
         testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+        implementation 'net.nurigo:sdk:4.3.0'
     }
 
     dependencyManagement {

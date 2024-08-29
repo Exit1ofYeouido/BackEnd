@@ -49,22 +49,17 @@ public class SecurityConfig {
         http
                 .csrf((auth) -> auth.disable()
                 );
-
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "logout", "/reissue").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 );
-
         http
                 .addFilterAt(
                         new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper,
                                 authRepository, tokenService),
                         UsernamePasswordAuthenticationFilter.class);
-
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, tokenRepository), LogoutFilter.class);
-
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
