@@ -57,9 +57,8 @@ public class ReceiptController {
     public ResponseEntity<Double> rewardStock(@RequestHeader("memberId") String memberId, @RequestBody RewardRequestDTO rewardRequestDTO) {
         Integer priceOfStock = receiptService.getPrice(rewardRequestDTO.getEnterpriseName());
         Double amountOfStock = receiptService.calDecimalStock(priceOfStock);
-//        receiptService.giveStockAndSaveReceipt(Long.valueOf(memberId), rewardRequestDTO, priceOfStock, amountOfStock);
+        receiptService.giveStockAndSaveReceipt(Long.valueOf(memberId), rewardRequestDTO, priceOfStock, amountOfStock);
         return ResponseEntity.ok(amountOfStock);
-
     }
 
 }

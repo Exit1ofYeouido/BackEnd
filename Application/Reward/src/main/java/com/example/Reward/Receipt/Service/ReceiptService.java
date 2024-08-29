@@ -2,12 +2,17 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
+import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.Event;
 import com.example.Reward.Receipt.Repository.EventRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -36,6 +41,7 @@ public class ReceiptService {
     private String appKey;
     @Value("${appSecret}")
     private String appSecret;
+    private final KafkaTemplate<String,Object> kafkaTemplate;
 
     public GetEnterpriseListDTO getEnterpriseList() {
         List<String> enterpriseList = new ArrayList<>();
@@ -157,6 +163,25 @@ public class ReceiptService {
     public Double calDecimalStock(Integer priceOfStock) {
         BigDecimal price = new BigDecimal(Integer.toString(priceOfStock));
         return BigDecimal.valueOf(100).divide(price, 6, BigDecimal.ROUND_DOWN).doubleValue();
+    }
+
+    @Transactional
+    public void giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
+
+        giveStock(memberId, rewardRequestDTO, priceOfStock, amountOfStock);
+    }
+
+    public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
+        String stockCode = eventRepository.findByEnterpriseName(rewardRequestDTO.getEnterpriseName());
+         GiveStockDTO giveStockDTO = GiveStockDTO.builder()
+                .memberId(memberId)
+                .enterpriseName(rewardRequestDTO.getEnterpriseName())
+                .code(stockCode)
+                .price(priceOfStock)
+                .amount(amountOfStock)
+                .build();
+
+        kafkaTemplate.send("test-mo", giveStockDTO);
     }
 
 }

@@ -15,6 +15,8 @@ project(":application:reward") {
         implementation 'com.mysql:mysql-connector-j'
         implementation 'com.amazonaws:aws-java-sdk-s3:1.12.770'
         implementation 'org.springframework.boot:spring-boot-starter-webflux'
+        implementation 'org.springframework.kafka:spring-kafka'
+        testImplementation 'org.springframework.kafka:spring-kafka-test'
     }
 
     dependencyManagement {
