@@ -20,8 +20,6 @@ public class MypageController {
 
     private final MyService myService;
 
-
-
     @GetMapping("/all")
     @Operation(description = "마이페이지 종합")
     public ResponseEntity<GetAllMyPageResponseDto> getAllMypage(@RequestHeader("memberId") String memberId){
@@ -37,8 +35,6 @@ public class MypageController {
 
     @PostMapping("/notuto")
     public ResponseEntity<?> postTutorialCheck(@RequestParam("type") String type,@RequestHeader("memberId") String memberId){
-
-
         myService.saveTutorialCheck(type,Long.valueOf(memberId));
         return ResponseEntity.ok("");
     }

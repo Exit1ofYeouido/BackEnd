@@ -11,7 +11,7 @@ import com.example.Mypage.Mypage.Dto.Other.EarningRate;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
-import com.example.Mypage.Mypage.Webclient.ApiService;
+import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +45,7 @@ public class MyService {
     }
 
     private String CalcAllAsssets(List<MemberStock> memberStocks){
+
         double allCost = 0;
         double currentAllCost = 0;
 
@@ -112,7 +113,8 @@ public class MyService {
             top3EarningRates.add(earningRate);
         }
 
-        top3EarningRates=top3EarningRates.stream()
+        top3EarningRates=top3EarningRates
+                .stream()
                 .sorted(Comparator.comparing(EarningRate::getEarningRate).reversed())
                 .limit(3)
                 .collect(Collectors.toList());

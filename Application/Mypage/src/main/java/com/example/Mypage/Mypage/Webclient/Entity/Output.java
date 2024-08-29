@@ -1,4 +1,4 @@
-package com.example.Mypage.Mypage.Webclient;
+package com.example.Mypage.Mypage.Webclient.Entity;
 
 import lombok.Getter;
 

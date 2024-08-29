@@ -1,5 +1,6 @@
-package com.example.Mypage.Mypage.Webclient;
+package com.example.Mypage.Mypage.Webclient.Service;
 
+import com.example.Mypage.Mypage.Webclient.Dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

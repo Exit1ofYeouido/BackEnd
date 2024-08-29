@@ -1,7 +1,11 @@
-package com.example.Mypage.Mypage.Webclient;
+package com.example.Mypage.Mypage.Webclient.Service;
 
 
 
+import com.example.Mypage.Mypage.Webclient.Entity.TokenInfo;
+import com.example.Mypage.Mypage.Webclient.Dto.OauthInfoDto;
+import com.example.Mypage.Mypage.Webclient.Repository.TokenInfoRepository;
+import com.example.Mypage.Mypage.Webclient.Entity.Token;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -48,7 +52,7 @@ public class GeneratedToken {
     public String generateAccessToken(){
 
         String url = "https://openapi.koreainvestment.com:9443" + "/oauth2/tokenP";
-        OauthInfo bodyOauthInfo=OauthInfo.builder()
+        OauthInfoDto bodyOauthInfoDto = OauthInfoDto.builder()
                 .grant_type("client_credentials")
                 .appkey(APPKEY)
                 .appsecret(APPSECRET)
@@ -57,7 +61,7 @@ public class GeneratedToken {
         Mono<Token> mono = client.post()
                 .uri(url)
                 .header("content-type", "application/json")
-                .bodyValue(bodyOauthInfo)
+                .bodyValue(bodyOauthInfoDto)
                 .retrieve()
                 .bodyToMono(Token.class);
 

@@ -1,4 +1,4 @@
-package com.example.Mypage.Mypage.Webclient;
+package com.example.Mypage.Mypage.Webclient.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

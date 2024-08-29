@@ -1,4 +1,4 @@
-package com.example.Mypage.Mypage.Webclient;
+package com.example.Mypage.Mypage.Webclient.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OauthInfo {
+public class OauthInfoDto {
 
     private String grant_type;
 
