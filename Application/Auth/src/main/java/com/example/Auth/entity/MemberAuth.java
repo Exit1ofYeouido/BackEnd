@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,19 +17,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class MemberAuth implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long authId;
 
+    private Long memberId;
     private String memberName;
-
     private String memberPassword;
-
+    private String phoneNumber;
     private String role;
 
-    private Long memberId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
