@@ -1,6 +1,7 @@
 project(":application:api-gateway") {
-	bootJar{enabled = true}
-	jar {enabled = false}
+
+	bootJar { enabled = false}
+	jar { enabled = false }
 
 	ext {
 		set('springCloudVersion', "2023.0.2")

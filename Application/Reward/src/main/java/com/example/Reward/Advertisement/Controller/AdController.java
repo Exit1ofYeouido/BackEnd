@@ -58,4 +58,3 @@ public class AdController {
         return ResponseEntity.ok(detailEnterPriseResponseDto);
     }
 }
-

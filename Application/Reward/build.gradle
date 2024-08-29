@@ -1,6 +1,7 @@
 project(":application:reward") {
-    bootJar { enabled = true }
-    jar { enabled = true }
+
+    bootJar { enabled = false}
+    jar { enabled = false }
 
     ext {
         set('springCloudVersion', "2023.0.2")
