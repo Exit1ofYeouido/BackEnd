@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/receipt")
@@ -53,13 +54,11 @@ public class ReceiptController {
 
     @PostMapping("/")
     @Operation(description = "사용자 확인 후 영수증 정보 저장 및 리워드 제공")
-    public ResponseEntity<Integer> rewardStock(@RequestBody RewardRequestDTO rewardRequestDTO) {
-        Long memberId = 1L;
+    public ResponseEntity<Double> rewardStock(@RequestHeader("memberId") String memberId, @RequestBody RewardRequestDTO rewardRequestDTO) {
         Integer priceOfStock = receiptService.getPrice(rewardRequestDTO.getEnterpriseName());
-//        double amountOfStock = receiptService.calDecimal(priceOfStock);
-//        receiptService.giveStock();
-//        receiptService.saveReceipt();
-        return ResponseEntity.ok(priceOfStock);
+        Double amountOfStock = receiptService.calDecimalStock(priceOfStock);
+//        receiptService.giveStockAndSaveReceipt(Long.valueOf(memberId), rewardRequestDTO, priceOfStock, amountOfStock);
+        return ResponseEntity.ok(amountOfStock);
 
     }
 

@@ -2,9 +2,6 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.example.Reward.Receipt.Dto.out.AnalyzeReceiptDTO;
-import com.example.Reward.Receipt.Dto.out.OCRResponseDTO;
-import com.example.Reward.Receipt.Dto.out.GetEnterpriseListDTO;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.Event;
 import com.example.Reward.Receipt.Repository.EventRepository;
@@ -17,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -155,4 +153,10 @@ public class ReceiptService {
         PresentPriceDTO result = response.block();
         return result.getOutput().getStck_prpr();
     }
+
+    public Double calDecimalStock(Integer priceOfStock) {
+        BigDecimal price = new BigDecimal(Integer.toString(priceOfStock));
+        return BigDecimal.valueOf(100).divide(price, 6, BigDecimal.ROUND_DOWN).doubleValue();
+    }
+
 }
