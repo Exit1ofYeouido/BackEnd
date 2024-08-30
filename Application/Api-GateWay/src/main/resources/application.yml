@@ -42,9 +42,9 @@ spring:
         - id: mypage
           uri: http://3.36.68.97:8082
           predicates:
-            - Path= ${service-url}/mypage/**
+            - Path= ${service-url}/my/**
           filters:
-            - RewritePath=${service-url}/mypage/(?<path>.*),/$\{path}
+            - RewritePath=${service-url}/my/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
 
         - id: reward
@@ -86,7 +86,7 @@ springdoc:
         name: API Gateway Service
       - url: ${service-url}/basic/v3/api-docs
         name: Basic
-      - url: ${service-url}/mypage/v3/api-docs
+      - url: ${service-url}/my/v3/api-docs
         name: Mypage
       - url: ${service-url}/reward/v3/api-docs
         name: Reward
