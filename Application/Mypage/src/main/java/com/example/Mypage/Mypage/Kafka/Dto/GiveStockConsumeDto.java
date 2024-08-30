@@ -7,15 +7,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Builder
 @JsonSerialize
 @JsonDeserialize
 @NoArgsConstructor
 @AllArgsConstructor
-public class GiveStockDto {
+public class GiveStockConsumeDto {
 
     private Long memId;
 

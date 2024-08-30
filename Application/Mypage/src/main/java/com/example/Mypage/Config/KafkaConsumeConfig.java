@@ -1,6 +1,6 @@
 package com.example.Mypage.Config;
 
-import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
+import com.example.Mypage.Mypage.Kafka.Dto.GiveStockConsumeDto;
 import com.example.Mypage.Mypage.Kafka.Util.KafkaUtil;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -34,7 +34,7 @@ public class KafkaConsumeConfig {
         config.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
         config.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-        config.put(JsonSerializer.TYPE_MAPPINGS, KafkaUtil.getJsonTypeMapping(GiveStockDto.class));
+        config.put(JsonSerializer.TYPE_MAPPINGS, KafkaUtil.getJsonTypeMapping(GiveStockConsumeDto.class));
 
         return new DefaultKafkaConsumerFactory<>(config);
     }

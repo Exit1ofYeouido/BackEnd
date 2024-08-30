@@ -10,7 +10,7 @@ import com.example.Mypage.Common.Repository.PopupCheckRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
-import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
+import com.example.Mypage.Mypage.Kafka.Dto.GiveStockConsumeDto;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -123,16 +123,16 @@ public class MyService {
 
     }
 
-    public void giveStock(GiveStockDto giveStockDto) {
+    public void giveStock(GiveStockConsumeDto giveStockConsumeDto) {
 
-        Optional<Member> member=memberRepostory.findById(giveStockDto.getMemId());
-        MemberStock memberStock=memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
-                ,giveStockDto.getMemId());
+        Optional<Member> member=memberRepostory.findById(giveStockConsumeDto.getMemId());
+        MemberStock memberStock=memberStockRepository.findByStockNameAndMember(giveStockConsumeDto.getEnterpriseName()
+                , giveStockConsumeDto.getMemId());
 
         if (memberStock !=null){
-            memberStock.setCount(memberStock.getCount()+giveStockDto.getAmount());
+            memberStock.setCount(memberStock.getCount()+ giveStockConsumeDto.getAmount());
             int avgPrice= (int) ((memberStock.getCount()*memberStock.getAveragePrice()+
-                                giveStockDto.getAmount()*giveStockDto.getPrice())/(memberStock.getCount()+giveStockDto.getAmount()));
+                                giveStockConsumeDto.getAmount()* giveStockConsumeDto.getPrice())/(memberStock.getCount()+ giveStockConsumeDto.getAmount()));
 
             memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdateAt(LocalDateTime.now());
@@ -140,10 +140,10 @@ public class MyService {
         }else {
             MemberStock new_memberStock = MemberStock.builder()
                     .member(member.get())
-                    .stockName(giveStockDto.getEnterpriseName())
-                    .count(giveStockDto.getAmount())
-                    .stockCode(giveStockDto.getCode())
-                    .averagePrice(giveStockDto.getPrice())
+                    .stockName(giveStockConsumeDto.getEnterpriseName())
+                    .count(giveStockConsumeDto.getAmount())
+                    .stockCode(giveStockConsumeDto.getCode())
+                    .averagePrice(giveStockConsumeDto.getPrice())
                     .createdAt(LocalDateTime.now())
                     .updateAt(LocalDateTime.now())
                     .build();
@@ -174,5 +174,11 @@ public class MyService {
                 .build();
         popupCheckRepository.save(popupCheck);
 
+    }
+
+    public List<MemberStock> getAllStock(Long memId) {
+        List<MemberStock> memberStocks=memberStockRepository.findByMemberId(memId);
+
+        return memberStocks;
     }
 }
