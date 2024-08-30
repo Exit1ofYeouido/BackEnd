@@ -49,7 +49,7 @@ public class ReceiptService {
 
     public GetEnterpriseListDTO getEnterpriseList() {
         List<String> enterpriseList = new ArrayList<>();
-        List<Event> eventEnterprises = eventRepository.findEventIdAndEnterpriseNameByRewardAmount();
+        List<Event> eventEnterprises = eventRepository.findByGreaterThanAndContentId(3L,2L);
         for(Event event : eventEnterprises) {
             enterpriseList.add(event.getEnterpriseName());
         }
