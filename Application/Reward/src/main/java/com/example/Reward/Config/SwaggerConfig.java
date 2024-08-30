@@ -1,7 +1,10 @@
 package com.example.Reward.Config;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
+
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -10,20 +13,24 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+
 @Configuration
-@SecurityScheme(
-        name = "bearerAuth",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        scheme = "bearer"
-)
+
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI(@Value("${service-url}") String url) {
 
+        SecurityScheme securityScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
+                .in(SecurityScheme.In.HEADER).name("Authorization");
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
+
 
         return new OpenAPI()
                 .addServersItem(new Server().url(url))
+                .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
+                .security(Arrays.asList(securityRequirement))
                 .info(new Info()
                         .title("Reward API")
                         .version("1.0")
