@@ -1,9 +1,8 @@
-package com.example.Reward.Advertisement.Kafka.Dto;
+package com.example.Reward.Common.Kafka;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,7 +10,7 @@ import lombok.Getter;
 @Builder
 @JsonSerialize
 @JsonDeserialize
-public class GiveStockDto {
+public class GiveStockProduceDto {
 
     private Long memId;
 

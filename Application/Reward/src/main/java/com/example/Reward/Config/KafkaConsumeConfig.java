@@ -1,12 +1,9 @@
 package com.example.Reward.Config;
 
-import com.example.Reward.Advertisement.Kafka.Dto.GiveStockDto;
+import com.example.Reward.Common.Kafka.GiveStockProduceDto;
 import com.example.Reward.Common.Util.KafkaUtil;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.RoundRobinPartitioner;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +28,7 @@ public class KafkaConsumeConfig {
         config.put(ConsumerConfig.GROUP_ID_CONFIG,"group_1");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,StringDeserializer.class);
-        config.put(JsonSerializer.TYPE_MAPPINGS, KafkaUtil.getJsonTypeMapping(GiveStockDto.class));
+        config.put(JsonSerializer.TYPE_MAPPINGS, KafkaUtil.getJsonTypeMapping(GiveStockProduceDto.class));
 
         return new DefaultKafkaConsumerFactory<>(config);
     }

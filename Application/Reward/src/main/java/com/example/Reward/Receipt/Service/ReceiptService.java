@@ -3,6 +3,7 @@ package com.example.Reward.Receipt.Service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.Reward.Common.Entity.Event;
+import com.example.Reward.Common.Kafka.GiveStockProduceDto;
 import com.example.Reward.Common.Repository.EventRepository;
 import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.out.*;
@@ -198,8 +199,8 @@ public class ReceiptService {
 
     public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
         String stockCode = eventRepository.findCodeByEnterpriseName(rewardRequestDTO.getEnterpriseName());
-         GiveStockProduceDTO giveStockProduceDTO = GiveStockProduceDTO.builder()
-                .memberId(memberId)
+         GiveStockProduceDto giveStockProduceDTO = GiveStockProduceDto.builder()
+                .memId(memberId)
                 .enterpriseName(rewardRequestDTO.getEnterpriseName())
                 .code(stockCode)
                 .price(priceOfStock)
