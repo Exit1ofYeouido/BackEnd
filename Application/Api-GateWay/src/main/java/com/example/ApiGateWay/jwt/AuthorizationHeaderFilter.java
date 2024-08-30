@@ -35,6 +35,13 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
+
+            String path = exchange.getRequest().getURI().getPath();
+
+            if (path.contains("/v3/api-docs")) {
+                return chain.filter(exchange);
+            }
+            
             if (!request.getHeaders().containsKey("Authorization")) {
                 return onError(exchange, "No authorization Header", HttpStatus.UNAUTHORIZED);
             }
