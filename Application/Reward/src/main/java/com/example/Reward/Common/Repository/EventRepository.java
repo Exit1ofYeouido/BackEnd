@@ -13,9 +13,5 @@ public interface EventRepository extends JpaRepository<Event,Long> {
 
     List<Event> findByRewardAmountGreaterThanEqualAndContentId(Long rewardAmount, Long contentId);
 
-    @Query(nativeQuery = true, value = "SELECT code FROM event WHERE enterprise_name = ? AND content_id = 2")
-    String findCodeByEnterpriseName(@Param("enterpriseName") String enterpriseName);
-
-    Event findByEnterpriseName(String enterpriseName);
-
+    Event findByEnterpriseNameContainingAndContentId(String name, Long contentId);
 }

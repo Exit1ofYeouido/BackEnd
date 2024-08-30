@@ -149,7 +149,6 @@ public class ReceiptService {
             if(detected.length()>longest.length()) {
                 longest = detected;
             }
-            System.out.println(longest);
         }
         if(!longest.isEmpty()) {
             return longest;
@@ -159,7 +158,8 @@ public class ReceiptService {
 
 
     public Integer getPrice(String enterpriseName) {
-        String stockCode = eventRepository.findCodeByEnterpriseName(enterpriseName);
+        String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, 2L).getStockCode();
+        System.out.println(stockCode);
         Mono<PresentPriceDTO> response = webClient.get()
                 .uri(STOCK_BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-price?FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={param}", stockCode)
                 .header("authorization", "Bearer " + generatedToken.getAccessToken())
@@ -179,9 +179,8 @@ public class ReceiptService {
 
     @Transactional
     public RewardResponseDTO giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-
         giveStock(memberId, rewardRequestDTO, priceOfStock, amountOfStock);
-        Event event = eventRepository.findByEnterpriseName(rewardRequestDTO.getEnterpriseName());
+        Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
         event.setRewardAmount(event.getRewardAmount()-amountOfStock);
         eventRepository.save(event);
 
@@ -206,8 +205,8 @@ public class ReceiptService {
     }
 
     public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-        String stockCode = eventRepository.findCodeByEnterpriseName(rewardRequestDTO.getEnterpriseName());
-         GiveStockProduceDto giveStockProduceDTO = GiveStockProduceDto.builder()
+        String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L).getStockCode();
+        GiveStockProduceDto giveStockProduceDTO = GiveStockProduceDto.builder()
                 .memId(memberId)
                 .enterpriseName(rewardRequestDTO.getEnterpriseName())
                 .code(stockCode)
