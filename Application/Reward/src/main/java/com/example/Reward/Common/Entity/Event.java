@@ -20,9 +20,9 @@ public class Event {
 
     private String enterpriseName;
 
-    private LocalDateTime create_at;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime update_at;
+    private LocalDateTime updatedAt;
 
     private Double rewardAmount;
 

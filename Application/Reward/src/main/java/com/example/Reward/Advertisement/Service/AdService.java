@@ -115,7 +115,6 @@ public class AdService {
         //오늘봤던 checkToday 체크 (중복제외 로직 포함)
         CheckToday checkToday=checkTodayRepository.findByEnterpriseNameAndMemberId(giveStockRequestDto.getEnterpriseName(),memId);
         if (checkToday ==null) {
-            System.out.println("하하");
             CheckToday new_checkToday = CheckToday.builder().enterpriseName(giveStockRequestDto.getEnterpriseName()).memberId(memId).build();
             checkTodayRepository.save(new_checkToday);
             checkToday=new_checkToday;
