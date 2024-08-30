@@ -2,6 +2,7 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.Reward.Advertisement.Webclient.GeneratedToken;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Kafka.GiveStockProduceDto;
 import com.example.Reward.Common.Repository.EventRepository;
@@ -39,13 +40,12 @@ public class ReceiptService {
     private String ocrSecret;
     private static final String OCR_BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
     private static final String STOCK_BASE_URL = "https://openapi.koreainvestment.com:9443";
-    @Value("${authorization}")
-    private String authorization;
-    @Value("${appKey}")
+    @Value("${app.key}")
     private String appKey;
-    @Value("${appSecret}")
+    @Value("${app.secretkey}")
     private String appSecret;
     private final KafkaTemplate<String,Object> kafkaTemplate;
+    private final GeneratedToken generatedToken;
 
     public GetEnterpriseListDTO getEnterpriseList() {
         List<String> enterpriseList = new ArrayList<>();
@@ -154,7 +154,7 @@ public class ReceiptService {
         String stockCode = eventRepository.findCodeByEnterpriseName(enterpriseName);
         Mono<PresentPriceDTO> response = webClient.get()
                 .uri(STOCK_BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-price?FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={param}", stockCode)
-                .header("authorization", "Bearer " + authorization)
+                .header("authorization", "Bearer " + generatedToken.getAccessToken())
                 .header("appkey", appKey)
                 .header("appsecret", appSecret)
                 .header("tr_id", "FHKST01010100")
