@@ -86,7 +86,7 @@ public class ReceiptService {
         metadata.setContentLength(receiptImg.getSize());
         metadata.setContentType(receiptImg.getContentType());
         InputStream inputStream = receiptImg.getInputStream();
-        String fileKey = receiptImg.getOriginalFilename();
+        String fileKey = "receipts/" + receiptImg.getOriginalFilename();
         amazonS3.putObject(bucket, fileKey, inputStream, metadata);
         return fileKey;
     }
