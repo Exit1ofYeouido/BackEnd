@@ -15,7 +15,8 @@ public class CheckToday {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long checkTodayId;
+    @Column(name="check_today_id")
+    private Long id;
 
     @Column(unique = true)
     private String enterpriseName;
