@@ -12,6 +12,7 @@ import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.ReceiptLog;
 import com.example.Reward.Receipt.Entity.ReceiptLogKey;
 import com.example.Reward.Receipt.Repository.ReceiptLogRepository;
+import com.example.Reward.Receipt.Util.GetLongestCommonSubstring;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -46,6 +47,7 @@ public class ReceiptService {
     private String appSecret;
     private final KafkaTemplate<String,Object> kafkaTemplate;
     private final GeneratedToken generatedToken;
+    private final GetLongestCommonSubstring getLongestCommonSubstring;
 
     public GetEnterpriseListDTO getEnterpriseList() {
         List<String> enterpriseList = new ArrayList<>();
@@ -141,10 +143,16 @@ public class ReceiptService {
     }
 
     public String checkEnterpriseName(List<String> enterprises, String storeName) {
+        String longest = "";
         for(String name : enterprises) {
-            if(storeName.contains(name)) {
-                return name;
+            String detected = getLongestCommonSubstring.getlongestCommonSubstring(name, storeName);
+            if(detected.length()>longest.length()) {
+                longest = detected;
             }
+            System.out.println(longest);
+        }
+        if(!longest.isEmpty()) {
+            return longest;
         }
         return "";
     }
