@@ -48,7 +48,7 @@ public class TokenService {
 
         RefreshToken savedRefreshToken = tokenRepository.findById(memberId);
 
-        if (!isVaildRefreshToken(refreshToken, savedRefreshToken)) {
+        if (!isValidRefreshToken(refreshToken, savedRefreshToken)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return response;
         }
@@ -76,7 +76,7 @@ public class TokenService {
         saveRefreshToken(refresh);
     }
 
-    private boolean isVaildRefreshToken(String refreshToken, RefreshToken savedRefreshToken) {
+    private boolean isValidRefreshToken(String refreshToken, RefreshToken savedRefreshToken) {
         if (refreshToken.equals(savedRefreshToken.getToken())) {
             return true;
         }
