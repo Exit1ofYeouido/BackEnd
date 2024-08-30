@@ -2,6 +2,8 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.Reward.Common.Entity.Event;
+import com.example.Reward.Common.Repository.EventRepository;
 import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
