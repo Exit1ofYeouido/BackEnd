@@ -4,10 +4,9 @@ package com.example.Mypage.Common.Entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -31,8 +30,6 @@ public class Member {
     private String phoneNumber;
 
     private String role;
-
-    private String account;
 
     private LocalDateTime createAt;
 
