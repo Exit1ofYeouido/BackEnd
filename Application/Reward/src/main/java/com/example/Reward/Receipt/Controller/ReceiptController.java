@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 @RequestMapping("/receipt")
 @Tag(name="영수증 API")
 public class ReceiptController {
-    private ReceiptService receiptService;
+    private final ReceiptService receiptService;
 
     public ReceiptController(ReceiptService receiptService) {
         this.receiptService = receiptService;
