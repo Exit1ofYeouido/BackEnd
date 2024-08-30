@@ -1,6 +1,5 @@
 package com.example.Mypage.Common.Entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,20 +17,26 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+public class AccountHistory {
 
     @Id
     @GeneratedValue
-    @Column(name = "account_id")
-    private Long id;
+    @Column(name = "account_trade_id")
+    private Long accountTradeId;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private Integer point;
+    private Integer requestPoint;
 
-    private String accountNumber;
+    private Integer resultPoint;
+
+    private String type;
 
     private LocalDateTime createdAt;
 }
