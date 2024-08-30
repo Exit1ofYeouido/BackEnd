@@ -1,6 +1,8 @@
 package com.example.Mypage.Mypage.Service;
 
+import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.Member;
+import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberRepository;
 import com.example.Mypage.Mypage.Dto.in.MemberSignupRequestDTO;
 import com.example.Mypage.Mypage.Exception.DuplicateIdException;
@@ -8,6 +10,8 @@ import com.example.Mypage.Mypage.Kafka.Dto.AuthProduceDTO;
 import com.example.Mypage.Mypage.Kafka.ouput.AuthMessageProducer;
 import jakarta.persistence.PessimisticLockException;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,7 @@ public class SignupService {
 
     private final MemberRepository memberRepository;
     private final AuthMessageProducer authMessageProducer;
+    private final AccountRepository accountRepository;
 
     @Transactional
     public boolean saveMember(MemberSignupRequestDTO memberSignupRequestDTO) {
@@ -32,6 +37,10 @@ public class SignupService {
         try {
             Member newMember = memberSignupRequestDTO.toEntity();
             Member joinedMember = memberRepository.save(newMember);
+
+            String newAccountNumber = makeNewAccountNumber();
+            Account newAccount = getNewAccount(newMember, newAccountNumber);
+            accountRepository.save(newAccount);
 
             AuthProduceDTO authProduceDTO = getAuthProduceDTO(memberSignupRequestDTO,
                     joinedMember);
@@ -48,15 +57,44 @@ public class SignupService {
         return true;
     }
 
+    private static Account getNewAccount(Member newMember, String newAccountNumber) {
+        return Account.builder()
+                .member(newMember)
+                .accountNumber(newAccountNumber)
+                .point(0)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
     private AuthProduceDTO getAuthProduceDTO(MemberSignupRequestDTO memberSignupRequestDTO, Member joinedMember) {
-        AuthProduceDTO authProduceDTO = AuthProduceDTO.builder()
+        return AuthProduceDTO.builder()
                 .memberId(joinedMember.getId())
                 .memberName(joinedMember.getMemberName())
                 .memberPassword(memberSignupRequestDTO.getMemberPassword())
                 .phoneNumber(joinedMember.getPhoneNumber())
                 .role(joinedMember.getRole())
                 .build();
-        return authProduceDTO;
+    }
+
+    private String generateAccountNumber() {
+        Random random = new Random();
+
+        String prePart = String.format("%06d", random.nextInt(1000000));
+        String inPart = String.format("%02d", random.nextInt(100));
+        String postPart = String.format("%05d", random.nextInt(10000));
+
+        return String.format("%s-%s-%s", prePart, inPart, postPart);
+    }
+
+
+    private String makeNewAccountNumber() {
+        while (true) {
+            String accountNumber = generateAccountNumber();
+
+            if (!accountRepository.existsByAccountNumber(accountNumber)) {
+                return accountNumber;
+            }
+        }
     }
 
 }

@@ -27,8 +27,7 @@ public class MemberSignupRequestDTO {
     private Integer sex;
 
     public Member toEntity() {
-
-        Member member = Member.builder()
+        return Member.builder()
                 .name(name)
                 .birth(convertStringToDate(birth, sex))
                 .phoneNumber(phoneNumber)
@@ -39,8 +38,6 @@ public class MemberSignupRequestDTO {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-
-        return member;
     }
 
     private Date convertStringToDate(String date, Integer number) {
@@ -51,8 +48,7 @@ public class MemberSignupRequestDTO {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate localDate = LocalDate.parse(formattedDate, formatter);
 
-        Date birthDate = Date.from(localDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
-        return birthDate;
+        return Date.from(localDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
     }
 
     private Character convertGenderNumberToGenderCode(Integer genderNumber) {
