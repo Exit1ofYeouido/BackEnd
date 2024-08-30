@@ -59,7 +59,7 @@ public class TokenService {
         updateRefreshToken(memberId, newAccessToken);
 
         response.setHeader("accssToken", newAccessToken);
-        response.setHeader("refreshToken", newRefreshToken);
+        response.addCookie(createCookie("refreshToken", newRefreshToken));
         response.setStatus(HttpServletResponse.SC_CREATED);
 
         return response;
@@ -81,5 +81,13 @@ public class TokenService {
             return true;
         }
         return false;
+    }
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(60 * 60 * 24 * 3);
+        cookie.setHttpOnly(true);
+
+        return cookie;
     }
 }
