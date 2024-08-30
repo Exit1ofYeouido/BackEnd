@@ -9,11 +9,9 @@ import lombok.Getter;
 @Table(name="quiz")
 public class Quiz {
 
-
-
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;
+    private Long quizId;
 
     private String question;
 

@@ -12,7 +12,7 @@ import lombok.Getter;
 public class Content {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;
+    private Long contentId;
 
 
     private String type;

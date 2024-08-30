@@ -12,7 +12,7 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;
+    private Long eventId;
 
     private String stockCode;
 
