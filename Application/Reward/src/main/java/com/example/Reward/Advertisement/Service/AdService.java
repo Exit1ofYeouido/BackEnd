@@ -18,6 +18,7 @@ import com.example.Reward.Advertisement.Webclient.ApiService;
 import com.example.Reward.Advertisement.Webclient.ResultDto;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Repository.EventRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ public class AdService {
     private final ApiService apiservice;
 
 
+    @Transactional(readOnly=true)
     public List<GetInfoResponseDto> getAdInfo(Long memId) {
         List<String> enterpriseNoneList=new ArrayList<>();
         List<Long> mediaLinkIdList=new ArrayList<>();
@@ -84,6 +86,7 @@ public class AdService {
 
     }
 
+    @Transactional(readOnly=true)
     public GetMediaUrlResponseDto getMediaUrl(Long mediaId) {
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
         mediaLink.orElseThrow(()-> new RuntimeException());
@@ -91,12 +94,14 @@ public class AdService {
     }
 
 
+    @Transactional(readOnly=true)
     public GetQuizResponseDto getQuiz(Long mediaId) {
         Quiz quiz=quizRepository.findByMediaLinkId(mediaId);
         return GetQuizResponseDto.of(quiz);
     }
 
 
+    @Transactional
     public GiveStockResponseDto giveStock(Long mediaId, GiveStockRequestDto giveStockRequestDto,Long memId) {
 
 
@@ -146,10 +151,10 @@ public class AdService {
 
     }
 
+    @Transactional(readOnly=true)
     public DetailEnterPriseResponseDto getEnterpriseDetail(String enterpriseName) {
 
         Event event=eventRepository.findByEnterpriseNameContaining(enterpriseName);
-
         return DetailEnterPriseResponseDto.of(event);
     }
 }
