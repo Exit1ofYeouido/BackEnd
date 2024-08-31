@@ -135,7 +135,7 @@ public class MyService {
                                 giveStockConsumeDto.getAmount()* giveStockConsumeDto.getPrice())/(memberStock.getCount()+ giveStockConsumeDto.getAmount()));
 
             memberStock.setAveragePrice(avgPrice);
-            memberStock.setUpdateAt(LocalDateTime.now());
+            memberStock.setUpdatedAt(LocalDateTime.now());
             memberStockRepository.save(memberStock);
         }else {
             MemberStock new_memberStock = MemberStock.builder()
@@ -145,7 +145,7 @@ public class MyService {
                     .stockCode(giveStockConsumeDto.getCode())
                     .averagePrice(giveStockConsumeDto.getPrice())
                     .createdAt(LocalDateTime.now())
-                    .updateAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
                     .build();
             memberStockRepository.save(new_memberStock);
         }

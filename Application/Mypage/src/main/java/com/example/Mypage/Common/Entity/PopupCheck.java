@@ -1,5 +1,6 @@
 package com.example.Mypage.Common.Entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class PopupCheck {
     @Id
     @GeneratedValue
+    @Column(name="popup_check_id")
     private Long id;
 
     private String popupType;

@@ -17,6 +17,7 @@ public class MemberStock {
 
     @Id
     @GeneratedValue
+    @Column(name="member_stock_id")
     private Long id;
 
     private double count;
@@ -24,15 +25,14 @@ public class MemberStock {
 
     private int averagePrice;
 
-    @Column(unique = true)
+
     private String stockCode;
 
-    @Column(unique = true)
     private String stockName;
 
     private LocalDateTime createdAt;
 
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name="member_id")
