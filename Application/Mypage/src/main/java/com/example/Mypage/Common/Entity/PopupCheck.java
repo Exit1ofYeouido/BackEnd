@@ -15,11 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PopupCheck {
-    @Id
-    @GeneratedValue
-    @Column(name="popup_check_id")
-    private Long id;
 
+    @Id
     private String popupType;
 
     private Long memberId;
