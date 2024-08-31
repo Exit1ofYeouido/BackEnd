@@ -104,10 +104,6 @@ public class AdService {
     @Transactional
     public GiveStockResponseDto giveStock(Long mediaId, GiveStockRequestDto giveStockRequestDto,Long memId) {
 
-
-
-        //미디어 시청내역 체크  (중복제외 로직 포함)
-
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
 
         MediaHistory mediaHistory=mediaHistoryRepository.findByMemberIdAndMediaLinkId(memId,mediaLink.get().getId());
@@ -116,8 +112,6 @@ public class AdService {
             mediaHistoryRepository.save(new_mediaHistory);
         }
 
-
-        //오늘봤던 checkToday 체크 (중복제외 로직 포함)
         CheckToday checkToday=checkTodayRepository.findByEnterpriseNameAndMemberId(giveStockRequestDto.getEnterpriseName(),memId);
         if (checkToday ==null) {
             CheckToday new_checkToday = CheckToday.builder().enterpriseName(giveStockRequestDto.getEnterpriseName()).memberId(memId).build();
@@ -128,12 +122,8 @@ public class AdService {
             throw new NotMatchedEnterpriseName(checkToday.getEnterpriseName(),giveStockRequestDto.getEnterpriseName());
         }
 
-
-        //만일 된다면 주식 가격을 불러오고 주식 100원마치 0.x주를 줘야함+event 삭제
-
         Event event=eventRepository.findByEnterpriseNameContaining(giveStockRequestDto.getEnterpriseName());
 
-        //주식 이벤트 리워드 0 이하면 에러 return
         if (event.getRewardAmount()<=0){
             throw new NoStockException();
         }
@@ -141,9 +131,6 @@ public class AdService {
         ResultDto resultDto=apiservice.getPrise(event.getStockCode());
         event.setRewardAmount(event.getRewardAmount()-resultDto.getAmount());
         eventRepository.save(event);
-
-
-        //카프카로 멤버한테 요청해서 stock을 줌(완)
 
         kafkaOutputService.giveStock(memId,resultDto.getAmount(),event.getStockCode(),event.getEnterpriseName(),resultDto.getCost());
 
