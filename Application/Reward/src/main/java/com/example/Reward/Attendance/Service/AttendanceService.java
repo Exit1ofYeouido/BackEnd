@@ -3,13 +3,16 @@ package com.example.Reward.Attendance.Service;
 import com.example.Reward.Advertisement.Kafka.Dto.Stock;
 import com.example.Reward.Attendance.Dto.out.AttendResponseDTO;
 import com.example.Reward.Attendance.Dto.out.GetAttendanceResponseDTO;
+import com.example.Reward.Attendance.Dto.out.Reward;
 import com.example.Reward.Attendance.Dto.out.StockInfoDTO;
 import com.example.Reward.Attendance.Entity.Attendance;
 import com.example.Reward.Attendance.Repository.AttendanceRepository;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Repository.EventRepository;
+import com.example.Reward.Common.Service.GiveStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +24,7 @@ import java.util.Random;
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final EventRepository eventRepository;
+    private final GiveStockService giveStockService;
 
     public GetAttendanceResponseDTO findAttendInfo(Long memberId) {
         Attendance attendance = attendanceRepository.findByMemberId(memberId);
@@ -71,5 +75,22 @@ public class AttendanceService {
         Random random = new Random();
         int randomIndex = random.nextInt(eventList.size());
         return eventList.get(randomIndex);
+    }
+
+    @Transactional
+    public AttendResponseDTO giveStock(Long memberId, StockInfoDTO stockInfoDTO, Integer priceOfStock, Double amountOfStock) {
+        giveStockService.giveStock(memberId, stockInfoDTO.getEnterpriseName(), stockInfoDTO.getContentId(), priceOfStock, amountOfStock);
+        Event event = eventRepository.findByEnterpriseNameContaining(stockInfoDTO.getEnterpriseName());
+        event.setRewardAmount(event.getRewardAmount()-amountOfStock);
+        eventRepository.save(event);
+        Reward reward = Reward.builder()
+                .enterpriseName(stockInfoDTO.getEnterpriseName())
+                .amount(amountOfStock)
+                .build();
+        AttendResponseDTO attendResponseDTO = AttendResponseDTO.builder()
+                .hasReward(true)
+                .reward(reward)
+                .build();
+        return attendResponseDTO;
     }
 }

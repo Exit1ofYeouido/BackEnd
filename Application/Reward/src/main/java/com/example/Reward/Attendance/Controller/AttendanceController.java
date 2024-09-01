@@ -4,6 +4,7 @@ import com.example.Reward.Attendance.Dto.out.AttendResponseDTO;
 import com.example.Reward.Attendance.Dto.out.GetAttendanceResponseDTO;
 import com.example.Reward.Attendance.Dto.out.StockInfoDTO;
 import com.example.Reward.Attendance.Service.AttendanceService;
+import com.example.Reward.Common.Service.GiveStockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name="출석체크 API")
 public class AttendanceController {
     private final AttendanceService attendanceService;
+    private final GiveStockService giveStockService;
 
-    public AttendanceController(AttendanceService attendanceService) {
+    public AttendanceController(AttendanceService attendanceService, GiveStockService giveStockService) {
         this.attendanceService = attendanceService;
+        this.giveStockService = giveStockService;
     }
 
     @GetMapping("/")
@@ -34,8 +37,10 @@ public class AttendanceController {
             AttendResponseDTO attendResponseDTO = AttendResponseDTO.builder().hasReward(false).build();
             return ResponseEntity.ok(attendResponseDTO);
         }
-        StockInfoDTO stockInfoDTO = attendanceService.getRandomStock(Long.valueOf(memberId));
-        AttendResponseDTO attendResponseDTO = AttendResponseDTO.builder().hasReward(true).build();
+        StockInfoDTO randomStock = attendanceService.getRandomStock(Long.valueOf(memberId));
+        Integer priceOfStock = giveStockService.getPrice(randomStock.getEnterpriseName());
+        Double amountOfStock = giveStockService.calDecimalStock(priceOfStock);
+        AttendResponseDTO attendResponseDTO = attendanceService.giveStock(Long.valueOf(memberId), randomStock, priceOfStock, amountOfStock);
         return ResponseEntity.ok(attendResponseDTO);
     }
 }

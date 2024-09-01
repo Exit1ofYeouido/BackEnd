@@ -16,8 +16,7 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class GiveStockService {
-
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
     private final WebClient webClient;
     @Value("${app.key}")
     private String appKey;
