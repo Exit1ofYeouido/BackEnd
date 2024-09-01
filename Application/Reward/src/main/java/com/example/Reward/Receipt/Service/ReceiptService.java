@@ -152,7 +152,7 @@ public class ReceiptService {
 
     @Transactional
     public RewardResponseDTO giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-        giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(), priceOfStock, amountOfStock);
+        giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(),2L, priceOfStock, amountOfStock);
         Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
         event.setRewardAmount(event.getRewardAmount()-amountOfStock);
         eventRepository.save(event);
