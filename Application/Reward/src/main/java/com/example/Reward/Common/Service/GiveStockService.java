@@ -46,11 +46,11 @@ public class GiveStockService {
         return BigDecimal.valueOf(100).divide(price, 6, BigDecimal.ROUND_DOWN).doubleValue();
     }
 
-    public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-        String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L).getStockCode();
+    public void giveStock(Long memberId, String enterpriseName, Integer priceOfStock, Double amountOfStock) {
+        String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, 2L).getStockCode();
         GiveStockProduceDto giveStockProduceDTO = GiveStockProduceDto.builder()
                 .memId(memberId)
-                .enterpriseName(rewardRequestDTO.getEnterpriseName())
+                .enterpriseName(enterpriseName)
                 .code(stockCode)
                 .price(priceOfStock)
                 .amount(amountOfStock)
