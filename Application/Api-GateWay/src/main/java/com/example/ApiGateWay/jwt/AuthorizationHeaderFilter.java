@@ -3,6 +3,7 @@ package com.example.ApiGateWay.jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Jwts.SIG;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +13,9 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -35,6 +37,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
+
             if (!request.getHeaders().containsKey("Authorization")) {
                 return onError(exchange, "No authorization Header", HttpStatus.UNAUTHORIZED);
             }
@@ -44,6 +47,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             String jwt = authorizationHeader.replace("Bearer ", "");
 
             if (!isJwtValid(jwt)) {
+                if (isJwtExpired(jwt)) {
+                    return onError(exchange, "JWT Expired is expired", HttpStatus.FORBIDDEN);
+                }
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
 
@@ -55,11 +61,20 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         };
     }
 
-    private Mono<Void> onError(ServerWebExchange exchange, String error, HttpStatus httpStatus) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(httpStatus);
+    private Mono<ResponseEntity<String>> onError(ServerWebExchange exchange, String error, HttpStatus httpStatus) {
         log.error(error);
-        return response.setComplete();
+
+        // 오류 메시지를 JSON 형태로 생성
+        String responseBody = String.format("{\"error\": \"%s\"}", error);
+
+        // ResponseEntity 생성
+        ResponseEntity<String> responseEntity = ResponseEntity
+                .status(httpStatus)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(responseBody);
+
+        // Mono로 래핑하여 반환
+        return Mono.just(responseEntity);
     }
 
     private boolean isJwtValid(String jwt) {
@@ -72,6 +87,16 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             log.error(e.getMessage());
         }
         return !Strings.isBlank(subject);
+    }
+
+    private boolean isJwtExpired(String jwt) {
+        try {
+            return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(jwt).getPayload().getExpiration()
+                    .before(new Date());
+        } catch (Exception e) {
+            log.error("Error checking JWT expiration: " + e.getMessage());
+            return true;
+        }
     }
 
 }
