@@ -11,11 +11,13 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -61,20 +63,19 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         };
     }
 
-    private Mono<ResponseEntity<String>> onError(ServerWebExchange exchange, String error, HttpStatus httpStatus) {
+    private Mono<Void> onError(ServerWebExchange exchange, String error, HttpStatus httpStatus) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(httpStatus);
         log.error(error);
 
-        // 오류 메시지를 JSON 형태로 생성
+        // 응답 본문에 오류 메시지 추가
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         String responseBody = String.format("{\"error\": \"%s\"}", error);
 
-        // ResponseEntity 생성
-        ResponseEntity<String> responseEntity = ResponseEntity
-                .status(httpStatus)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(responseBody);
+        DataBufferFactory bufferFactory = response.bufferFactory();
+        DataBuffer dataBuffer = bufferFactory.wrap(responseBody.getBytes(StandardCharsets.UTF_8));
 
-        // Mono로 래핑하여 반환
-        return Mono.just(responseEntity);
+        return response.writeWith(Mono.just(dataBuffer));
     }
 
     private boolean isJwtValid(String jwt) {

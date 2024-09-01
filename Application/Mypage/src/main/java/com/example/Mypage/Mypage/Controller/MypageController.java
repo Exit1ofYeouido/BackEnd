@@ -2,7 +2,6 @@ package com.example.Mypage.Mypage.Controller;
 
 
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
-import com.example.Mypage.Mypage.Dto.out.GetPointReponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.MyService;
@@ -48,14 +47,4 @@ public class MypageController {
         myService.saveTutorialCheck(type, Long.valueOf(memberId));
         return ResponseEntity.ok("");
     }
-
-    @GetMapping("/point")
-    @Operation(description = "나의 현재 포인트 조회")
-    public ResponseEntity<GetPointReponseDto> getPoint(@RequestHeader("memberId") Long memberId) {
-        //TODO : Long Type으로 매핑되지 않은 경우에 대한 Exception Handler 만들기
-        GetPointReponseDto getPointReponseDto = accountService.getPoint(memberId);
-        return ResponseEntity.ok(getPointReponseDto);
-    }
-
-
 }
