@@ -25,13 +25,8 @@ public class MypageExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<?> handelGrobalException(Exception e){
-        ErrorResponseDto errorResponseDto=new ErrorResponseDto(
-                e.getMessage(),
-                LocalDateTime.now()
-        );
-
-        return new ResponseEntity<>(errorResponseDto,HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(NotMemberException.class)
+    public ResponseEntity<String> notmemberException(NotMemberException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("멤버가 존재하지않습니다."+e.getMemId());
     }
 }

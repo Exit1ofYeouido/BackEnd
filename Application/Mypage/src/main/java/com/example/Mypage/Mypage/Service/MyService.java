@@ -12,6 +12,8 @@ import com.example.Mypage.Common.Repository.PopupCheckRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
+import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
+import com.example.Mypage.Mypage.Exception.NotMemberException;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.text.DecimalFormat;
@@ -41,7 +43,10 @@ public class MyService {
 
     @Transactional(readOnly = true)
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
-        Account account = accountRepository.findByMemberId(memId).orElse(null);
+
+        Account account = accountRepository.findByMemberId(memId).orElseThrow(
+                ()-> new AccountNotFoundException("계좌가 존재하지않습니다.")
+        );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
         String calcAssetsEarningRate = CalcAllAsssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
@@ -92,6 +97,7 @@ public class MyService {
     private List<EarningRate> Top3EarningRateAssets(List<MemberStock> memberStocks) {
 
         List<EarningRate> top3EarningRates = new ArrayList<>();
+
         for (MemberStock memberStock : memberStocks) {
             double stockCount = memberStock.getCount();
             int stockPrice = memberStock.getAveragePrice();
@@ -134,6 +140,7 @@ public class MyService {
 
 
         Optional<Member> member = memberRepository.findById(giveStockDto.getMemId());
+        member.orElseThrow(()-> new NotMemberException(giveStockDto.getMemId()));
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
                 , giveStockDto.getMemId());
 
