@@ -7,6 +7,7 @@ import com.example.Reward.Attendance.Repository.AttendanceRepository;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Repository.EventRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -40,19 +41,23 @@ public class AttendanceService {
         return getAttendanceResponseDTO;
     }
 
-    public AttendResponseDTO attend(Long memberId) {
+    public Boolean attend(Long memberId) {
         Attendance attendance = attendanceRepository.findByMemberId(memberId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate recentAttendDate = LocalDate.parse(attendance.getRecent(), formatter);
         LocalDate today = LocalDate.now();
         if(recentAttendDate.equals(today)) {
-            return AttendResponseDTO.builder().hasReward(false).build();
+            return false;
         }
         attendance.setRecent(today.toString());
         attendance.setCount(attendance.getCount()+1);
         if(attendance.getCount()%5!=0) {
-            return AttendResponseDTO.builder().hasReward(false).build();
+            return false;
         }
+        return true;
+    }
+
+    public AttendResponseDTO giveStock(Long memberId) {
         List<Event> eventList;
         eventList = eventRepository.findByRewardAmountLessThanAndContentId(1L, 2L);
         if(eventList.isEmpty()) eventList = eventRepository.findByRewardAmountGreaterThanEqualAndContentId(1L, 2L);

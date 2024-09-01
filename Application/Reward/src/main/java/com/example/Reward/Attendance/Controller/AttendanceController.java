@@ -28,7 +28,12 @@ public class AttendanceController {
     @PostMapping("/check")
     @Operation(description = "출석 체크 요청")
     public ResponseEntity<AttendResponseDTO> postAttend(@RequestHeader("memberId") String memberId) {
-        AttendResponseDTO attendResponseDTO = attendanceService.attend(Long.valueOf(memberId));
-        return ResponseEntity.ok(attendResponseDTO);
+        Boolean hasReward = attendanceService.attend(Long.valueOf(memberId));
+        if(!hasReward) {
+            AttendResponseDTO attendResponseDTO = AttendResponseDTO.builder().hasReward(false).build();
+            return ResponseEntity.ok(attendResponseDTO);
+        }
+        attendanceService.giveStock(Long.valueOf(memberId));
+
     }
 }
