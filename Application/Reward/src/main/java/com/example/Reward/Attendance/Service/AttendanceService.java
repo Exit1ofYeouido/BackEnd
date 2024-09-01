@@ -54,12 +54,12 @@ public class AttendanceService {
         if(recentAttendDate.equals(today)) {
             return false;
         }
+        int currentMonth = today.getMonthValue();
+        int recentMonth = recentAttendDate.getMonthValue();
         attendance.setRecent(today.toString());
-        attendance.setCount(attendance.getCount()+1);
-        if(attendance.getCount()%5!=0) {
-            return false;
-        }
-        return true;
+        attendance.setCount((currentMonth==recentMonth) ? attendance.getCount()+1 : 1);
+        attendanceRepository.save(attendance);
+        return attendance.getCount() % 5 == 0;
     }
 
     public StockInfoDTO getRandomStock(Long memberId) {
