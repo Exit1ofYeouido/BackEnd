@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @JsonDeserialize
 @NoArgsConstructor
 @AllArgsConstructor
-public class GiveStockConsumeDto {
+public class GiveStockDto {
 
     private Long memId;
 
