@@ -10,7 +10,7 @@ import lombok.Getter;
 @Builder
 @JsonSerialize
 @JsonDeserialize
-public class GiveStockProduceDto {
+public class GiveStockDto {
 
     private Long memId;
 

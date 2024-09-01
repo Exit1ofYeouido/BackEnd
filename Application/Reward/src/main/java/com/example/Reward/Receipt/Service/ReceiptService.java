@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.Reward.Advertisement.Webclient.GeneratedToken;
 import com.example.Reward.Common.Entity.Event;
-import com.example.Reward.Common.Kafka.GiveStockProduceDto;
+import com.example.Reward.Common.Kafka.GiveStockDto;
 import com.example.Reward.Common.Repository.EventRepository;
 import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.out.*;
@@ -206,7 +206,7 @@ public class ReceiptService {
 
     public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
         String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L).getStockCode();
-        GiveStockProduceDto giveStockProduceDTO = GiveStockProduceDto.builder()
+        GiveStockDto giveStockDTO = GiveStockDto.builder()
                 .memId(memberId)
                 .enterpriseName(rewardRequestDTO.getEnterpriseName())
                 .code(stockCode)
@@ -214,6 +214,6 @@ public class ReceiptService {
                 .amount(amountOfStock)
                 .build();
 
-        kafkaTemplate.send("test-mo", giveStockProduceDTO);
+        kafkaTemplate.send("test-mo", giveStockDTO);
     }
 }
