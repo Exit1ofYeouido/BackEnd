@@ -59,8 +59,8 @@ public class AttendanceService {
 
     public AttendResponseDTO giveStock(Long memberId) {
         List<Event> eventList;
-        eventList = eventRepository.findByRewardAmountLessThanAndContentId(1L, 2L);
-        if(eventList.isEmpty()) eventList = eventRepository.findByRewardAmountGreaterThanEqualAndContentId(1L, 2L);
+        eventList = eventRepository.findByRewardAmountLessThan(1L);
+        if(eventList.isEmpty()) eventList = eventRepository.findByRewardAmountGreaterThanEqual(1L);
         Event randomStock = getRandomEvent(eventList);
         return null;
     }
