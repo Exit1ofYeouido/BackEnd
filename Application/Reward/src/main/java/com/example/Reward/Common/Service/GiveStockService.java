@@ -1,20 +1,14 @@
 package com.example.Reward.Common.Service;
 
 import com.example.Reward.Advertisement.Webclient.GeneratedToken;
-import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Kafka.GiveStockProduceDto;
 import com.example.Reward.Common.Repository.EventRepository;
 import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
-import com.example.Reward.Receipt.Dto.out.RewardResponseDTO;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
-import com.example.Reward.Receipt.Entity.ReceiptLog;
-import com.example.Reward.Receipt.Entity.ReceiptLogKey;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
