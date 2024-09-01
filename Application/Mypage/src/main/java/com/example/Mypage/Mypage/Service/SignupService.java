@@ -85,8 +85,7 @@ public class SignupService {
 
         return String.format("%s-%s-%s", prePart, inPart, postPart);
     }
-
-
+    
     private String makeNewAccountNumber() {
         while (true) {
             String accountNumber = generateAccountNumber();
