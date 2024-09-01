@@ -14,4 +14,6 @@ public interface EventRepository extends JpaRepository<Event,Long> {
     List<Event> findByRewardAmountGreaterThanEqualAndContentId(Long rewardAmount, Long contentId);
 
     Event findByEnterpriseNameContainingAndContentId(String name, Long contentId);
+
+    List<Event> findByRewardAmountLessThanAndContentId(Long rewardAmount, Long contentId);
 }

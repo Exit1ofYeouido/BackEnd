@@ -1,23 +1,29 @@
 package com.example.Reward.Attendance.Service;
 
-import com.example.Reward.Attendance.Dto.out.AttendanceRespondDTO;
+import com.example.Reward.Attendance.Dto.out.AttendResponseDTO;
+import com.example.Reward.Attendance.Dto.out.GetAttendanceResponseDTO;
 import com.example.Reward.Attendance.Entity.Attendance;
 import com.example.Reward.Attendance.Repository.AttendanceRepository;
+import com.example.Reward.Common.Entity.Event;
+import com.example.Reward.Common.Repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
+    private final EventRepository eventRepository;
 
-    public AttendanceRespondDTO findAttendInfo(Long memberId) {
+    public GetAttendanceResponseDTO findAttendInfo(Long memberId) {
         Attendance attendance = attendanceRepository.findByMemberId(memberId);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // 날짜 형식에 맞게 패턴 설정
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate recentAttendDate = LocalDate.parse(attendance.getRecent(), formatter);
         LocalDate today = LocalDate.now();
         int currentMonth = today.getMonthValue();
@@ -25,12 +31,38 @@ public class AttendanceService {
         int recentMonth = recentAttendDate.getMonthValue();
         int count = (currentMonth==recentMonth) ? attendance.getCount() : 0;
 
-        AttendanceRespondDTO attendanceRespondDTO = AttendanceRespondDTO.builder()
+        GetAttendanceResponseDTO getAttendanceResponseDTO = GetAttendanceResponseDTO.builder()
                 .isChecked(isChecked)
                 .attendCount(count)
                 .month(currentMonth)
                 .build();
 
-        return attendanceRespondDTO;
+        return getAttendanceResponseDTO;
+    }
+
+    public AttendResponseDTO attend(Long memberId) {
+        Attendance attendance = attendanceRepository.findByMemberId(memberId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate recentAttendDate = LocalDate.parse(attendance.getRecent(), formatter);
+        LocalDate today = LocalDate.now();
+        if(recentAttendDate.equals(today)) {
+            return AttendResponseDTO.builder().hasReward(false).build();
+        }
+        attendance.setRecent(today.toString());
+        attendance.setCount(attendance.getCount()+1);
+        if(attendance.getCount()%5!=0) {
+            return AttendResponseDTO.builder().hasReward(false).build();
+        }
+        List<Event> eventList;
+        eventList = eventRepository.findByRewardAmountLessThanAndContentId(1L, 2L);
+        if(eventList.isEmpty()) eventList = eventRepository.findByRewardAmountGreaterThanEqualAndContentId(1L, 2L);
+        Event randomStock = getRandomEvent(eventList);
+        return null;
+    }
+
+    private Event getRandomEvent(List<Event> eventList) {
+        Random random = new Random();
+        int randomIndex = random.nextInt(eventList.size());
+        return eventList.get(randomIndex);
     }
 }

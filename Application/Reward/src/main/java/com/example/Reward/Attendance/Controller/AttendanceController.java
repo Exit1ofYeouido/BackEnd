@@ -1,14 +1,12 @@
 package com.example.Reward.Attendance.Controller;
 
-import com.example.Reward.Attendance.Dto.out.AttendanceRespondDTO;
+import com.example.Reward.Attendance.Dto.out.AttendResponseDTO;
+import com.example.Reward.Attendance.Dto.out.GetAttendanceResponseDTO;
 import com.example.Reward.Attendance.Service.AttendanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/attendance")
@@ -22,8 +20,15 @@ public class AttendanceController {
 
     @GetMapping("/")
     @Operation(description = "이번 달 출석 현황 조회")
-    public ResponseEntity<AttendanceRespondDTO> getAttendInfo(@RequestHeader("memberId") String memberId) {
-        AttendanceRespondDTO attendanceRespondDTO = attendanceService.findAttendInfo(Long.valueOf(memberId));
-        return ResponseEntity.ok(attendanceRespondDTO);
+    public ResponseEntity<GetAttendanceResponseDTO> getAttendInfo(@RequestHeader("memberId") String memberId) {
+        GetAttendanceResponseDTO getAttendanceResponseDTO = attendanceService.findAttendInfo(Long.valueOf(memberId));
+        return ResponseEntity.ok(getAttendanceResponseDTO);
+    }
+
+    @PostMapping("/check")
+    @Operation(description = "출석 체크 요청")
+    public ResponseEntity<AttendResponseDTO> postAttend(@RequestHeader("memberId") String memberId) {
+        AttendResponseDTO attendResponseDTO = attendanceService.attend(Long.valueOf(memberId));
+        return ResponseEntity.ok(attendResponseDTO);
     }
 }
