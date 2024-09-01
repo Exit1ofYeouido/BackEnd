@@ -37,12 +37,16 @@ public class AccountService {
         }
     }
 
-    //TODO : 정상작동 확인했고 이후 테스트 로직 지우고 정상화하기
     public List<GetPointHistoryResponseDto> getPointHistory(Long memberId, int index, int limit) {
         Pageable pageable = PageRequest.of(index, limit);
         Page<AccountHistory> accountHistoryPage = accountHistoryRepository.findByMemberId(memberId, pageable);
         List<AccountHistory> accountHistoryList = accountHistoryPage.getContent();
 
+        return getPointHistoryResponseDtos(accountHistoryList);
+    }
+
+    private static List<GetPointHistoryResponseDto> getPointHistoryResponseDtos(
+            List<AccountHistory> accountHistoryList) {
         return accountHistoryList.stream()
                 .map(accountHistory -> GetPointHistoryResponseDto.builder()
                         .memberId(accountHistory.getMember().getId())
