@@ -2,6 +2,7 @@ package com.example.Reward.Attendance.Controller;
 
 import com.example.Reward.Attendance.Dto.out.AttendResponseDTO;
 import com.example.Reward.Attendance.Dto.out.GetAttendanceResponseDTO;
+import com.example.Reward.Attendance.Dto.out.StockInfoDTO;
 import com.example.Reward.Attendance.Service.AttendanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +34,8 @@ public class AttendanceController {
             AttendResponseDTO attendResponseDTO = AttendResponseDTO.builder().hasReward(false).build();
             return ResponseEntity.ok(attendResponseDTO);
         }
-        attendanceService.giveStock(Long.valueOf(memberId));
-
+        StockInfoDTO stockInfoDTO = attendanceService.getRandomStock(Long.valueOf(memberId));
+        AttendResponseDTO attendResponseDTO = AttendResponseDTO.builder().hasReward(true).build();
+        return ResponseEntity.ok(attendResponseDTO);
     }
 }

@@ -1,13 +1,14 @@
 package com.example.Reward.Attendance.Service;
 
+import com.example.Reward.Advertisement.Kafka.Dto.Stock;
 import com.example.Reward.Attendance.Dto.out.AttendResponseDTO;
 import com.example.Reward.Attendance.Dto.out.GetAttendanceResponseDTO;
+import com.example.Reward.Attendance.Dto.out.StockInfoDTO;
 import com.example.Reward.Attendance.Entity.Attendance;
 import com.example.Reward.Attendance.Repository.AttendanceRepository;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Repository.EventRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -57,15 +58,16 @@ public class AttendanceService {
         return true;
     }
 
-    public AttendResponseDTO giveStock(Long memberId) {
+    public StockInfoDTO getRandomStock(Long memberId) {
         List<Event> eventList;
         eventList = eventRepository.findByRewardAmountLessThan(1L);
         if(eventList.isEmpty()) eventList = eventRepository.findByRewardAmountGreaterThanEqual(1L);
-        Event randomStock = getRandomEvent(eventList);
-        return null;
+        Event randomStock = selectRandomEvent(eventList);
+        StockInfoDTO stockInfoDTO = new StockInfoDTO(randomStock.getId(), randomStock.getContent().getId(), randomStock.getEnterpriseName(), randomStock.getStockCode());
+        return stockInfoDTO;
     }
 
-    private Event getRandomEvent(List<Event> eventList) {
+    private Event selectRandomEvent(List<Event> eventList) {
         Random random = new Random();
         int randomIndex = random.nextInt(eventList.size());
         return eventList.get(randomIndex);
