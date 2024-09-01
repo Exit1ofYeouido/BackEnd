@@ -178,17 +178,17 @@ public class ReceiptService {
     }
 
 
-    public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-        String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L).getStockCode();
-        GiveStockDto giveStockDTO = GiveStockDto.builder()
-                .memId(memberId)
-                .enterpriseName(rewardRequestDTO.getEnterpriseName())
-                .code(stockCode)
-                .price(priceOfStock)
-                .amount(amountOfStock)
-                .build();
-
-        kafkaTemplate.send("test-mo", giveStockDTO);
-    }
+//    public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
+//        String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L).getStockCode();
+//        GiveStockDto giveStockDTO = GiveStockDto.builder()
+//                .memId(memberId)
+//                .enterpriseName(rewardRequestDTO.getEnterpriseName())
+//                .code(stockCode)
+//                .price(priceOfStock)
+//                .amount(amountOfStock)
+//                .build();
+//
+//        kafkaTemplate.send("test-mo", giveStockDTO);
+//    }
 
 }

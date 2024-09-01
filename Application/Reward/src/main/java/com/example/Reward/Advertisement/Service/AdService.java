@@ -9,7 +9,6 @@ import com.example.Reward.Advertisement.Entity.MediaLink;
 import com.example.Reward.Advertisement.Entity.Quiz;
 import com.example.Reward.Advertisement.Exception.NoStockException;
 import com.example.Reward.Advertisement.Exception.NotMatchedEnterpriseName;
-import com.example.Reward.Advertisement.Kafka.Service.KafkaOutputService;
 import com.example.Reward.Advertisement.Repository.CheckTodayRepository;
 import com.example.Reward.Advertisement.Repository.MediaHistoryRepository;
 import com.example.Reward.Advertisement.Repository.MediaLinkRepository;
@@ -18,6 +17,7 @@ import com.example.Reward.Advertisement.Webclient.ApiService;
 import com.example.Reward.Advertisement.Webclient.ResultDto;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Repository.EventRepository;
+import com.example.Reward.Common.Service.GiveStockService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class AdService {
     private final MediaHistoryRepository mediaHistoryRepository;
     private final CheckTodayRepository checkTodayRepository;
     private final EventRepository eventRepository;
-    private final KafkaOutputService kafkaOutputService;
+    private final GiveStockService giveStockService;
     private final ApiService apiservice;
 
 
@@ -132,7 +132,7 @@ public class AdService {
         event.setRewardAmount(event.getRewardAmount()-resultDto.getAmount());
         eventRepository.save(event);
 
-        kafkaOutputService.giveStock(memId,resultDto.getAmount(),event.getStockCode(),event.getEnterpriseName(),resultDto.getCost());
+        giveStockService.giveAdStock(memId,resultDto.getAmount(),event.getStockCode(),event.getEnterpriseName(),resultDto.getCost());
 
         return GiveStockResponseDto.givetostock(giveStockRequestDto.getEnterpriseName(),resultDto.getAmount());
 
