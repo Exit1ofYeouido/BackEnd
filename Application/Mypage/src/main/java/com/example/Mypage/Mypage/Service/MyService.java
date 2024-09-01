@@ -21,8 +21,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +38,8 @@ public class MyService {
 
     //TODO : 더미데이터를 넣어서 포인트로직 검증하기
     //TODO: orElse() 변경
+
+    @Transactional(readOnly = true)
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
         Account account = accountRepository.findByMemberId(memId).orElse(null);
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
@@ -125,6 +129,7 @@ public class MyService {
 
     }
 
+    @Transactional
     public void giveStock(GiveStockDto giveStockDto) {
 
 
@@ -142,6 +147,7 @@ public class MyService {
             memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdatedAt(LocalDateTime.now());
             memberStockRepository.save(memberStock);
+
         } else {
             MemberStock new_memberStock = MemberStock.builder()
                     .member(member.get())
@@ -157,6 +163,7 @@ public class MyService {
     }
 
 
+    @Transactional(readOnly = true)
     public GetTutorialCheckResponseDto getTutorialCheck(String type, Long memId) {
 
         PopupCheck popupCheck = popupCheckRepository.findByPopupTypeAndMemberId(type, memId);
@@ -178,6 +185,7 @@ public class MyService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
         List<MemberStock> memberStocks=memberStockRepository.findByMemberId(memId);
 
