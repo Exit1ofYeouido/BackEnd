@@ -3,7 +3,6 @@ package com.example.Mypage.Mypage.Controller;
 
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
-import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.MyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class MypageController {
 
     private final MyService myService;
-    private final AccountService accountService;
 
     @GetMapping("/all")
     @Operation(description = "마이페이지 종합")

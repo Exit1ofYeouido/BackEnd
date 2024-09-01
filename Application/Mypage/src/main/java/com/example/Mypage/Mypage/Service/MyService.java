@@ -37,8 +37,7 @@ public class MyService {
     //TODO : 더미데이터를 넣어서 포인트로직 검증하기
     //TODO: orElse() 변경
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
-//        Optional<Member> member = memberRepository.findById(memId);
-        Account account = accountRepository.findById(memId).orElse(null);
+        Account account = accountRepository.findByMemberId(memId).orElse(null);
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
         String calcAssetsEarningRate = CalcAllAsssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
