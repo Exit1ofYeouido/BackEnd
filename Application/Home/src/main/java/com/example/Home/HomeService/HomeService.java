@@ -39,7 +39,7 @@ public class HomeService {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
         MemberPoint memberPoint = memberPointRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("멤버 포인트가 없습니다."));
-        int totalPoint = memberPoint.getResultPoint();
+        int totalPoint = memberPoint.getPoint();
         int totalStock = calculateTotalStock(memberStocks);
         int totalAssets = totalPoint + totalStock;
         double totalEarningRate = calculateEarningRate(memberStocks);

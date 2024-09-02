@@ -1,7 +1,9 @@
 package com.example.Home.Member;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "account")
 public class MemberPoint {
@@ -13,18 +15,10 @@ public class MemberPoint {
 
 
     @Column(name = "point")
-    private int resultPoint;
+    private int point;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public Long getId() {
-        return id;
-    }
-
-
-    public int getResultPoint() {
-        return resultPoint;
-    }
 }
