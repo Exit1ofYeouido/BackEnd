@@ -7,13 +7,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 @JsonSerialize
 @JsonDeserialize
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class AuthConsumeDTO {
 
     private Long memberId;
