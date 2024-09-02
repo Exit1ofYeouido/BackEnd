@@ -60,6 +60,7 @@ spring:
             - Path= ${service-url}/search/**
           filters:
             - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
         - id: auth
           uri: http://3.39.235.153:8085
         - id: home
@@ -68,6 +69,7 @@ spring:
             - Path= ${service-url}/home/**
           filters:
             - RewritePath=${service-url}/home/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
 
 
 
@@ -93,3 +95,4 @@ springdoc:
       - url: ${service-url}/search/v3/api-docs
         name: Search
       - url: ${service-url}/home/v3/api-docs
+        name: Home
