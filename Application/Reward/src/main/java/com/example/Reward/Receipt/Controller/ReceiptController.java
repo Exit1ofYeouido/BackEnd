@@ -43,7 +43,7 @@ public class ReceiptController {
         String receiptData = receiptService.convertImage(receiptImg);
         AnalyzeReceiptDTO analyzeReceiptDTO = receiptService.analyzeReceipt(receiptURL, receiptData, extension);
         GetEnterpriseListDTO getEnterpriseListDTO = receiptService.getEnterpriseList();
-        String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseListDTO.getEnterprises(), analyzeReceiptDTO.getStoreName());
+        String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseListDTO.getEnterprises(), analyzeReceiptDTO.getStoreName(), receiptURL);
         CheckReceiptResponseDTO checkReceiptResponseDTO = CheckReceiptResponseDTO.builder()
                 .find(checkedEnterpriseName.isEmpty() ? false:true)
                 .storeName(analyzeReceiptDTO.getStoreName())

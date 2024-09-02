@@ -65,7 +65,6 @@ public class ReceiptService {
         String originalFileName = receiptImg.getOriginalFilename();
         if(originalFileName != null && originalFileName.contains(".")) {
             String extension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
-            System.out.println(extension);
             return switch (extension) {
                 case "jpg", "jpeg" -> "jpg";
                 case "png" -> "png";
@@ -156,7 +155,7 @@ public class ReceiptService {
         }
     }
 
-    public String checkEnterpriseName(List<String> enterprises, String storeName) {
+    public String checkEnterpriseName(List<String> enterprises, String storeName, String receiptURL) {
         String longest = "";
         for(String name : enterprises) {
             String detected = getLongestCommonSubstring.getlongestCommonSubstring(name, storeName);
@@ -167,7 +166,7 @@ public class ReceiptService {
         if(!longest.isEmpty()) {
             return longest;
         }
-        return "";
+        throw new StockNotFoundException(storeName, receiptURL);
     }
 
     @Transactional

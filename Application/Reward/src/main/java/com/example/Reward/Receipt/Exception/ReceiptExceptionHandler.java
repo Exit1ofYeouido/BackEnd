@@ -50,7 +50,7 @@ public class ReceiptExceptionHandler {
         ReceiptErrorResponse response = ReceiptErrorResponse.builder()
                 .status(e.getStatus())
                 .message(e.getMessage())
-                .data(e.getFoundName())
+                .data(new StockNotFoundExceptionDto(e.getFoundName(), e.getReceiptURL()))
                 .build();
         return ResponseEntity.badRequest().body(response);
     }
@@ -70,7 +70,7 @@ public class ReceiptExceptionHandler {
         ReceiptErrorResponse response = ReceiptErrorResponse.builder()
                 .status(e.getStatus())
                 .message(e.getMessage())
-                .data(new InvalidFileExtensionDto(e.getExtension(), e.getValidExtentions()))
+                .data(new InvalidFileExtensionExceptionDto(e.getExtension(), e.getValidExtentions()))
                 .build();
         return ResponseEntity.badRequest().body(response);
     }
