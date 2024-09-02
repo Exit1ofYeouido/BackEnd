@@ -13,4 +13,8 @@ public class InvalidFileExtensionException extends ReceiptException {
         super(ReceiptErrorStatus.INVALID_FILE_EXTENSION);
         this.extension = extension;
     }
+
+    public String getValidExtentions() {
+        return validExtentions;
+    }
 }

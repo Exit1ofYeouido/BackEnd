@@ -1,0 +1,78 @@
+package com.example.Reward.Receipt.Exception;
+
+import com.example.Reward.Receipt.Controller.ReceiptController;
+import com.example.Reward.Receipt.Exception.ReceiptExceptions.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice(basePackageClasses = ReceiptController.class)
+public class ReceiptExceptionHandler {
+
+    private ResponseEntity<ReceiptErrorResponse> handler(GiveStockErrorException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private ResponseEntity<ReceiptErrorResponse> handler(KISApiException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private ResponseEntity<ReceiptErrorResponse> handler(S3UploadFailedException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private ResponseEntity<ReceiptErrorResponse> handler(NoStockException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private ResponseEntity<ReceiptErrorResponse> handler(StockNotFoundException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .data(e.getFoundName())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private ResponseEntity<ReceiptErrorResponse> handler(OcrErrorException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .data(e.getUrl())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private ResponseEntity<ReceiptErrorResponse> handler(InvalidFileExtensionException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .data(new InvalidFileExtensionDto(e.getExtension(), e.getValidExtentions()))
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private ResponseEntity<ReceiptErrorResponse> handler(MissingOcrInfoException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .data(new MissingOcrInfoExceptionDto(e.getUrl(), e.getMissingMessage()))
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+}
