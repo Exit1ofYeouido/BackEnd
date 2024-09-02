@@ -32,7 +32,6 @@ public class MemberSignupRequestDTO {
                 .birth(convertStringToDate(birth, sex))
                 .phoneNumber(phoneNumber)
                 .email(email)
-                .point(0)
                 .sex(convertGenderNumberToGenderCode(sex))
                 .memberName(memberName)
                 .role("ROLE_USER")
