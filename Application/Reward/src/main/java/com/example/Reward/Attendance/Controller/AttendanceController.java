@@ -22,14 +22,14 @@ public class AttendanceController {
         this.giveStockService = giveStockService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(description = "이번 달 출석 현황 조회")
     public ResponseEntity<GetAttendanceResponseDTO> getAttendInfo(@RequestHeader("memberId") String memberId) {
         GetAttendanceResponseDTO getAttendanceResponseDTO = attendanceService.findAttendInfo(Long.valueOf(memberId));
         return ResponseEntity.ok(getAttendanceResponseDTO);
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @Operation(description = "출석 체크 요청")
     public ResponseEntity<AttendResponseDTO> postAttend(@RequestHeader("memberId") String memberId) {
         Boolean hasReward = attendanceService.attend(Long.valueOf(memberId));
