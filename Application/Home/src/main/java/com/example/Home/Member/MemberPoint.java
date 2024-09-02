@@ -3,6 +3,8 @@ package com.example.Home.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Entity
 @Table(name = "account")
@@ -14,11 +16,14 @@ public class MemberPoint {
     private Long id;
 
 
-    @Column(name = "point")
-    private int point;
-
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    private Integer point;
+
+    private String accountNumber;
+
+    private LocalDateTime createdAt;
 
 }
