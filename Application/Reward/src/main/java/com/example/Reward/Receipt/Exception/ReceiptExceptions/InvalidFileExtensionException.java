@@ -5,7 +5,7 @@ import com.example.Reward.Receipt.Exception.ReceiptException;
 
 public class InvalidFileExtensionException extends ReceiptException {
     private final String extension;
-    private static final String correntExtentions = "jpg, jpeg, png, svg";
+    private static final String validExtentions = "가능한 확장자 : jpg, jpeg, png, svg";
 
     public InvalidFileExtensionException(String extension) {
         super(ReceiptErrorStatus.INVALID_FILE_EXTENSION);
