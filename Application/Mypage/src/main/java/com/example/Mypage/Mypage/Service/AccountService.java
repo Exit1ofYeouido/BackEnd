@@ -2,11 +2,16 @@ package com.example.Mypage.Mypage.Service;
 
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.AccountHistory;
+import com.example.Mypage.Common.Entity.MemberStock;
 import com.example.Mypage.Common.Repository.AccountHistoryRepository;
 import com.example.Mypage.Common.Repository.AccountRepository;
+import com.example.Mypage.Common.Repository.MemberStockRepository;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
+import com.example.Mypage.Mypage.Webclient.Service.ApiService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +28,8 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
+    private final ApiService apiService;
+    private final MemberStockRepository memberStockRepository;
 
     public GetPointResponseDto getPoint(Long memberId) {
         try {
@@ -43,6 +50,36 @@ public class AccountService {
         List<AccountHistory> accountHistoryList = accountHistoryPage.getContent();
 
         return getPointHistoryResponseDtos(accountHistoryList);
+    }
+
+    public List<MyStocksResponseDto> getAllMyStocks(Long memberId) {
+        log.info("MemberId : {} 의 보유주식 조회", memberId);
+        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
+        List<MyStocksResponseDto> myStocks = new ArrayList<>();
+
+        for (MemberStock memberStock : memberStocks) {
+            myStocks.add(MyStocksResponseDto.builder()
+                    .earningRate(getEarningRate(memberStock))
+                    .holdStockCount(memberStock.getCount())
+                    .build());
+        }
+
+        return myStocks;
+
+    }
+
+    private String getEarningRate(MemberStock memberStock) {
+        Integer curPrice = apiService.getPrice(memberStock.getStockCode());
+        Double resultPrice = (double) curPrice / (double) memberStock.getAveragePrice();
+
+        Double earningRate = (resultPrice - 1) * 100;
+
+        if (resultPrice < 1) {
+            earningRate = (1 - resultPrice) * 100;
+        }
+
+        String formattedEarningRate = String.format("%.2f", earningRate);
+        return formattedEarningRate;
     }
 
     private static List<GetPointHistoryResponseDto> getPointHistoryResponseDtos(

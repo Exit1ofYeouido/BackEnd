@@ -25,28 +25,24 @@ public class MemberStock {
 
     @Id
     @GeneratedValue
+    @Column(name = "member_stock_id")
     private Long id;
-
-    private double count;
-
-    private int averagePrice;
-
-    @Column(unique = true)
-    private String stockCode;
-
-    @Column(unique = true)
-    private String stockName;
-
-    @Column(unique = true)
-    private String account;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
+    private double count;
 
+    private int averagePrice;
+
+    @Column(unique = true, name = "code")
+    private String stockCode;
+
+    @Column(unique = true)
+    private String stockName;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

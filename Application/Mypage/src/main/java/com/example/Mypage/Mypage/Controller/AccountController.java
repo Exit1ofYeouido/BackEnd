@@ -33,4 +33,10 @@ public class AccountController {
 
         return ResponseEntity.ok(accountService.getPointHistory(memberId, index, size));
     }
+
+    @GetMapping("/stocks")
+    @Operation(description = "나의 보유주식 조회")
+    public ResponseEntity<?> getMyStocks(@RequestHeader("memberId") Long memberId) {
+        return ResponseEntity.ok(accountService.getAllMyStocks(memberId));
+    }
 }
