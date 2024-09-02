@@ -57,7 +57,7 @@ spring:
             - RewritePath=${service-url}/reward/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
         - id: search
-          uri: http://localhost:8084
+          uri: http://43.203.230.188:8084
           predicates:
             - Path= ${service-url}/search/**
           filters:
@@ -102,3 +102,4 @@ springdoc:
         name: Search
       - url: ${service-url}/home/v3/api-docs
         name: Home
+
