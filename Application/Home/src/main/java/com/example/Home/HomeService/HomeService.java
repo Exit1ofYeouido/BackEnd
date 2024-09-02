@@ -36,8 +36,8 @@ public class HomeService {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("멤버가 없습니다."));
-        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
-        MemberPoint memberPoint = memberPointRepository.findByMemberId(memberId)
+        List<MemberStock> memberStocks = memberStockRepository.findByMember_Id(memberId);
+        MemberPoint memberPoint = memberPointRepository.findByMember_Id(memberId)
                 .orElseThrow(() -> new RuntimeException("멤버 포인트가 없습니다."));
         int totalPoint = memberPoint.getResultPoint();
         int totalStock = calculateTotalStock(memberStocks);
