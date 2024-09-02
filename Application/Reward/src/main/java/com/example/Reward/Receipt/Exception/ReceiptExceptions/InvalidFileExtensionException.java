@@ -1,6 +1,9 @@
-package com.example.Reward.Receipt.Exception;
+package com.example.Reward.Receipt.Exception.ReceiptExceptions;
 
-public class InvalidFileExtensionException extends ReceiptException{
+import com.example.Reward.Receipt.Exception.ReceiptErrorStatus;
+import com.example.Reward.Receipt.Exception.ReceiptException;
+
+public class InvalidFileExtensionException extends ReceiptException {
     private final String extension;
     private static final String correntExtentions = "jpg, jpeg, png, svg";
 
