@@ -11,7 +11,6 @@ public enum ReceiptErrorStatus {
     MISSING_OCR_INFO(400, "영수증 내 필수 정보 누락 !!"),
     STOCK_NOT_FOUND(400, "상장된 주식 없음 !!"),
     KIS_API(400, "한국투자증권 API 오류 !!"),
-    KAFKA_COMMUNICATION(400, "KAFKA 통신 오류 !!"),
     GIVE_STOCK_ERROR(400, "주식 증정 로직 오류 !!");
 
     private final int status;
