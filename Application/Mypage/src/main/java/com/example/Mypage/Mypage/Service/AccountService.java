@@ -3,11 +3,14 @@ package com.example.Mypage.Mypage.Service;
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.AccountHistory;
 import com.example.Mypage.Common.Entity.MemberStock;
+import com.example.Mypage.Common.Entity.Trade;
 import com.example.Mypage.Common.Repository.AccountHistoryRepository;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
+import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
@@ -30,6 +33,7 @@ public class AccountService {
     private final AccountHistoryRepository accountHistoryRepository;
     private final ApiService apiService;
     private final MemberStockRepository memberStockRepository;
+    private final TradeRepository tradeRepository;
 
     public GetPointResponseDto getPoint(Long memberId) {
         try {
@@ -65,7 +69,21 @@ public class AccountService {
         }
 
         return myStocks;
+    }
 
+    public List<MyStocksHistoryResponseDto> getMyStocksHistory(Long memberId, int index, int limit) {
+        Pageable pageable = PageRequest.of(index, limit);
+        Page<Trade> myStockHistoyPage = tradeRepository.findByMemberId(memberId, pageable);
+        List<Trade> trades = myStockHistoyPage.getContent();
+
+        return trades.stream()
+                .map(trade -> MyStocksHistoryResponseDto.builder()
+                        .name(trade.getStockName())
+                        .type(trade.getTradeType())
+                        .amount(String.format("%.6f", trade.getCount()))
+                        .date((trade.getCreatedAt())
+                        ).build())
+                .toList();
     }
 
     private String getEarningRate(MemberStock memberStock) {
@@ -77,7 +95,7 @@ public class AccountService {
         if (resultPrice < 1) {
             earningRate = (1 - resultPrice) * 100;
         }
-        
+
         return String.format("%.2f", earningRate);
     }
 

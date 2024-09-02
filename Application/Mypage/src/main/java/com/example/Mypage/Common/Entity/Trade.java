@@ -28,6 +28,8 @@ public class Trade {
 
     private String tradeType;
 
+    private double count;
+
     private LocalDateTime createdAt;
 
     @ManyToOne

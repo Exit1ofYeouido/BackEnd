@@ -192,6 +192,7 @@ public class MyService {
                 .stockName(giveStockDto.getEnterpriseName())
                 .tradeType("입금")
                 .member(member)
+                .count(giveStockDto.getAmount())
                 .createdAt(LocalDateTime.now())
                 .memberStock(memberStock)
                 .build();
