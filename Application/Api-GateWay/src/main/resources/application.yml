@@ -18,9 +18,9 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-            - 'http://3.36.196.194:5173'
-            - 'http://localhost:5173'
-            - 'http://stock-craft.kro.kr'
+              - 'http://3.36.196.194:5173'
+              - 'http://localhost:5173'
+              - 'http://stock-craft.kro.kr'
             allow-credentials: true
             allowedHeaders: '*'
             allowedMethods:
