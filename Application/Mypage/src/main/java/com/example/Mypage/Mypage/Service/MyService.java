@@ -12,6 +12,8 @@ import com.example.Mypage.Common.Repository.PopupCheckRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
+import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
+import com.example.Mypage.Mypage.Exception.NotMemberException;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.text.DecimalFormat;
@@ -21,8 +23,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +40,13 @@ public class MyService {
 
     //TODO : 더미데이터를 넣어서 포인트로직 검증하기
     //TODO: orElse() 변경
+
+    @Transactional(readOnly = true)
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
-        Account account = accountRepository.findByMemberId(memId).orElse(null);
+
+        Account account = accountRepository.findByMemberId(memId).orElseThrow(
+                ()-> new AccountNotFoundException("계좌가 존재하지않습니다.")
+        );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
         String calcAssetsEarningRate = CalcAllAsssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
@@ -88,6 +97,7 @@ public class MyService {
     private List<EarningRate> Top3EarningRateAssets(List<MemberStock> memberStocks) {
 
         List<EarningRate> top3EarningRates = new ArrayList<>();
+
         for (MemberStock memberStock : memberStocks) {
             double stockCount = memberStock.getCount();
             int stockPrice = memberStock.getAveragePrice();
@@ -125,9 +135,12 @@ public class MyService {
 
     }
 
+    @Transactional
     public void giveStock(GiveStockDto giveStockDto) {
 
+
         Optional<Member> member = memberRepository.findById(giveStockDto.getMemId());
+        member.orElseThrow(()-> new NotMemberException(giveStockDto.getMemId()));
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
                 , giveStockDto.getMemId());
 
@@ -137,9 +150,11 @@ public class MyService {
                     giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getCount()
                     + giveStockDto.getAmount()));
 
+
             memberStock.setAveragePrice(avgPrice);
-            memberStock.setUpdateAt(LocalDateTime.now());
+            memberStock.setUpdatedAt(LocalDateTime.now());
             memberStockRepository.save(memberStock);
+
         } else {
             MemberStock new_memberStock = MemberStock.builder()
                     .member(member.get())
@@ -148,13 +163,14 @@ public class MyService {
                     .stockCode(giveStockDto.getCode())
                     .averagePrice(giveStockDto.getPrice())
                     .createdAt(LocalDateTime.now())
-                    .updateAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
                     .build();
             memberStockRepository.save(new_memberStock);
         }
     }
 
 
+    @Transactional(readOnly = true)
     public GetTutorialCheckResponseDto getTutorialCheck(String type, Long memId) {
 
         PopupCheck popupCheck = popupCheckRepository.findByPopupTypeAndMemberId(type, memId);
@@ -174,5 +190,12 @@ public class MyService {
                 .build();
         popupCheckRepository.save(popupCheck);
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<MemberStock> getAllStock(Long memId) {
+        List<MemberStock> memberStocks=memberStockRepository.findByMemberId(memId);
+
+        return memberStocks;
     }
 }

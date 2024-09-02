@@ -2,11 +2,13 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+
 import com.example.Reward.Advertisement.Webclient.GeneratedToken;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Kafka.GiveStockProduceDto;
 import com.example.Reward.Common.Repository.EventRepository;
 import com.example.Reward.Common.Service.GiveStockService;
+
 import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
@@ -176,4 +178,5 @@ public class ReceiptService {
                 .build();
         return rewardResponseDTO;
     }
+
 }
