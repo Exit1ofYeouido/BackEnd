@@ -21,5 +21,4 @@ public enum ReceiptErrorStatus {
         this.status = status;
         this.message = message;
     }
-
 }
