@@ -15,6 +15,8 @@ project(":application:search") {
 		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 		implementation 'com.mysql:mysql-connector-j'
 
+		implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 	}
 
 	dependencyManagement {

@@ -15,6 +15,7 @@ public class Trade {
 
     @Id
     @GeneratedValue
+    @Column(name="trade_id")
     private Long id;
 
     private String stockName;

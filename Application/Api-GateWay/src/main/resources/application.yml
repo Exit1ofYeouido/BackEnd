@@ -6,8 +6,6 @@ server:
     context-path: ${service-url}
 
 spring:
-  token:
-    secret: ${SECRET}
   application:
     name: api-gateway
   cloud:
@@ -41,7 +39,6 @@ spring:
           filters:
             - RewritePath=${service-url}/basic/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
-
         - id: mypage
           uri: http://3.36.68.97:8082
           predicates:
@@ -49,7 +46,7 @@ spring:
           filters:
             - RewritePath=${service-url}/my/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
-
+            - RewritePath=${service-url}/mypage/(?<path>.*),/$\{path}
         - id: reward
           uri: http://43.203.224.71:8083
           predicates:
@@ -57,27 +54,20 @@ spring:
           filters:
             - RewritePath=${service-url}/reward/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
-
         - id: search
           uri: http://localhost:8084
           predicates:
             - Path= ${service-url}/search/**
           filters:
             - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
-
         - id: auth
           uri: http://3.39.235.153:8085
-          predicates:
-            - Path= ${service-url}/auth/**
-          filters:
-            - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
         - id: home
           uri: http://43.203.198.57:8086
           predicates:
             - Path= ${service-url}/home/**
           filters:
             - RewritePath=${service-url}/home/(?<path>.*),/$\{path}
-
 
 
 
@@ -100,9 +90,6 @@ springdoc:
         name: Mypage
       - url: ${service-url}/reward/v3/api-docs
         name: Reward
-      - url: ${service-url}/auth/v3/api-docs
-        name: Auth
       - url: ${service-url}/search/v3/api-docs
         name: Search
       - url: ${service-url}/home/v3/api-docs
-        name: Search
