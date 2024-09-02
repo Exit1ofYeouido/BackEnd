@@ -122,7 +122,7 @@ public class AdService {
             throw new NotMatchedEnterpriseName(checkToday.getEnterpriseName(),giveStockRequestDto.getEnterpriseName());
         }
 
-        Event event=eventRepository.findByEnterpriseNameContaining(giveStockRequestDto.getEnterpriseName());
+        Event event=eventRepository.findByEnterpriseNameContainingAndContentId(giveStockRequestDto.getEnterpriseName(),1L);
 
         if (event.getRewardAmount()<=0){
             throw new NoStockException();
