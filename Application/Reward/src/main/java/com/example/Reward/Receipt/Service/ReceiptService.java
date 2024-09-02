@@ -48,7 +48,7 @@ public class ReceiptService {
 
     public GetEnterpriseListDTO getEnterpriseList() throws NoStockException {
         List<String> enterpriseList = new ArrayList<>();
-        List<Event> eventEnterprises = eventRepository.findByRewardAmountGreaterThanEqualAndContentId(3L,2L);
+        List<Event> eventEnterprises = eventRepository.findByRewardAmountGreaterThanEqualAndContentId(1L,2L);
         if (eventEnterprises.isEmpty()) {
             throw new NoStockException();
         }
