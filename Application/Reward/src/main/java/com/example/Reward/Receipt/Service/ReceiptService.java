@@ -133,17 +133,36 @@ public class ReceiptService {
 
             OCRResponseDTO ocrResponseDTO = response.block();
 
-            String storeName = ocrResponseDTO.getImages()[0].getReceipt().getResult().getStoreInfo().getName().getText();
-            String price = ocrResponseDTO.getImages()[0].getReceipt().getResult().getTotalPrice().getPrice().getText();
-            String date = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getDate().getText();
-            String time = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getTime().getText();
-            StringBuilder dealTimeBuilder = new StringBuilder();
-            dealTimeBuilder.append(date)
-                    .append(" ")
-                    .append(time);
-            String dealTime = dealTimeBuilder.toString();
-            String approvalNum = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getConfirmNum().getText();
-
+            String storeName;
+            String price;
+            String dealTime;
+            String approvalNum;
+            try {
+                storeName = ocrResponseDTO.getImages()[0].getReceipt().getResult().getStoreInfo().getName().getText();
+            } catch (Exception e) {
+                throw new MissingOcrInfoException(receiptURL, "storeName");
+            }
+            try {
+                price = ocrResponseDTO.getImages()[0].getReceipt().getResult().getTotalPrice().getPrice().getText();
+            } catch (Exception e) {
+                throw new MissingOcrInfoException(receiptURL, "price");
+            }
+            try {
+                String date = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getDate().getText();
+                String time = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getTime().getText();
+                StringBuilder dealTimeBuilder = new StringBuilder();
+                dealTimeBuilder.append(date)
+                        .append(" ")
+                        .append(time);
+                dealTime = dealTimeBuilder.toString();
+            } catch (Exception e) {
+                throw new MissingOcrInfoException(receiptURL, "dealTime");
+            }
+            try {
+                approvalNum = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getConfirmNum().getText();
+            } catch (Exception e) {
+                throw new MissingOcrInfoException(receiptURL, "approvalNum");
+            }
             return AnalyzeReceiptDTO.builder()
                     .storeName(storeName)
                     .price(price)
