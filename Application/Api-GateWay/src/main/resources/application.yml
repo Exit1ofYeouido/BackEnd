@@ -6,6 +6,8 @@ server:
     context-path: ${service-url}
 
 spring:
+  token:
+    secret: ${SECRET}
   application:
     name: api-gateway
   cloud:
@@ -16,9 +18,9 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-            - 'http://3.36.196.194:5173'
-            - 'http://localhost:5173'
-            - 'http://stock-craft.kro.kr'
+              - 'http://3.36.196.194:5173'
+              - 'http://localhost:5173'
+              - 'http://stock-craft.kro.kr'
             allow-credentials: true
             allowedHeaders: '*'
             allowedMethods:
@@ -55,19 +57,25 @@ spring:
             - RewritePath=${service-url}/reward/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
         - id: search
-          uri: http://localhost:8084
+          uri: http://43.203.230.188:8084
           predicates:
             - Path= ${service-url}/search/**
           filters:
             - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
         - id: auth
           uri: http://3.39.235.153:8085
+          predicates:
+            - Path= ${service-url}/auth/**
+          filters:
+              - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
         - id: home
           uri: http://43.203.198.57:8086
           predicates:
             - Path= ${service-url}/home/**
           filters:
             - RewritePath=${service-url}/home/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
 
 
 
@@ -93,3 +101,5 @@ springdoc:
       - url: ${service-url}/search/v3/api-docs
         name: Search
       - url: ${service-url}/home/v3/api-docs
+        name: Home
+
