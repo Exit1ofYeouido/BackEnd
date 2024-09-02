@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -17,12 +18,14 @@ public class ConsumerService {
 
     private final ObjectMapper objectMapper;
     private final AuthRepository authRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @KafkaListener(topics = "test-auth", groupId = "Auth", concurrency = "3")
     public void consume(@Payload ConsumerRecord<String, String> message) {
         try {
             log.info("Consume 발생: {}", message.value());
             AuthConsumeDTO authConsumeDTO = objectMapper.readValue(message.value(), AuthConsumeDTO.class);
+            authConsumeDTO.setMemberPassword(bCryptPasswordEncoder.encode(authConsumeDTO.getMemberPassword()));
             MemberAuth newMemberAuth = authConsumeDTO.toEntity();
 
             authRepository.save(newMemberAuth);
