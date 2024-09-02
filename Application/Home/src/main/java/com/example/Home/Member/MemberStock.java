@@ -19,7 +19,7 @@ public class MemberStock {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(name="stock_code", columnDefinition = "char(6)")
+    @Column(name="code", columnDefinition = "char(6)")
     private String code;
 
     @Column(name = "count")

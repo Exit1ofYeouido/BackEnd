@@ -11,10 +11,8 @@ public class MemberPoint {
     @Column(name = "account_id")
     private Long id;
 
-    //    @Column(name = "member_id")
-    private Integer point;
 
-    @Column(name = "result_point")
+    @Column(name = "point")
     private int resultPoint;
 
     @ManyToOne
@@ -25,9 +23,6 @@ public class MemberPoint {
         return id;
     }
 
-    public int getPoint() {
-        return point;
-    }
 
     public int getResultPoint() {
         return resultPoint;
