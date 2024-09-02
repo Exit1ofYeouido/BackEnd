@@ -1,7 +1,7 @@
 service-url: /api/home
 
 server:
-  port: 8085
+  port: 8086
   shutdown: graceful
 
 spring:
