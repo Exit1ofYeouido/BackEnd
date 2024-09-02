@@ -9,7 +9,7 @@ public class MemberPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
-    private Long member_point_id;
+    private Long id;
 
     //    @Column(name = "member_id")
     private Integer point;
@@ -21,8 +21,8 @@ public class MemberPoint {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public Long getMember_point_id() {
-        return member_point_id;
+    public Long getId() {
+        return id;
     }
 
     public int getPoint() {

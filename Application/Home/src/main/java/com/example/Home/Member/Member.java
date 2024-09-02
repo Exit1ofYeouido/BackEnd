@@ -9,11 +9,12 @@ import lombok.Getter;
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long memberId;
+    @Column(name="member_id")
+    private Long id;
     private Long point;
 
-    public Long getMemberId() {
-        return memberId;
+    public Long getId() {
+        return id;
     }
 
     public Long getPoint() {

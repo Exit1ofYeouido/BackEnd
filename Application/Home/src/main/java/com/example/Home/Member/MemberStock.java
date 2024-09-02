@@ -13,11 +13,11 @@ public class MemberStock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_stock_id")
-    private Long memberStockId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member memberId;
+    private Member member;
 
     @Column(name="stock_code", columnDefinition = "char(6)")
     private String code;
