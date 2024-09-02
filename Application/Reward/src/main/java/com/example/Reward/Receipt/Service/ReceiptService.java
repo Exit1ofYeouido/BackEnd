@@ -14,6 +14,7 @@ import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.ReceiptLog;
 import com.example.Reward.Receipt.Entity.ReceiptLogKey;
+import com.example.Reward.Receipt.Exception.ReceiptExceptions.S3UploadFailedException;
 import com.example.Reward.Receipt.Repository.ReceiptLogRepository;
 import com.example.Reward.Receipt.Util.GetLongestCommonSubstring;
 import lombok.RequiredArgsConstructor;
@@ -78,13 +79,17 @@ public class ReceiptService {
     }
 
     public String uploadReceiptToS3(MultipartFile receiptImg) throws IOException {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(receiptImg.getSize());
-        metadata.setContentType(receiptImg.getContentType());
-        InputStream inputStream = receiptImg.getInputStream();
-        String fileKey = "receipts/" + receiptImg.getOriginalFilename();
-        amazonS3.putObject(bucket, fileKey, inputStream, metadata);
-        return fileKey;
+        try {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(receiptImg.getSize());
+            metadata.setContentType(receiptImg.getContentType());
+            InputStream inputStream = receiptImg.getInputStream();
+            String fileKey = "receipts/" + receiptImg.getOriginalFilename();
+            amazonS3.putObject(bucket, fileKey, inputStream, metadata);
+            return fileKey;
+        } catch (Exception e) {
+            throw new S3UploadFailedException();
+        }
     }
 
     public String convertImage(MultipartFile receiptImg) throws IOException {
