@@ -94,6 +94,8 @@ springdoc:
         name: API Gateway Service
       - url: ${service-url}/basic/v3/api-docs
         name: Basic
+      - url: ${service-url}/auth/v3/api-docs
+        name: Auth
       - url: ${service-url}/my/v3/api-docs
         name: Mypage
       - url: ${service-url}/reward/v3/api-docs
