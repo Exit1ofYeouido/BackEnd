@@ -14,7 +14,7 @@ public class HomeController {
     private final HomeService homeService;
 
 
-    @GetMapping("/home")
+    @GetMapping("")
     public ResponseEntity<HomeResponseDTO> getHomeData(@RequestHeader("memberId") String memberId) {
         HomeResponseDTO response = homeService.getHomeData(Long.valueOf(memberId));
         return ResponseEntity.ok().body(response);
