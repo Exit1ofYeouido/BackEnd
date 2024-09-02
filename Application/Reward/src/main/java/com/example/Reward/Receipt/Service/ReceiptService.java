@@ -14,10 +14,7 @@ import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.ReceiptLog;
 import com.example.Reward.Receipt.Entity.ReceiptLogKey;
-import com.example.Reward.Receipt.Exception.ReceiptExceptions.InvalidFileExtensionException;
-import com.example.Reward.Receipt.Exception.ReceiptExceptions.NoStockException;
-import com.example.Reward.Receipt.Exception.ReceiptExceptions.OcrErrorException;
-import com.example.Reward.Receipt.Exception.ReceiptExceptions.S3UploadFailedException;
+import com.example.Reward.Receipt.Exception.ReceiptExceptions.*;
 import com.example.Reward.Receipt.Repository.ReceiptLogRepository;
 import com.example.Reward.Receipt.Util.GetLongestCommonSubstring;
 import lombok.RequiredArgsConstructor;
@@ -175,29 +172,33 @@ public class ReceiptService {
 
     @Transactional
     public RewardResponseDTO giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-        giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(),2L, priceOfStock, amountOfStock);
-        Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
-        event.setRewardAmount(event.getRewardAmount()-amountOfStock);
-        eventRepository.save(event);
+        try {
+            giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(), 2L, priceOfStock, amountOfStock);
+            Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
+            event.setRewardAmount(event.getRewardAmount() - amountOfStock);
+            eventRepository.save(event);
 
-        ReceiptLog receiptLog = ReceiptLog.builder()
-                .receiptLogKey(ReceiptLogKey.builder()
-                        .approvalNum(rewardRequestDTO.getApprovalNum())
-                        .dealTime(rewardRequestDTO.getDealTime())
-                        .build())
-                .store(rewardRequestDTO.getStoreName())
-                .price(rewardRequestDTO.getPrice())
-                .imgUrl(rewardRequestDTO.getImgURL())
-                .enterpriseName(rewardRequestDTO.getEnterpriseName())
-                .memberId(memberId)
-                .build();
-        receiptLogRepository.save(receiptLog);
+            ReceiptLog receiptLog = ReceiptLog.builder()
+                    .receiptLogKey(ReceiptLogKey.builder()
+                            .approvalNum(rewardRequestDTO.getApprovalNum())
+                            .dealTime(rewardRequestDTO.getDealTime())
+                            .build())
+                    .store(rewardRequestDTO.getStoreName())
+                    .price(rewardRequestDTO.getPrice())
+                    .imgUrl(rewardRequestDTO.getImgURL())
+                    .enterpriseName(rewardRequestDTO.getEnterpriseName())
+                    .memberId(memberId)
+                    .build();
+            receiptLogRepository.save(receiptLog);
 
-        RewardResponseDTO rewardResponseDTO = RewardResponseDTO.builder()
-                .name(rewardRequestDTO.getEnterpriseName())
-                .amount(amountOfStock)
-                .build();
-        return rewardResponseDTO;
+            RewardResponseDTO rewardResponseDTO = RewardResponseDTO.builder()
+                    .name(rewardRequestDTO.getEnterpriseName())
+                    .amount(amountOfStock)
+                    .build();
+            return rewardResponseDTO;
+        } catch (Exception e) {
+            throw new GiveStockErrorException();
+        }
     }
 
 }
