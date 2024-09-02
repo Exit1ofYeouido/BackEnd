@@ -8,6 +8,7 @@ import com.example.Home.Member.MemberStock;
 import com.example.Home.MemberRepository.MemberPointRepository;
 import com.example.Home.MemberRepository.MemberRepository;
 import com.example.Home.MemberRepository.MemberStockRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -98,5 +99,15 @@ public class HomeService {
         }
         double earningRate = ((totalCurrentValue - totalPurchaseValue) / totalPurchaseValue) * 100;
         return Math.round(earningRate*100.0) / 100.0;
+    }
+
+    @Transactional
+    public void updateCurrentPrices() {
+        List<MemberStock> stocks = memberStockRepository.findAll();
+        for (MemberStock stock : stocks) {
+            Long currentPrice = koreaInvestmentApiService.getCurrentPrice(stock.getCode());
+            stock.setAveragePrice(currentPrice);
+            memberStockRepository.save(stock);
+        }
     }
 }

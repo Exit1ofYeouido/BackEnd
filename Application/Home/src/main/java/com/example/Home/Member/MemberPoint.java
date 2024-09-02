@@ -3,7 +3,7 @@ package com.example.Home.Member;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "member_point", schema = "mo")
+@Table(name = "member_point")
 public class MemberPoint {
 
     @Id
