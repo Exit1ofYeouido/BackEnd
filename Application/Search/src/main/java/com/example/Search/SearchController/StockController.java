@@ -5,10 +5,7 @@ import com.example.Search.Api.KisService;
 import com.example.Search.SearchDTO.StockDetailDTO;
 import com.example.Search.SearchDTO.StocksDTO;
 import com.example.Search.SearchService.StockService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,15 +21,15 @@ public class StockController {
     }
 
     @GetMapping("/search/stocks")
-    public List<StocksDTO> getStocks(@RequestParam Long memberId) {
-        return stockService.getStocks(memberId);
+    public List<StocksDTO> getStocks(@RequestHeader String memberId) {
+        return stockService.getStocks(Long.valueOf(memberId));
     }
 
     @GetMapping("/search/stock/{code}")
     public StockDetailDTO getStock(@PathVariable String code,
                                    @RequestParam(defaultValue = "1M") String period,
-                                   @RequestParam Long memberId) {
-        return stockService.getStockByCode(code, period, memberId);
+                                   @RequestHeader String memberId) {
+        return stockService.getStockByCode(code, period, Long.valueOf(memberId));
     }
 
     @GetMapping("/search/stocks/keyword")
