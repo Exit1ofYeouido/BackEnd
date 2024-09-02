@@ -63,13 +63,13 @@ spring:
             - AuthorizationHeaderFilter
         - id: auth
           uri: http://3.39.235.153:8085
-        - id: home
-          uri: http://43.203.198.57:8086
-          predicates:
-            - Path= ${service-url}/home/**
-          filters:
-            - RewritePath=${service-url}/home/(?<path>.*),/$\{path}
-            - AuthorizationHeaderFilter
+#        - id: home
+#          uri: http://43.203.198.57:8086
+#          predicates:
+#            - Path= ${service-url}/home/**
+#          filters:
+#            - RewritePath=${service-url}/home/(?<path>.*),/$\{path}
+#            - AuthorizationHeaderFilter
 
 
 
