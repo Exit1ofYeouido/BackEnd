@@ -15,6 +15,7 @@ import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.ReceiptLog;
 import com.example.Reward.Receipt.Entity.ReceiptLogKey;
 import com.example.Reward.Receipt.Exception.ReceiptExceptions.InvalidFileExtensionException;
+import com.example.Reward.Receipt.Exception.ReceiptExceptions.OcrErrorException;
 import com.example.Reward.Receipt.Exception.ReceiptExceptions.S3UploadFailedException;
 import com.example.Reward.Receipt.Repository.ReceiptLogRepository;
 import com.example.Reward.Receipt.Util.GetLongestCommonSubstring;
@@ -105,50 +106,54 @@ public class ReceiptService {
         return Base64.getEncoder().encodeToString(fileBytes);
     }
 
-    public AnalyzeReceiptDTO analyzeReceipt(String receiptData, String extension) {
-        String url = OCR_BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
-        List<Map<String, String>> imageDataList = new ArrayList<>();
-        Map<String, String> imageData = new HashMap<>();
-        imageData.put("format", extension);
-        imageData.put("data", receiptData);
-        imageData.put("name", "receipt4");
+    public AnalyzeReceiptDTO analyzeReceipt(String receiptURL, String receiptData, String extension) {
+        try {
+            String url = OCR_BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
+            List<Map<String, String>> imageDataList = new ArrayList<>();
+            Map<String, String> imageData = new HashMap<>();
+            imageData.put("format", extension);
+            imageData.put("data", receiptData);
+            imageData.put("name", "receipt4");
 
-        imageDataList.add(imageData);
+            imageDataList.add(imageData);
 
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("images", imageDataList);
-        requestBody.put("lang", "ko");
-        requestBody.put("requestId", "string");
-        requestBody.put("timestamp", System.currentTimeMillis());
-        requestBody.put("version", "V2");
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("images", imageDataList);
+            requestBody.put("lang", "ko");
+            requestBody.put("requestId", "string");
+            requestBody.put("timestamp", System.currentTimeMillis());
+            requestBody.put("version", "V2");
 
-        Mono<OCRResponseDTO> response = webClient.post()
-                .uri(url)
-                .header("X-OCR-SECRET", ocrSecret)
-                .header("Content-Type", "application/json")
-                .bodyValue(requestBody)
-                .retrieve()
-                .bodyToMono(OCRResponseDTO.class);
+            Mono<OCRResponseDTO> response = webClient.post()
+                    .uri(url)
+                    .header("X-OCR-SECRET", ocrSecret)
+                    .header("Content-Type", "application/json")
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(OCRResponseDTO.class);
 
-        OCRResponseDTO ocrResponseDTO = response.block();
+            OCRResponseDTO ocrResponseDTO = response.block();
 
-        String storeName = ocrResponseDTO.getImages()[0].getReceipt().getResult().getStoreInfo().getName().getText();
-        String price = ocrResponseDTO.getImages()[0].getReceipt().getResult().getTotalPrice().getPrice().getText();
-        String date = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getDate().getText();
-        String time = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getTime().getText();
-        StringBuilder dealTimeBuilder = new StringBuilder();
-        dealTimeBuilder.append(date)
-                .append(" ")
-                .append(time);
-        String dealTime = dealTimeBuilder.toString();
-        String approvalNum = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getConfirmNum().getText();
+            String storeName = ocrResponseDTO.getImages()[0].getReceipt().getResult().getStoreInfo().getName().getText();
+            String price = ocrResponseDTO.getImages()[0].getReceipt().getResult().getTotalPrice().getPrice().getText();
+            String date = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getDate().getText();
+            String time = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getTime().getText();
+            StringBuilder dealTimeBuilder = new StringBuilder();
+            dealTimeBuilder.append(date)
+                    .append(" ")
+                    .append(time);
+            String dealTime = dealTimeBuilder.toString();
+            String approvalNum = ocrResponseDTO.getImages()[0].getReceipt().getResult().getPaymentInfo().getConfirmNum().getText();
 
-        return AnalyzeReceiptDTO.builder()
-                .storeName(storeName)
-                .price(price)
-                .dealTime(dealTime)
-                .approvalNum(approvalNum)
-                .build();
+            return AnalyzeReceiptDTO.builder()
+                    .storeName(storeName)
+                    .price(price)
+                    .dealTime(dealTime)
+                    .approvalNum(approvalNum)
+                    .build();
+        } catch (Exception e) {
+            throw new OcrErrorException(receiptURL);
+        }
     }
 
     public String checkEnterpriseName(List<String> enterprises, String storeName) {
