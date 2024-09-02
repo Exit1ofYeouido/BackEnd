@@ -71,6 +71,13 @@ spring:
             - Path= ${service-url}/auth/**
           filters:
             - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
+        - id: home
+          uri: http://43.203.198.57:8086
+          predicates:
+            - Path= ${service-url}/home/**
+          filters:
+            - RewritePath=${service-url}/home/(?<path>.*),/$\{path}
+
 
 
 
@@ -96,4 +103,6 @@ springdoc:
       - url: ${service-url}/auth/v3/api-docs
         name: Auth
       - url: ${service-url}/search/v3/api-docs
+        name: Search
+      - url: ${service-url}/home/v3/api-docs
         name: Search
