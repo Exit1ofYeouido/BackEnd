@@ -15,6 +15,7 @@ import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.ReceiptLog;
 import com.example.Reward.Receipt.Entity.ReceiptLogKey;
 import com.example.Reward.Receipt.Exception.ReceiptExceptions.InvalidFileExtensionException;
+import com.example.Reward.Receipt.Exception.ReceiptExceptions.NoStockException;
 import com.example.Reward.Receipt.Exception.ReceiptExceptions.OcrErrorException;
 import com.example.Reward.Receipt.Exception.ReceiptExceptions.S3UploadFailedException;
 import com.example.Reward.Receipt.Repository.ReceiptLogRepository;
@@ -48,13 +49,15 @@ public class ReceiptService {
     private static final String OCR_BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
     private final GetLongestCommonSubstring getLongestCommonSubstring;
 
-    public GetEnterpriseListDTO getEnterpriseList() {
+    public GetEnterpriseListDTO getEnterpriseList() throws NoStockException {
         List<String> enterpriseList = new ArrayList<>();
         List<Event> eventEnterprises = eventRepository.findByRewardAmountGreaterThanEqualAndContentId(3L,2L);
+        if (eventEnterprises.isEmpty()) {
+            throw new NoStockException();
+        }
         for(Event event : eventEnterprises) {
             enterpriseList.add(event.getEnterpriseName());
         }
-
         return GetEnterpriseListDTO
                 .builder()
                 .enterprises(enterpriseList)
