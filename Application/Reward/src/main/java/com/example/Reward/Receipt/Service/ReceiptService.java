@@ -2,14 +2,20 @@ package com.example.Reward.Receipt.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+
+import com.example.Reward.Advertisement.Webclient.GeneratedToken;
 import com.example.Reward.Common.Entity.Event;
+import com.example.Reward.Common.Kafka.GiveStockProduceDto;
 import com.example.Reward.Common.Repository.EventRepository;
+import com.example.Reward.Common.Service.GiveStockService;
+
 import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.ReceiptLog;
 import com.example.Reward.Receipt.Entity.ReceiptLogKey;
 import com.example.Reward.Receipt.Repository.ReceiptLogRepository;
+import com.example.Reward.Receipt.Util.GetLongestCommonSubstring;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -27,24 +33,17 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class ReceiptService {
-
+    private final GiveStockService giveStockService;
     private final EventRepository eventRepository;
     private final ReceiptLogRepository receiptLogRepository;
     private final AmazonS3 amazonS3;
+    private final WebClient webClient;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final WebClient webClient;
     @Value("${x-ocr-secret}")
     private String ocrSecret;
     private static final String OCR_BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
-    private static final String STOCK_BASE_URL = "https://openapi.koreainvestment.com:9443";
-    @Value("${authorization}")
-    private String authorization;
-    @Value("${appKey}")
-    private String appKey;
-    @Value("${appSecret}")
-    private String appSecret;
-    private final KafkaTemplate<String,Object> kafkaTemplate;
+    private final GetLongestCommonSubstring getLongestCommonSubstring;
 
     public GetEnterpriseListDTO getEnterpriseList() {
         List<String> enterpriseList = new ArrayList<>();
@@ -83,7 +82,7 @@ public class ReceiptService {
         metadata.setContentLength(receiptImg.getSize());
         metadata.setContentType(receiptImg.getContentType());
         InputStream inputStream = receiptImg.getInputStream();
-        String fileKey = receiptImg.getOriginalFilename();
+        String fileKey = "receipts/" + receiptImg.getOriginalFilename();
         amazonS3.putObject(bucket, fileKey, inputStream, metadata);
         return fileKey;
     }
@@ -140,38 +139,22 @@ public class ReceiptService {
     }
 
     public String checkEnterpriseName(List<String> enterprises, String storeName) {
+        String longest = "";
         for(String name : enterprises) {
-            if(storeName.contains(name)) {
-                return name;
+            String detected = getLongestCommonSubstring.getlongestCommonSubstring(name, storeName);
+            if(detected.length()>longest.length()) {
+                longest = detected;
             }
+        }
+        if(!longest.isEmpty()) {
+            return longest;
         }
         return "";
     }
 
-
-    public Integer getPrice(String enterpriseName) {
-        String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, 2L).getStockCode();
-        Mono<PresentPriceDTO> response = webClient.get()
-                .uri(STOCK_BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-price?FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={param}", stockCode)
-                .header("authorization", "Bearer " + authorization)
-                .header("appkey", appKey)
-                .header("appsecret", appSecret)
-                .header("tr_id", "FHKST01010100")
-                .retrieve()
-                .bodyToMono(PresentPriceDTO.class);
-        PresentPriceDTO result = response.block();
-        return result.getOutput().getStck_prpr();
-    }
-
-    public Double calDecimalStock(Integer priceOfStock) {
-        BigDecimal price = new BigDecimal(Integer.toString(priceOfStock));
-        return BigDecimal.valueOf(100).divide(price, 6, BigDecimal.ROUND_DOWN).doubleValue();
-    }
-
     @Transactional
     public RewardResponseDTO giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-
-        giveStock(memberId, rewardRequestDTO, priceOfStock, amountOfStock);
+        giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(),2L, priceOfStock, amountOfStock);
         Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
         event.setRewardAmount(event.getRewardAmount()-amountOfStock);
         eventRepository.save(event);
@@ -196,16 +179,4 @@ public class ReceiptService {
         return rewardResponseDTO;
     }
 
-    public void giveStock(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
-        String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L).getStockCode();
-         GiveStockProduceDTO giveStockProduceDTO = GiveStockProduceDTO.builder()
-                .memberId(memberId)
-                .enterpriseName(rewardRequestDTO.getEnterpriseName())
-                .code(stockCode)
-                .price(priceOfStock)
-                .amount(amountOfStock)
-                .build();
-
-        kafkaTemplate.send("test-mo", giveStockProduceDTO);
-    }
 }
