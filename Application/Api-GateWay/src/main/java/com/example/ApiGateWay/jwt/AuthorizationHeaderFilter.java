@@ -43,7 +43,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
             String path = exchange.getRequest().getURI().getPath();
 
-            if (path.contains("/v3/api-docs")) {
+            if (path.contains("/v3/api-docs") || path.contains("/api/my/signup")) {
                 return chain.filter(exchange);
             }
 
