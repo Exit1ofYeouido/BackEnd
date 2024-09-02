@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class AuthMessageProducer {
+public class AttendanceMessageProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -17,12 +17,11 @@ public class AuthMessageProducer {
 
         try {
             ProducerRecord<String, Object> record = new ProducerRecord<>(topic, message);
-            log.info("회원가입 Auth 요청 => {}", kafkaTemplate.send(record).get());
+            log.info("출석체크 기록 생성 Attendance 요청 => {}", kafkaTemplate.send(record).get());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
     }
-
 }

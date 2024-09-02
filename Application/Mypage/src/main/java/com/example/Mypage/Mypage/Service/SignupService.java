@@ -6,7 +6,9 @@ import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberRepository;
 import com.example.Mypage.Mypage.Dto.in.MemberSignupRequestDTO;
 import com.example.Mypage.Mypage.Exception.DuplicateIdException;
+import com.example.Mypage.Mypage.Kafka.Dto.AttendanceDto;
 import com.example.Mypage.Mypage.Kafka.Dto.AuthProduceDTO;
+import com.example.Mypage.Mypage.Kafka.ouput.AttendanceMessageProducer;
 import com.example.Mypage.Mypage.Kafka.ouput.AuthMessageProducer;
 import jakarta.persistence.PessimisticLockException;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,7 @@ public class SignupService {
 
     private final MemberRepository memberRepository;
     private final AuthMessageProducer authMessageProducer;
+    private final AttendanceMessageProducer attendanceMessageProducer;
     private final AccountRepository accountRepository;
 
     @Transactional
@@ -36,16 +39,19 @@ public class SignupService {
 
         try {
             Member newMember = memberSignupRequestDTO.toEntity();
-            Member joinedMember = memberRepository.save(newMember);
+            Member savedMember = memberRepository.save(newMember);
 
             String newAccountNumber = makeNewAccountNumber();
             Account newAccount = getNewAccount(newMember, newAccountNumber);
             accountRepository.save(newAccount);
 
             AuthProduceDTO authProduceDTO = getAuthProduceDTO(memberSignupRequestDTO,
-                    joinedMember);
+                    savedMember);
 
             authMessageProducer.sendMessage("test-auth", authProduceDTO);
+
+            AttendanceDto attendanceDto = getAttendanceDto(savedMember);
+            attendanceMessageProducer.sendMessage("attendance", attendanceDto);
 
         } catch (PessimisticLockException e) {
             log.error("Lock Transaction 얻지 못 함 {} ", e.getMessage());
@@ -55,6 +61,10 @@ public class SignupService {
             throw new RuntimeException(e.getMessage());
         }
         return true;
+    }
+
+    private static AttendanceDto getAttendanceDto(Member savedMember) {
+        return AttendanceDto.builder().memberId(savedMember.getId()).build();
     }
 
     private static Account getNewAccount(Member newMember, String newAccountNumber) {
@@ -85,7 +95,7 @@ public class SignupService {
 
         return String.format("%s-%s-%s", prePart, inPart, postPart);
     }
-    
+
     private String makeNewAccountNumber() {
         while (true) {
             String accountNumber = generateAccountNumber();
