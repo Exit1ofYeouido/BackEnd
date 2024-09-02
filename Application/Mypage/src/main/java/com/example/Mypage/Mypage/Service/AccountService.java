@@ -69,17 +69,16 @@ public class AccountService {
     }
 
     private String getEarningRate(MemberStock memberStock) {
-        Integer curPrice = apiService.getPrice(memberStock.getStockCode());
-        Double resultPrice = (double) curPrice / (double) memberStock.getAveragePrice();
+        int curPrice = apiService.getPrice(memberStock.getStockCode());
+        double resultPrice = (double) curPrice / (double) memberStock.getAveragePrice();
 
-        Double earningRate = (resultPrice - 1) * 100;
+        double earningRate = (resultPrice - 1) * 100;
 
         if (resultPrice < 1) {
             earningRate = (1 - resultPrice) * 100;
         }
-
-        String formattedEarningRate = String.format("%.2f", earningRate);
-        return formattedEarningRate;
+        
+        return String.format("%.2f", earningRate);
     }
 
     private static List<GetPointHistoryResponseDto> getPointHistoryResponseDtos(
