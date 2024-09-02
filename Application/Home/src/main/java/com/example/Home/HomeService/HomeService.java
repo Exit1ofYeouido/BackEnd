@@ -32,12 +32,13 @@ public class HomeService {
         this.koreaInvestmentApiService = koreaInvestmentApiService;
     }
 
-    public HomeResponseDTO getHomeData() {
-        //일단은 첫번째 멤버 잘 나오나 확인하기
-        Member member = memberRepository.findAll().get(0);
-        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(member.getMemberId());
-        MemberPoint memberPoint = memberPointRepository.findAll().get(0);
+    public HomeResponseDTO getHomeData(Long memberId) {
 
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("멤버가 없습니다."));
+        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
+        MemberPoint memberPoint = memberPointRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("멤버 포인트가 없습니다."));
         int totalPoint = memberPoint.getResultPoint();
         int totalStock = calculateTotalStock(memberStocks);
         int totalAssets = totalPoint + totalStock;
