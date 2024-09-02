@@ -1,10 +1,7 @@
 package com.example.Reward.Common.Entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 @Entity
@@ -12,6 +9,7 @@ import lombok.Getter;
 public class Content {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="content_id")
     private Long id;
 
 

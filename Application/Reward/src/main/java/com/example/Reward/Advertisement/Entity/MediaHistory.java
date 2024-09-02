@@ -17,6 +17,7 @@ public class MediaHistory{
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="media_history_id")
     private Long id;
 
     private Long memberId;
