@@ -14,18 +14,17 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class StockService {
+public class SearchService {
 
     private final StockRepository stockRepository;
     private final KisService kisService;
     private final MemberStockRepository memberStockRepository;
 
 
-    public StockService(StockRepository stockRepository, KisService kisService, MemberStockRepository memberStockRepository) {
+    public SearchService(StockRepository stockRepository, KisService kisService, MemberStockRepository memberStockRepository) {
         this.stockRepository = stockRepository;
         this.kisService = kisService;
         this.memberStockRepository = memberStockRepository;
