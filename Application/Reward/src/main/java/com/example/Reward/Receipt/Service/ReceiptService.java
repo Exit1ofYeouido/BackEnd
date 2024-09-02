@@ -14,6 +14,7 @@ import com.example.Reward.Receipt.Dto.out.*;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Entity.ReceiptLog;
 import com.example.Reward.Receipt.Entity.ReceiptLogKey;
+import com.example.Reward.Receipt.Exception.ReceiptExceptions.InvalidFileExtensionException;
 import com.example.Reward.Receipt.Exception.ReceiptExceptions.S3UploadFailedException;
 import com.example.Reward.Receipt.Repository.ReceiptLogRepository;
 import com.example.Reward.Receipt.Util.GetLongestCommonSubstring;
@@ -62,7 +63,14 @@ public class ReceiptService {
     public String getExtension(MultipartFile receiptImg) {
         String originalFileName = receiptImg.getOriginalFilename();
         if(originalFileName != null && originalFileName.contains(".")) {
-            return originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+            String extension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
+            System.out.println(extension);
+            return switch (extension) {
+                case "jpg", "jpeg" -> "jpg";
+                case "png" -> "png";
+                case "svg" -> "svg";
+                default -> throw new InvalidFileExtensionException(extension);
+            };
         }
         else  {
             String contentType = receiptImg.getContentType();
@@ -70,11 +78,11 @@ public class ReceiptService {
                 return switch (contentType) {
                     case "image/jpeg", "image/jpg" -> "jpg";
                     case "image/png" -> "png";
-                    case "image/svg" -> "svg";
-                    default -> null;
+                    case "image/svg+xml" -> "svg";
+                    default -> throw new InvalidFileExtensionException(contentType);
                 };
             }
-            return null;
+            else throw new InvalidFileExtensionException("unknown");
         }
     }
 
