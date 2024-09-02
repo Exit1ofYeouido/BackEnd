@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Entity
 @Table(name = "member_stock")
@@ -13,10 +15,11 @@ public class MemberStock {
     @Column(name = "member_stock_id")
     private Long memberStockId;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member memberId;
 
-    @Column(name="code", columnDefinition = "char(6)")
+    @Column(name="stock_code", columnDefinition = "char(6)")
     private String code;
 
     @Column(name = "count")
@@ -26,17 +29,14 @@ public class MemberStock {
     @Column(name = "average_price")
     private Long averagePrice;
 
+    private LocalDate createdAt;
+
+    private LocalDate updatedAt;
+
     public Long getAveragePrice() {
         return averagePrice;
     }
 
-    public Long getMemberStockId() {
-        return memberStockId;
-    }
-
-    public Long getMemberId() {
-        return memberId;
-    }
 
     public String getCode() {
         return code;
