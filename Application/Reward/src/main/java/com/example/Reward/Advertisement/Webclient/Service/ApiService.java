@@ -1,17 +1,13 @@
-package com.example.Reward.Advertisement.Webclient;
+package com.example.Reward.Advertisement.Webclient.Service;
 
-import com.example.Reward.Common.Repository.TokenInfoRepository;
+import com.example.Reward.Advertisement.Webclient.Dto.ResponseDto;
+import com.example.Reward.Advertisement.Webclient.Dto.ResultDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +44,6 @@ public class ApiService {
         int cost= Integer.parseInt(result.getOutput().getStck_prpr());
         double resultCost=Math.round((150.0 /cost) * 1000000) / 1000000.0;
 
-        System.out.println(resultCost);
         ResultDto resultDto=ResultDto.builder()
                 .cost(cost)
                 .amount(resultCost)

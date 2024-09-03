@@ -1,10 +1,9 @@
 package com.example.Reward.Common.Service;
 
-import com.example.Reward.Advertisement.Webclient.GeneratedToken;
+import com.example.Reward.Advertisement.Webclient.Service.GeneratedToken;
 
 import com.example.Reward.Common.Kafka.GiveStockDto;
 import com.example.Reward.Common.Repository.EventRepository;
-import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

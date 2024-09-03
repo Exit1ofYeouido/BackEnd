@@ -1,7 +1,12 @@
-package com.example.Reward.Advertisement.Webclient;
+package com.example.Reward.Advertisement.Webclient.Service;
 
 
+import com.example.Reward.Advertisement.Exception.NotAccessTokenException;
+import com.example.Reward.Advertisement.Webclient.OauthInfo;
+import com.example.Reward.Advertisement.Webclient.Token;
+import com.example.Reward.Advertisement.Webclient.TokenInfo;
 import com.example.Reward.Common.Repository.TokenInfoRepository;
+import jakarta.transaction.Transactional;
 import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,13 +32,14 @@ public class GeneratedToken {
 
     WebClient client=WebClient.create();
 
+    @Transactional
     public String getAccessToken() {
 
         List<TokenInfo> tokenInfos=tokenInfoRepository.findAll();
 
+
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
-            System.out.println(ACCESS_TOKEN);
             TokenInfo tokenInfo = TokenInfo
                     .builder()
                     .accessToken(ACCESS_TOKEN)
@@ -55,7 +61,6 @@ public class GeneratedToken {
                 .appsecret(APPSECRET)
                 .build();
 
-        System.out.println(bodyOauthInfo.getAppsecret());
 
         Mono<Token> mono = client.post()
                 .uri(url)
@@ -65,9 +70,8 @@ public class GeneratedToken {
                 .bodyToMono(Token.class);
 
         Token token = mono.block();
-        System.out.println(token);
         if (token == null) {
-            throw new RuntimeException("액세스 토큰을 가져올 수 없습니다.");
+            throw new NotAccessTokenException();
         }
 
         ACCESS_TOKEN = token.getAccess_token();

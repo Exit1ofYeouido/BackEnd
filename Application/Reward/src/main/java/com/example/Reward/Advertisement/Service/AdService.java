@@ -8,13 +8,14 @@ import com.example.Reward.Advertisement.Entity.MediaHistory;
 import com.example.Reward.Advertisement.Entity.MediaLink;
 import com.example.Reward.Advertisement.Entity.Quiz;
 import com.example.Reward.Advertisement.Exception.NoStockException;
+import com.example.Reward.Advertisement.Exception.NotFoundMediaLinkException;
 import com.example.Reward.Advertisement.Exception.NotMatchedEnterpriseName;
 import com.example.Reward.Advertisement.Repository.CheckTodayRepository;
 import com.example.Reward.Advertisement.Repository.MediaHistoryRepository;
 import com.example.Reward.Advertisement.Repository.MediaLinkRepository;
 import com.example.Reward.Advertisement.Repository.QuizRepository;
-import com.example.Reward.Advertisement.Webclient.ApiService;
-import com.example.Reward.Advertisement.Webclient.ResultDto;
+import com.example.Reward.Advertisement.Webclient.Service.ApiService;
+import com.example.Reward.Advertisement.Webclient.Dto.ResultDto;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Repository.EventRepository;
 import com.example.Reward.Common.Service.GiveStockService;
@@ -52,7 +53,6 @@ public class AdService {
             enterpriseNoneList.add(check.getEnterpriseName());
         }
 
-
         for (MediaHistory media:mediaHistory){
             mediaLinkIdList.add(media.getMediaLink().getId());
         }
@@ -60,11 +60,11 @@ public class AdService {
         List<MediaLink> mediaLinks=mediaLinkRepository.findmedialink(mediaLinkIdList,enterpriseNoneList);
 
         Collections.shuffle(mediaLinks);
+
         List<GetInfoResponseDto> getInfoResponseDtos=new ArrayList<>();
-
-
         List<String> lists=new ArrayList<>();
         for (MediaLink medialink:mediaLinks){
+
             if (!lists.contains(medialink.getEnterpriseName())) {
                 GetInfoResponseDto getInfoResponseDto = GetInfoResponseDto
                         .builder()
@@ -81,15 +81,13 @@ public class AdService {
 
         Collections.shuffle(getInfoResponseDtos);
 
-
         return getInfoResponseDtos;
-
     }
 
     @Transactional(readOnly=true)
     public GetMediaUrlResponseDto getMediaUrl(Long mediaId) {
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
-        mediaLink.orElseThrow(()-> new RuntimeException());
+        mediaLink.orElseThrow(()-> new NotFoundMediaLinkException());
         return GetMediaUrlResponseDto.of(mediaLink);
     }
 
