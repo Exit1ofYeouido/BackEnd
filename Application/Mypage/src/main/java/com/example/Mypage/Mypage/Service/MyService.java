@@ -5,26 +5,29 @@ import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
 import com.example.Mypage.Common.Entity.PopupCheck;
+import com.example.Mypage.Common.Entity.Trade;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberRepository;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
 import com.example.Mypage.Common.Repository.PopupCheckRepository;
+import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
-import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
-import com.example.Mypage.Mypage.Exception.NotMemberException;
+import com.example.Mypage.Mypage.Exception.MemberNotFoundException;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
+import jakarta.transaction.Transactional;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +35,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MyService {
 
+    private static final Logger log = LoggerFactory.getLogger(MyService.class);
     private MemberRepository memberRepository;
     private final MemberStockRepository memberStockRepository;
     private final ApiService apiService;
     private final PopupCheckRepository popupCheckRepository;
     private final AccountRepository accountRepository;
+    private final TradeRepository tradeRepository;
 
     //TODO : 더미데이터를 넣어서 포인트로직 검증하기
     //TODO: orElse() 변경
@@ -64,7 +69,7 @@ public class MyService {
         for (MemberStock memberStock : memberStocks) {
             double stockcount = memberStock.getCount();
             double stockprice = memberStock.getAveragePrice();
-            double currentprice = apiService.getPrise(memberStock.getStockCode());
+            double currentprice = apiService.getPrice(memberStock.getStockCode());
 
             allCost = allCost + (stockprice * stockcount);
             currentAllCost = currentAllCost + (currentprice * stockcount);
@@ -101,7 +106,7 @@ public class MyService {
         for (MemberStock memberStock : memberStocks) {
             double stockCount = memberStock.getCount();
             int stockPrice = memberStock.getAveragePrice();
-            int currentPrice = apiService.getPrise(memberStock.getStockCode());
+            int currentPrice = apiService.getPrice(memberStock.getStockCode());
 
             double stock = stockCount * stockPrice;
             double currentStock = stockCount * currentPrice;
@@ -138,26 +143,24 @@ public class MyService {
     @Transactional
     public void giveStock(GiveStockDto giveStockDto) {
 
-
-        Optional<Member> member = memberRepository.findById(giveStockDto.getMemId());
-        member.orElseThrow(()-> new NotMemberException(giveStockDto.getMemId()));
+        Member member = memberRepository.findById(giveStockDto.getMemId())
+                .orElseThrow(() -> new MemberNotFoundException("주식을 증정할 유저를 찾을 수 없습니다." + giveStockDto.getMemId()));
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
                 , giveStockDto.getMemId());
 
         if (memberStock != null) {
-            memberStock.setCount(memberStock.getCount() + giveStockDto.getAmount());
             int avgPrice = (int) ((memberStock.getCount() * memberStock.getAveragePrice() +
                     giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getCount()
                     + giveStockDto.getAmount()));
 
-
+            memberStock.setCount(memberStock.getCount() + giveStockDto.getAmount());
             memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdatedAt(LocalDateTime.now());
             memberStockRepository.save(memberStock);
 
         } else {
             MemberStock new_memberStock = MemberStock.builder()
-                    .member(member.get())
+                    .member(member)
                     .stockName(giveStockDto.getEnterpriseName())
                     .count(giveStockDto.getAmount())
                     .stockCode(giveStockDto.getCode())
@@ -167,6 +170,7 @@ public class MyService {
                     .build();
             memberStockRepository.save(new_memberStock);
         }
+        addStockTrade(giveStockDto, member, memberStock);
     }
 
 
@@ -192,10 +196,18 @@ public class MyService {
 
     }
 
-    @Transactional(readOnly = true)
-    public List<MemberStock> getAllStock(Long memId) {
-        List<MemberStock> memberStocks=memberStockRepository.findByMemberId(memId);
+    // 주식 거래내역 추가
+    private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
+        Trade trade = Trade.builder()
+                .stockName(giveStockDto.getEnterpriseName())
+                .tradeType("입금")
+                .member(member)
+                .count(giveStockDto.getAmount())
+                .createdAt(LocalDateTime.now())
+                .memberStock(memberStock)
+                .build();
 
-        return memberStocks;
+        tradeRepository.save(trade);
+        log.info("주식 거래내역 저장 성공 => {}", trade.getId());
     }
 }

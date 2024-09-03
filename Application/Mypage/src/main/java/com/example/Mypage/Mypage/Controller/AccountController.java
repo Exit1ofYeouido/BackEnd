@@ -1,8 +1,11 @@
 package com.example.Mypage.Mypage.Controller;
 
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,5 +35,20 @@ public class AccountController {
                                              @RequestParam(defaultValue = "5") int size) {
 
         return ResponseEntity.ok(accountService.getPointHistory(memberId, index, size));
+    }
+
+    @GetMapping("/stocks")
+    @Operation(description = "나의 보유주식 조회")
+    public ResponseEntity<List<MyStocksResponseDto>> getMyStocks(@RequestHeader("memberId") Long memberId) {
+        return ResponseEntity.ok(accountService.getAllMyStocks(memberId));
+    }
+
+    @GetMapping("/stocks-history")
+    @Operation(description = "나의 주식 거래내역 조회")
+    public ResponseEntity<List<MyStocksHistoryResponseDto>> getMyStocksHistory(@RequestHeader("memberId") Long memberId,
+                                                                               @RequestParam(defaultValue = "0") int index,
+                                                                               @RequestParam(defaultValue = "5") int size) {
+
+        return ResponseEntity.ok(accountService.getMyStocksHistory(memberId, index, size));
     }
 }
