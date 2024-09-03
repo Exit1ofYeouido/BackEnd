@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyService {
 
     private static final Logger log = LoggerFactory.getLogger(MyService.class);
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
     private final MemberStockRepository memberStockRepository;
     private final ApiService apiService;
     private final PopupCheckRepository popupCheckRepository;
@@ -139,7 +139,6 @@ public class MyService {
 
     @Transactional
     public void giveStock(GiveStockDto giveStockDto) {
-
 
         Member member = memberRepository.findById(giveStockDto.getMemId())
                 .orElseThrow(() -> new MemberNotFoundException("주식을 증정할 유저를 찾을 수 없습니다." + giveStockDto.getMemId()));
