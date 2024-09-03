@@ -169,7 +169,9 @@ public class ReceiptService {
                     .dealTime(dealTime)
                     .approvalNum(approvalNum)
                     .build();
-        } catch (Exception e) {
+        } catch (MissingOcrInfoException e) {
+            throw e;
+        } catch (OcrErrorException e) {
             throw new OcrErrorException(receiptURL);
         }
     }

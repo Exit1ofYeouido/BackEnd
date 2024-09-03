@@ -5,10 +5,10 @@ import lombok.Getter;
 @Getter
 public class MissingOcrInfoExceptionDto {
     private String url;
-    private String message;
+    private String missingValue;
 
-    public MissingOcrInfoExceptionDto(String url, String message) {
+    public MissingOcrInfoExceptionDto(String url, String missingValue) {
         this.url = url;
-        this.message = message;
+        this.missingValue = missingValue;
     }
 }

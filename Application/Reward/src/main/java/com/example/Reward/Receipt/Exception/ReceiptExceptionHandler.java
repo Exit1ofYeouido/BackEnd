@@ -80,7 +80,7 @@ public class ReceiptExceptionHandler {
         ReceiptErrorResponse response = ReceiptErrorResponse.builder()
                 .status(e.getStatus())
                 .message(e.getMessage())
-                .data(new MissingOcrInfoExceptionDto(e.getUrl(), e.getMissingMessage()))
+                .data(new MissingOcrInfoExceptionDto(e.getUrl(), e.getMissingValue()))
                 .build();
         return ResponseEntity.badRequest().body(response);
     }
