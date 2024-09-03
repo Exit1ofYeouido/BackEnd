@@ -86,9 +86,9 @@ public class SearchService {
             String previousRate = kisService.getPreviousRate(stock.getCode());
             List<DailyStockPriceDTO> stockPriceList = kisService.getStockPriceList(stock.getCode(), period);
 
-            Double stockCount = memberStockRepository.findStockCountByMemberIdAndStockCode(memberId, stock.getCode()).orElse(0.0);
-
-            return new StockDetailDTO(stock.getName(), stock.getCode(), currentPrice.intValue(),stockCount, previousPrice, previousRate, stockPriceList);
+//            Double stockCount = memberStockRepository.findStockCountByMemberIdAndStockCode(memberId, stock.getCode()).orElse(0.0);
+            Double availableAmount = memberStockRepository.findAvailableCountByMemberIdAndStockCode(memberId,stock.getCode()).orElse(0.0);
+            return new StockDetailDTO(stock.getName(), stock.getCode(), currentPrice.intValue(),availableAmount, previousPrice, previousRate, stockPriceList);
         } else {
             return null;
         }
