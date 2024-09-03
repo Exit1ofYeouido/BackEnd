@@ -44,9 +44,6 @@ public class MyService {
     private final AccountRepository accountRepository;
     private final TradeRepository tradeRepository;
 
-    //TODO : 더미데이터를 넣어서 포인트로직 검증하기
-    //TODO: orElse() 변경
-
     @Transactional(readOnly = true)
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
 
@@ -54,7 +51,7 @@ public class MyService {
                 ()-> new AccountNotFoundException("계좌가 존재하지않습니다.")
         );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
-        String calcAssetsEarningRate = CalcAllAsssets(memberStock);
+        String calcAssetsEarningRate = CalcAllAssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
         int allCost = AllAssetsCount(memberStock);
 
@@ -62,7 +59,7 @@ public class MyService {
 
     }
 
-    private String CalcAllAsssets(List<MemberStock> memberStocks) {
+    private String CalcAllAssets(List<MemberStock> memberStocks) {
 
         double allCost = 0;
         double currentAllCost = 0;
