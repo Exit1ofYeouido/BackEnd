@@ -6,6 +6,8 @@ server:
     context-path: ${service-url}
 
 spring:
+  token:
+    secret: ${SECRET}
   application:
     name: api-gateway
   cloud:
@@ -15,7 +17,10 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: 'http://localhost:5173'
+            allowedOrigins:
+              - 'http://3.36.196.194:5173'
+              - 'http://localhost:5173'
+              - 'http://stock-craft.kro.kr'
             allow-credentials: true
             allowedHeaders: '*'
             allowedMethods:
@@ -35,30 +40,44 @@ spring:
             - Path= ${service-url}/basic/**
           filters:
             - RewritePath=${service-url}/basic/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
         - id: mypage
-          uri: http://localhost:8082
+          uri: http://3.36.68.97:8082
           predicates:
-            - Path= ${service-url}/mypage/**
+            - Path= ${service-url}/my/**
           filters:
+            - RewritePath=${service-url}/my/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
             - RewritePath=${service-url}/mypage/(?<path>.*),/$\{path}
         - id: reward
-          uri: http://localhost:8083
+          uri: http://43.203.224.71:8083
           predicates:
             - Path= ${service-url}/reward/**
           filters:
             - RewritePath=${service-url}/reward/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
         - id: search
-          uri: http://localhost:8084
+          uri: http://43.203.230.188:8084
           predicates:
             - Path= ${service-url}/search/**
           filters:
             - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
+        - id: auth
+          uri: http://3.39.235.153:8085
+          predicates:
+            - Path= ${service-url}/auth/**
+          filters:
+              - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
         - id: home
-          uri: http://localhost:8085
+          uri: http://43.203.198.57:8086
           predicates:
             - Path= ${service-url}/home/**
           filters:
-            - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
+            - RewritePath=${service-url}/home/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
+
+
 
 
 springdoc:
@@ -75,7 +94,7 @@ springdoc:
         name: API Gateway Service
       - url: ${service-url}/basic/v3/api-docs
         name: Basic
-      - url: ${service-url}/mypage/v3/api-docs
+      - url: ${service-url}/my/v3/api-docs
         name: Mypage
       - url: ${service-url}/reward/v3/api-docs
         name: Reward
@@ -83,10 +102,4 @@ springdoc:
         name: Search
       - url: ${service-url}/home/v3/api-docs
         name: Home
-
-
-
-
-
-
 
