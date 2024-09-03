@@ -36,11 +36,11 @@ public class MemberStock {
 
     private int averagePrice;
 
-    @Column(unique = true, name = "code")
     private String stockCode;
 
-    @Column(unique = true)
     private String stockName;
+
+    private double availableAmount;
 
     private LocalDateTime createdAt;
 
