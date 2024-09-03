@@ -63,6 +63,10 @@ public class MyService {
         double allCost = 0;
         double currentAllCost = 0;
 
+        if (memberStocks.isEmpty()){
+            return "0";
+        }
+
         for (MemberStock memberStock : memberStocks) {
             double stockcount = memberStock.getCount();
             double stockprice = memberStock.getAveragePrice();
