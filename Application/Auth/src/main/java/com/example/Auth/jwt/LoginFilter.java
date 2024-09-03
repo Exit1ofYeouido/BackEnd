@@ -91,6 +91,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                                               AuthenticationException failed) throws IOException, ServletException {
         logger.info("로그인 실패");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setCharacterEncoding("UTF-8");
+
+        String jsonResponse = "{"
+                + "\"error\": \"로그인 오류\","
+                + "\"message\": \"아이디 및 패스워드를 확인해주세요.\""
+                + "}";
+
+        response.getWriter().write(jsonResponse);
     }
 
     private Cookie createCookie(String key, String value) {

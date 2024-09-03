@@ -25,13 +25,13 @@ public class MemberStock {
 
     @Id
     @GeneratedValue
-    @Column(name="member_stock_id")
+    @Column(name = "member_stock_id")
     private Long id;
+
 
     private double count;
 
     private int averagePrice;
-
 
     private String stockCode;
 
