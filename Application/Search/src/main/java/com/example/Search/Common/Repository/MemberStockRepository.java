@@ -1,5 +1,6 @@
-package com.example.Search.SearchRepository.MemberStockRepository;
+package com.example.Search.Common.Repository;
 
+import com.example.Search.Common.Entity.MemberStock;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

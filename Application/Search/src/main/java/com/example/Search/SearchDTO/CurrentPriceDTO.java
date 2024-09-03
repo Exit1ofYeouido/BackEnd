@@ -33,7 +33,7 @@ public class CurrentPriceDTO {
     @Getter
     @Setter
     public static class DailyPrice {
-        private String stck_bsop_date; // 거래일자
-        private String stck_clpr;      // 종가
+        private String stck_bsop_date;
+        private String stck_clpr;
     }
 }

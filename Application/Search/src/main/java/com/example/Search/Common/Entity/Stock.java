@@ -1,11 +1,11 @@
-package com.example.Search.SearchRepository.StockRepository;
+package com.example.Search.Common.Entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 
 @Getter
 @Entity
-@Table(name = "stock", schema = "mo" , indexes = {
+@Table(name = "stock",indexes = {
         @Index(name = "idx_stock_name",columnList = "name")
 })
 public class Stock {
