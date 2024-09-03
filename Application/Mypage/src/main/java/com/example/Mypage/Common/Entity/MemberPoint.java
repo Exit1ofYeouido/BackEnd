@@ -10,6 +10,7 @@ public class MemberPoint {
 
     @Id
     @GeneratedValue
+    @Column(name="member_point_id")
     private Long id;
 
     private String type;

@@ -6,6 +6,7 @@ import com.example.Reward.Attendance.Dto.out.GetAttendanceResponseDTO;
 import com.example.Reward.Attendance.Dto.out.Reward;
 import com.example.Reward.Attendance.Dto.out.StockInfoDTO;
 import com.example.Reward.Attendance.Entity.Attendance;
+import com.example.Reward.Attendance.Exception.AlreadyAttendedException;
 import com.example.Reward.Attendance.Repository.AttendanceRepository;
 import com.example.Reward.Common.Entity.Event;
 import com.example.Reward.Common.Repository.EventRepository;
@@ -52,7 +53,7 @@ public class AttendanceService {
         LocalDate recentAttendDate = LocalDate.parse(attendance.getRecent(), formatter);
         LocalDate today = LocalDate.now();
         if(recentAttendDate.equals(today)) {
-            return false;
+            throw new AlreadyAttendedException();
         }
         int currentMonth = today.getMonthValue();
         int recentMonth = recentAttendDate.getMonthValue();
