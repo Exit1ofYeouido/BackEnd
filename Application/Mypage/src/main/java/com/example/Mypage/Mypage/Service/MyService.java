@@ -220,5 +220,5 @@ public class MyService {
         log.info("주식 거래내역 저장 성공 => {}", trade.getId());
     }
 
-  
+
 }
