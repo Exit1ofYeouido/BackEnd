@@ -18,25 +18,22 @@ import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.MemberNotFoundException;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
-import jakarta.transaction.Transactional;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MyService {
 
-    private static final Logger log = LoggerFactory.getLogger(MyService.class);
     private MemberRepository memberRepository;
     private final MemberStockRepository memberStockRepository;
     private final ApiService apiService;
@@ -44,17 +41,14 @@ public class MyService {
     private final AccountRepository accountRepository;
     private final TradeRepository tradeRepository;
 
-    //TODO : 더미데이터를 넣어서 포인트로직 검증하기
-    //TODO: orElse() 변경
-
     @Transactional(readOnly = true)
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
 
         Account account = accountRepository.findByMemberId(memId).orElseThrow(
-                ()-> new AccountNotFoundException("계좌가 존재하지않습니다.")
+                () -> new AccountNotFoundException("계좌가 존재하지않습니다.")
         );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
-        String calcAssetsEarningRate = CalcAllAsssets(memberStock);
+        String calcAssetsEarningRate = CalcAllAssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
         int allCost = AllAssetsCount(memberStock);
 
@@ -62,7 +56,7 @@ public class MyService {
 
     }
 
-    private String CalcAllAsssets(List<MemberStock> memberStocks) {
+    private String CalcAllAssets(List<MemberStock> memberStocks) {
 
         double allCost = 0;
         double currentAllCost = 0;
@@ -144,7 +138,6 @@ public class MyService {
     @Transactional
     public void giveStock(GiveStockDto giveStockDto) {
 
-
         Member member = memberRepository.findById(giveStockDto.getMemId())
                 .orElseThrow(() -> new MemberNotFoundException("주식을 증정할 유저를 찾을 수 없습니다." + giveStockDto.getMemId()));
 
@@ -200,25 +193,10 @@ public class MyService {
     }
 
 
-
     @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
-
-    // 주식 거래내역 추가
-    private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
-        Trade trade = Trade.builder()
-                .stockName(giveStockDto.getEnterpriseName())
-                .tradeType("입금")
-                .member(member)
-                .count(giveStockDto.getAmount())
-                .createdAt(LocalDateTime.now())
-                .memberStock(memberStock)
-                .build();
-
-
-        tradeRepository.save(trade);
-        log.info("주식 거래내역 저장 성공 => {}", trade.getId());
+        return memberStocks;
     }
 
     private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
