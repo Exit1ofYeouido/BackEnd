@@ -14,4 +14,7 @@ public interface StockRepository extends JpaRepository<Stock,String> {
 
     @Query(value = "SELECT s FROM Stock s WHERE s.name LIKE %:keyword% ORDER BY s.name")
     List<Stock> findSimilarStocks(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query(value = "SELECT s FROM Stock s ORDER BY RAND()")
+    List<Stock> findRandomStocks(Pageable pageable);
 }

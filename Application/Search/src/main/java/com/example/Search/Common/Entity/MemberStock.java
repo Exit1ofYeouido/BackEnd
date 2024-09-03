@@ -1,9 +1,12 @@
 package com.example.Search.Common.Entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Builder
@@ -16,24 +19,25 @@ public class MemberStock {
 
     @Id
     @GeneratedValue
+    @Column(name = "member_stock_id")
     private Long id;
 
-    private double count;
-
-
-    private int averagePrice;
-
-    @Column(name = "stock_code")
-    private String stockCode;
-
-    @Column(name = "stock_name")
-    private String stockName;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+
+    private double count;
+
+    private int averagePrice;
+
+    private String stockCode;
+
+    @Column(unique = true)
+    private String stockName;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

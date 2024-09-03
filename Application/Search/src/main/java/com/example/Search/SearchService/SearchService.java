@@ -33,24 +33,38 @@ public class SearchService {
     public List<StocksDTO> getStocks(Long memberId) {
         List<StocksDTO> result = new ArrayList<>();
 
-        // 1. Get top 5 stocks from member_stock table for the given memberId
         List<MemberStock> memberStocks = memberStockRepository.findTop5ByMemberIdOrderByCountDesc(memberId, PageRequest.of(0, 5));
-        List<String> memberStockCodes = memberStocks.stream()
-                .map(MemberStock::getStockCode)
-                .collect(Collectors.toList());
+        List<String> memberStockCodes = new ArrayList<>();
 
-        for (String code : memberStockCodes) {
+        for (MemberStock memberStock : memberStocks) {
+            String code = memberStock.getStockCode();
+            memberStockCodes.add(code);
             Optional<Stock> stockOptional = stockRepository.findById(code);
             if (stockOptional.isPresent()) {
                 result.add(createStocksDTO(stockOptional.get()));
             }
         }
 
-        // 2. Get random stocks to fill up to 10 total
-        int remainingCount = 10 - result.size();
+        int targetCount = memberStocks.isEmpty() ? 5 : 10;
+        int remainingCount = targetCount - result.size();
+
         if (remainingCount > 0) {
-            List<Stock> randomStocks = stockRepository.findRandomStocksExcluding(memberStockCodes, remainingCount);
+            List<Stock> randomStocks;
+            if (memberStockCodes.isEmpty()) {
+
+                randomStocks = stockRepository.findRandomStocks(PageRequest.of(0, remainingCount));
+            } else {
+
+                randomStocks = stockRepository.findRandomStocksExcluding(memberStockCodes, remainingCount);
+            }
             for (Stock stock : randomStocks) {
+                result.add(createStocksDTO(stock));
+            }
+        }
+
+        if (result.isEmpty()) {
+            List<Stock> anyStocks = stockRepository.findRandomStocks(PageRequest.of(0, 5));
+            for (Stock stock : anyStocks) {
                 result.add(createStocksDTO(stock));
             }
         }

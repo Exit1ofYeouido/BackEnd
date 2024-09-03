@@ -1,42 +1,50 @@
 package com.example.Search.Common.Entity;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
-
+import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
+import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Member {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
 
     private String name;
 
-    private LocalDateTime birth;
+    private Date birth;
+
+    private Character sex;
 
     private Integer point;
 
-    private String sex;
-
+    @Email
     private String email;
+
+    private String memberName;
 
     private String phoneNumber;
 
     private String role;
 
-    private String account;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime createAt;
-
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
 }
