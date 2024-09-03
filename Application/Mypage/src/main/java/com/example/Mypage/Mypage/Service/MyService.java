@@ -14,6 +14,7 @@ import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
+import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.MemberNotFoundException;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
@@ -143,8 +144,10 @@ public class MyService {
     @Transactional
     public void giveStock(GiveStockDto giveStockDto) {
 
+
         Member member = memberRepository.findById(giveStockDto.getMemId())
                 .orElseThrow(() -> new MemberNotFoundException("주식을 증정할 유저를 찾을 수 없습니다." + giveStockDto.getMemId()));
+
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
                 , giveStockDto.getMemId());
 
@@ -196,7 +199,28 @@ public class MyService {
 
     }
 
+
+
+    @Transactional(readOnly = true)
+    public List<MemberStock> getAllStock(Long memId) {
+        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
+
     // 주식 거래내역 추가
+    private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
+        Trade trade = Trade.builder()
+                .stockName(giveStockDto.getEnterpriseName())
+                .tradeType("입금")
+                .member(member)
+                .count(giveStockDto.getAmount())
+                .createdAt(LocalDateTime.now())
+                .memberStock(memberStock)
+                .build();
+
+
+        tradeRepository.save(trade);
+        log.info("주식 거래내역 저장 성공 => {}", trade.getId());
+    }
+
     private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
         Trade trade = Trade.builder()
                 .stockName(giveStockDto.getEnterpriseName())
@@ -209,5 +233,6 @@ public class MyService {
 
         tradeRepository.save(trade);
         log.info("주식 거래내역 저장 성공 => {}", trade.getId());
+
     }
 }
