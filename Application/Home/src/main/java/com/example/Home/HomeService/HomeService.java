@@ -2,12 +2,12 @@ package com.example.Home.HomeService;
 
 import com.example.Home.HomeDTO.HomeResponseDTO;
 import com.example.Home.Kis.KoreaInvestmentApiService;
-import com.example.Home.Member.Member;
-import com.example.Home.Member.MemberPoint;
-import com.example.Home.Member.MemberStock;
-import com.example.Home.MemberRepository.MemberPointRepository;
-import com.example.Home.MemberRepository.MemberRepository;
-import com.example.Home.MemberRepository.MemberStockRepository;
+import com.example.Home.Common.Entity.Member;
+import com.example.Home.Common.Entity.Account;
+import com.example.Home.Common.Entity.MemberStock;
+import com.example.Home.Common.Repository.AccountRepository;
+import com.example.Home.Common.Repository.MemberRepository;
+import com.example.Home.Common.Repository.MemberStockRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,13 +22,13 @@ public class HomeService {
 
     private final MemberRepository memberRepository;
     private final MemberStockRepository memberStockRepository;
-    private final MemberPointRepository memberPointRepository;
+    private final AccountRepository accountRepository;
     private final KoreaInvestmentApiService koreaInvestmentApiService;
 
-    public HomeService(MemberRepository memberRepository, MemberStockRepository memberStockRepository, MemberPointRepository memberPointRepository, KoreaInvestmentApiService koreaInvestmentApiService) {
+    public HomeService(MemberRepository memberRepository, MemberStockRepository memberStockRepository, AccountRepository accountRepository, KoreaInvestmentApiService koreaInvestmentApiService) {
         this.memberRepository = memberRepository;
         this.memberStockRepository = memberStockRepository;
-        this.memberPointRepository = memberPointRepository;
+        this.accountRepository = accountRepository;
         this.koreaInvestmentApiService = koreaInvestmentApiService;
     }
 
@@ -37,9 +37,9 @@ public class HomeService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("멤버가 없습니다."));
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
-        MemberPoint memberPoint = memberPointRepository.findByMemberId(memberId)
+        Account account = accountRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("멤버 포인트가 없습니다."));
-        int totalPoint = memberPoint.getPoint();
+        int totalPoint = account.getPoint();
         int totalStock = calculateTotalStock(memberStocks);
         int totalAssets = totalPoint + totalStock;
         double totalEarningRate = calculateEarningRate(memberStocks);

@@ -1,6 +1,6 @@
-package com.example.Home.MemberRepository;
+package com.example.Home.Common.Repository;
 
-import com.example.Home.Member.MemberStock;
+import com.example.Home.Common.Entity.MemberStock;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

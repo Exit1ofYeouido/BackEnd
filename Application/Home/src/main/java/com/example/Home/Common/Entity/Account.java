@@ -1,4 +1,4 @@
-package com.example.Home.Member;
+package com.example.Home.Common.Entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @Table(name = "account")
-public class MemberPoint {
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

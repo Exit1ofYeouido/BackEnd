@@ -1,4 +1,4 @@
-package com.example.Home.Member;
+package com.example.Home.Common.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
