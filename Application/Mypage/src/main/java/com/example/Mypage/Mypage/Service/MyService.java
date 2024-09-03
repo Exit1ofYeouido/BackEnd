@@ -200,9 +200,12 @@ public class MyService {
     @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
+        return memberStocks;
+    }
 
     // 주식 거래내역 추가
     private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
+
         Trade trade = Trade.builder()
                 .stockName(giveStockDto.getEnterpriseName())
                 .tradeType("입금")
@@ -217,18 +220,5 @@ public class MyService {
         log.info("주식 거래내역 저장 성공 => {}", trade.getId());
     }
 
-    private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
-        Trade trade = Trade.builder()
-                .stockName(giveStockDto.getEnterpriseName())
-                .tradeType("입금")
-                .member(member)
-                .count(giveStockDto.getAmount())
-                .createdAt(LocalDateTime.now())
-                .memberStock(memberStock)
-                .build();
-
-        tradeRepository.save(trade);
-        log.info("주식 거래내역 저장 성공 => {}", trade.getId());
-
-    }
+  
 }
