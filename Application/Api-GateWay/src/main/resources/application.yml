@@ -42,7 +42,7 @@ spring:
             - RewritePath=${service-url}/basic/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
         - id: mypage
-          uri: http://3.36.68.97:8082
+          uri: http://172.31.3.175:8082
           predicates:
             - Path= ${service-url}/my/**
           filters:
@@ -50,27 +50,27 @@ spring:
             - AuthorizationHeaderFilter
             - RewritePath=${service-url}/mypage/(?<path>.*),/$\{path}
         - id: reward
-          uri: http://43.203.224.71:8083
+          uri: http://172.31.3.113:8083
           predicates:
             - Path= ${service-url}/reward/**
           filters:
             - RewritePath=${service-url}/reward/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
         - id: search
-          uri: http://43.203.230.188:8084
+          uri: http://172.31.3.217:8084
           predicates:
             - Path= ${service-url}/search/**
           filters:
             - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
         - id: auth
-          uri: http://3.39.235.153:8085
+          uri: http://172.31.3.103:8085
           predicates:
             - Path= ${service-url}/auth/**
           filters:
               - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
         - id: home
-          uri: http://43.203.198.57:8086
+          uri: http://172.31.3.21:8086
           predicates:
             - Path= ${service-url}/home/**
           filters:
