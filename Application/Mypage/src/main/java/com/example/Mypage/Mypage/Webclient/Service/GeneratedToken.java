@@ -36,7 +36,6 @@ public class GeneratedToken {
 
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
-            System.out.println(ACCESS_TOKEN);
             TokenInfo tokenInfo = TokenInfo
                     .builder()
                     .accessToken(ACCESS_TOKEN)

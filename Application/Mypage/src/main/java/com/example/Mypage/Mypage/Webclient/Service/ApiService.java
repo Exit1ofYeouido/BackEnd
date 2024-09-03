@@ -40,6 +40,7 @@ public class ApiService {
                 .bodyToMono(ResponseDto.class);
 
         ResponseDto result = response.block();
+        /** 예외 로직**/
 
         int cost = Integer.parseInt(result.getOutput().getStck_prpr());
 

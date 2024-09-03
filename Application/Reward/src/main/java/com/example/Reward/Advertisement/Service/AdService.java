@@ -99,8 +99,6 @@ public class AdService {
 
     public GiveStockResponseDto giveStock(Long mediaId, GiveStockRequestDto giveStockRequestDto,Long memId) {
 
-
-
         //미디어 시청내역 체크  (중복제외 로직 포함)
 
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
