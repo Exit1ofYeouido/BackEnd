@@ -4,6 +4,7 @@ import com.example.Search.SearchDTO.CurrentPriceDTO;
 import com.example.Search.SearchDTO.DailyStockPriceDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,8 @@ import java.util.List;
 public class KisService {
 
     private final WebClient webClient;
+    private final GeneratedToken generatedToken;
+
 
     @Value("${korea.investment.api.key}")
     private String apiKey;
@@ -27,15 +30,16 @@ public class KisService {
     @Value("${korea.investment.api.secret}")
     private String apiSecret;
 
-    @Value("${api.token}")
-    private String apiToken;
-
-    public KisService(@Value("https://openapi.koreainvestment.com:9443") String apiUrl) {
-        this.webClient = WebClient.create(apiUrl);
+    public KisService(@Value("${korea.investment.api.url}") String apiUrl, GeneratedToken generatedToken) {
+        this.webClient = WebClient.builder()
+                .baseUrl(apiUrl)
+                .defaultHeader("appkey", apiKey)
+                .defaultHeader("appsecret", apiSecret)
+                .build();
+        this.generatedToken = generatedToken;
     }
 
     public Long getCurrentPrice(String stockCode) {
-
         try {
             CurrentPriceDTO response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
@@ -43,14 +47,16 @@ public class KisService {
                             .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                             .queryParam("FID_INPUT_ISCD", stockCode)
                             .build())
-                    .header("authorization", "Bearer " + getToken())
-                    .header("appkey", "PSf02ZJFWOatPQuYU0f2eEaahY4y5o9aP70q")
-                    .header("appsecret", "sG4RxxJZej+oaePWgIA5fozlRR3YBCN2eSNBnW1p4iNjyIldK1HCi3rzMV21zAXf9xOZ0VolAWytiP5QpLemXyApDnaOKbLwR2jbdSsFdg/2SlUxaMoVrZxdjMtonM4IsfEjvWNcZM8ubvK/Wk8VawLdn01fc9gsx2SIRQNjWqctyLiUlf8=")
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
+                    .header("appkey", apiKey)
+                    .header("appsecret", apiSecret)
                     .header("tr_id", "FHKST01010100")
                     .retrieve()
                     .bodyToMono(CurrentPriceDTO.class)
                     .block();
-
+            System.out.println("@@@@@@@@@@@@@@@@@@@@apikey " + apiKey);
+            System.out.println("@@@@@@@@@@@@@@@@@@@@apisecret " + apiSecret);
+            System.out.println("@@@@@@@@@@@@@@@@@@@@token " + generatedToken.getAccessToken());
             System.out.println("response ::: " + response.getOutput());
             if (response != null && response.getOutput() != null) {
                 return Long.parseLong(response.getOutput().getStck_prpr());
@@ -72,9 +78,9 @@ public class KisService {
                             .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                             .queryParam("FID_INPUT_ISCD", stockCode)
                             .build())
-                    .header("authorization", "Bearer " + getToken())
-                    .header("appkey", "PSf02ZJFWOatPQuYU0f2eEaahY4y5o9aP70q")
-                    .header("appsecret", "sG4RxxJZej+oaePWgIA5fozlRR3YBCN2eSNBnW1p4iNjyIldK1HCi3rzMV21zAXf9xOZ0VolAWytiP5QpLemXyApDnaOKbLwR2jbdSsFdg/2SlUxaMoVrZxdjMtonM4IsfEjvWNcZM8ubvK/Wk8VawLdn01fc9gsx2SIRQNjWqctyLiUlf8=")
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
+                    .header("appkey", apiKey)
+                    .header("appsecret", apiSecret)
                     .header("tr_id", "FHKST01010100")
                     .retrieve()
                     .bodyToMono(CurrentPriceDTO.class)
@@ -101,9 +107,9 @@ public class KisService {
                             .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                             .queryParam("FID_INPUT_ISCD", stockCode)
                             .build())
-                    .header("authorization", "Bearer " + getToken())
-                    .header("appkey", "PSf02ZJFWOatPQuYU0f2eEaahY4y5o9aP70q")
-                    .header("appsecret", "sG4RxxJZej+oaePWgIA5fozlRR3YBCN2eSNBnW1p4iNjyIldK1HCi3rzMV21zAXf9xOZ0VolAWytiP5QpLemXyApDnaOKbLwR2jbdSsFdg/2SlUxaMoVrZxdjMtonM4IsfEjvWNcZM8ubvK/Wk8VawLdn01fc9gsx2SIRQNjWqctyLiUlf8=")
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
+                    .header("appkey", apiKey)
+                    .header("appsecret", apiSecret)
                     .header("tr_id", "FHKST01010100")
                     .retrieve()
                     .bodyToMono(CurrentPriceDTO.class)
@@ -153,7 +159,7 @@ public class KisService {
                             .queryParam("FID_ORG_ADJ_PRC", "0")
                             .build())
                     .header("content-type", "application/json; charset=utf-8")
-                    .header("authorization", "Bearer " + getToken())
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
                     .header("appkey", apiKey)
                     .header("appsecret", apiSecret)
                     .header("tr_id", "FHKST03010100")
@@ -187,10 +193,6 @@ public class KisService {
             log.error("Error getting stock price list for code {}: {}", stockCode, e.getMessage());
             return new ArrayList<>();
         }
-    }
-
-    private String getToken() {
-        return "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6ImYyZmQ1NzQ4LTRjMDMtNGYyOC1hOGE1LTczYmVkZTg1YjQ2NSIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTcyNTQxMzE4NiwiaWF0IjoxNzI1MzI2Nzg2LCJqdGkiOiJQU2YwMlpKRldPYXRQUXVZVTBmMmVFYWFoWTR5NW85YVA3MHEifQ.M0z6nw_MpJdOVSbk_CakLbyN32ZHbFVhMd5XtUkVSCtm_i_TmM53WauAfSiP9mx1o11ab9gQMRV4TRV6I4hcJQ";
     }
 
 }

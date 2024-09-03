@@ -16,7 +16,7 @@ project(":application:search") {
 		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 		implementation 'com.mysql:mysql-connector-j'
 		implementation 'mysql:mysql-connector-java:8.0.33'
-
+		implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
 	}
 
 	dependencyManagement {

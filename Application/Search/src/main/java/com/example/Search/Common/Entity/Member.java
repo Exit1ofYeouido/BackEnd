@@ -32,8 +32,6 @@ public class Member {
 
     private Character sex;
 
-    private Integer point;
-
     @Email
     private String email;
 
