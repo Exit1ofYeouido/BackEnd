@@ -29,7 +29,6 @@ public class ConsumerService {
             MemberAuth newMemberAuth = authConsumeDTO.toEntity();
 
             authRepository.save(newMemberAuth);
-
         } catch (Exception e) {
             log.error("유효하지 않은 데이터 수신: {}, 에러: {}", message.value(), e.getMessage());
         }

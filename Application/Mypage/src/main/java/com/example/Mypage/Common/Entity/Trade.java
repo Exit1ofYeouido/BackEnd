@@ -7,29 +7,33 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Trade {
 
     @Id
     @GeneratedValue
+    @Column(name = "trade_id")
     private Long id;
 
     private String stockName;
 
     private String tradeType;
 
-    private String rewardType;
+    private double count;
 
-    @Column(length = 6)
-    private String code;
-
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "memberStock_id")
+    @JoinColumn(name = "member_stock_id")
     private MemberStock memberStock;
 
     @ManyToOne
