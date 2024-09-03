@@ -29,24 +29,22 @@ public class MemberStock {
     private Long id;
 
 
-    private double count;
-
-    private int averagePrice;
-
-    private String stockCode;
-
-    private String stockName;
-
-    @Column(unique = true)
-    private String account;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
 
+    private double count;
+
+    private int averagePrice;
+
+
+    private String stockCode;
+
+    @Column(unique = true)
+    private String stockName;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }
