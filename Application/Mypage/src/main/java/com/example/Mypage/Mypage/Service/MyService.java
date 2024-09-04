@@ -24,19 +24,21 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 @RequiredArgsConstructor
 public class MyService {
 
-    private static final Logger log = LoggerFactory.getLogger(MyService.class);
+
     private final MemberRepository memberRepository;
+
     private final MemberStockRepository memberStockRepository;
     private final ApiService apiService;
     private final PopupCheckRepository popupCheckRepository;
@@ -47,7 +49,7 @@ public class MyService {
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
 
         Account account = accountRepository.findByMemberId(memId).orElseThrow(
-                ()-> new AccountNotFoundException("계좌가 존재하지않습니다.")
+                () -> new AccountNotFoundException("계좌가 존재하지않습니다.")
         );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
         String calcAssetsEarningRate = CalcAllAssets(memberStock);
@@ -206,11 +208,11 @@ public class MyService {
     }
 
 
-
     @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
         return memberStocks;
+
     }
 
     // 주식 거래내역 추가
@@ -227,7 +229,7 @@ public class MyService {
 
 
         tradeRepository.save(trade);
-        log.info("주식 거래내역 저장 성공 => {}", trade.getId());
+
     }
 
 

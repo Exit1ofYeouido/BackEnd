@@ -30,10 +30,10 @@ public class ApiService {
         String url=REST_BASE_URL+"/uapi/domestic-stock/v1/quotations/inquire-price?FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD="+code;
         Mono<ResponseDto> response=client.get()
                 .uri(url)
-                .header("authorization","Bearer " + generatedToken.getAccessToken())
-                .header("appkey",APPKEY)
-                .header("appsecret",APPSECRET)
-                .header("tr_id","FHKST01010100")
+                .header("authorization", "Bearer " + generatedToken.getAccessToken())
+                .header("appkey", APPKEY)
+                .header("appsecret", APPSECRET)
+                .header("tr_id", "FHKST01010100")
                 .retrieve()
                 .bodyToMono(ResponseDto.class);
 
