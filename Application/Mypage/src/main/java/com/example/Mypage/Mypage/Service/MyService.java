@@ -197,11 +197,7 @@ public class MyService {
         return GetTutorialCheckResponseDto.of(false);
     }
 
-    @Transactional(readOnly = true)
-    public List<MemberStock> getAllStock(Long memId) {
-        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
-        return memberStocks;
-    }
+
 
     public void saveTutorialCheck(String type, Long memId) {
 
@@ -213,7 +209,6 @@ public class MyService {
         popupCheckRepository.save(popupCheck);
 
     }
-
 
 
     @Transactional(readOnly = true)
