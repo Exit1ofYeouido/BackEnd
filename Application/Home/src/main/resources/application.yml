@@ -12,14 +12,6 @@ spring:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
-  api:
-    token:${API_TOKEN}
-  korea:
-    investment:
-      api:
-        key: ${KOREA_INVESTMENT_API_KEY}
-        secret: ${KOREA_INVESTMENT_API_SECRET}
-        url: ${KOREA_INVESTMENT_API_URL}
   sql:
     init:
       mode: always
@@ -38,3 +30,10 @@ springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   packages-to-scan: com.example
+
+korea:
+  investment:
+    api:
+      key: ${APP_KEY}
+      secret: ${APP_SECRET}
+      url: ${KOREA_INVESTMENT_API_URL}

@@ -30,12 +30,10 @@ public class ApiService {
 
         Mono<ResponseDto> response = client.get()
                 .uri(url)
-                .header("content-type", "application/json")
                 .header("authorization", "Bearer " + generatedToken.getAccessToken())
                 .header("appkey", APPKEY)
                 .header("appsecret", APPSECRET)
                 .header("tr_id", "FHKST01010100")
-                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(ResponseDto.class);
 

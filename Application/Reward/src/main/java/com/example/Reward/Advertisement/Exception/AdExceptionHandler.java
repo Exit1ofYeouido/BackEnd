@@ -52,5 +52,28 @@ public class AdExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(NotAccessTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    private ResponseEntity<AdResponse> handler(NotAccessTokenException e) {
+
+        AdResponse response = AdResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(NotFoundMediaLinkException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    private ResponseEntity<AdResponse> handler(NotFoundMediaLinkException e) {
+
+        AdResponse response = AdResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
 
 }

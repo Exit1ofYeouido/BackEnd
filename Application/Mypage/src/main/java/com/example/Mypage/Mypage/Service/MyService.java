@@ -137,6 +137,7 @@ public class MyService {
 
         Member member = memberRepository.findById(giveStockDto.getMemId())
                 .orElseThrow(() -> new MemberNotFoundException("주식을 증정할 유저를 찾을 수 없습니다." + giveStockDto.getMemId()));
+
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
                 , giveStockDto.getMemId());
 
@@ -208,5 +209,6 @@ public class MyService {
 
         tradeRepository.save(trade);
         log.info("주식 거래내역 저장 성공 => {}", trade.getId());
+
     }
 }
