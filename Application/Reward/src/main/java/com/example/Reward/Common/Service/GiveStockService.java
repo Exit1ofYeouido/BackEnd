@@ -1,9 +1,9 @@
 package com.example.Reward.Common.Service;
 
-import com.example.Reward.Advertisement.Webclient.GeneratedToken;
-import com.example.Reward.Common.Kafka.GiveStockProduceDto;
+import com.example.Reward.Advertisement.Webclient.Service.GeneratedToken;
+
+import com.example.Reward.Common.Kafka.GiveStockDto;
 import com.example.Reward.Common.Repository.EventRepository;
-import com.example.Reward.Receipt.Dto.in.RewardRequestDTO;
 import com.example.Reward.Receipt.Dto.webClient.PresentPriceDTO;
 import com.example.Reward.Receipt.Exception.ReceiptExceptions.KISApiException;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +52,7 @@ public class GiveStockService {
 
     public void giveStock(Long memberId, String enterpriseName, Long contentId, Integer priceOfStock, Double amountOfStock) {
         String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, contentId).getStockCode();
-        GiveStockProduceDto giveStockProduceDTO = GiveStockProduceDto.builder()
+        GiveStockDto giveStockProduceDTO = GiveStockDto.builder()
                 .memId(memberId)
                 .enterpriseName(enterpriseName)
                 .code(stockCode)
@@ -61,5 +61,15 @@ public class GiveStockService {
                 .build();
 
         kafkaTemplate.send("test-mo", giveStockProduceDTO);
+    }
+
+    public void giveAdStock(Long memId, double stockAmount, String code, String enterpriseName, int cost) {
+
+        kafkaTemplate.send("give-stock", GiveStockDto.builder()
+                .memId(memId)
+                .price(cost)
+                .amount(stockAmount)
+                .enterpriseName(enterpriseName)
+                .code(code).build());
     }
 }

@@ -18,10 +18,10 @@ public class ApiService {
     WebClient client = WebClient.create();
 
     @Value("${app.key}")
-    public String APPKEY;
+    private String APPKEY;
 
     @Value("${app.secretkey}")
-    public String APPSECRET;
+    private String APPSECRET;
 
     public int getPrice(String code) {
 
@@ -30,12 +30,10 @@ public class ApiService {
 
         Mono<ResponseDto> response = client.get()
                 .uri(url)
-                .header("content-type", "application/json")
                 .header("authorization", "Bearer " + generatedToken.getAccessToken())
                 .header("appkey", APPKEY)
                 .header("appsecret", APPSECRET)
                 .header("tr_id", "FHKST01010100")
-                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(ResponseDto.class);
 

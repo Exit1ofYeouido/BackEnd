@@ -1,5 +1,6 @@
 package com.example.Reward.Config;
 
+
 import com.example.Reward.Attendance.Kafka.AttendanceDto;
 import com.example.Reward.Common.Util.KafkaUtil;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -34,6 +35,7 @@ public class KafkaConsumeConfig {
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(AttendanceDto.class, false));
+
     }
 
     @Bean
