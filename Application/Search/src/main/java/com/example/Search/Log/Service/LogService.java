@@ -10,22 +10,26 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static java.lang.String.format;
+
 @Service
 @RequiredArgsConstructor
 public class LogService {
 
 
-    private SearchLogRepository searchLogRepository;
-    private MemberStockHoldingRepository memberStockHoldingRepository;
+    private final SearchLogRepository searchLogRepository;
+    private final MemberStockHoldingRepository memberStockHoldingRepository;
 
-    public List<GetHistoryStockResponseDto> gethistoryStock(String code, Integer year, Integer month) {
+    public void gethistoryStock(String code, Integer year, Integer month) {
 
         List<SearchLog> searchLogs=memberStockHoldingRepository.findByYearAndMonth(code,year,month);
 
-        for (SearchLog searchLog:searchLogs){
-            searchLog.getSearchTime();
 
+
+        for (SearchLog searchLog:searchLogs){
+            
         }
+
 
 
     }

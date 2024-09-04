@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -15,14 +17,13 @@ public class SearchLog {
     @Column(name = "search_log_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id", referencedColumnName = "member_id")
-    private Long memberId;
+
 
     @ManyToOne
     @JoinColumn(name = "code", referencedColumnName = "code")
     private Stock stock;
 
-    private String searchTime;
+    private LocalDateTime searchTime;
+
     private Boolean holding;
 }
