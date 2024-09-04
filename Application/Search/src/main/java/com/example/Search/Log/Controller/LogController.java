@@ -27,7 +27,7 @@ public class LogController {
     public ResponseEntity<?> gethistoryStock(@RequestParam("code") String code,@RequestParam("year") Integer year
             ,@RequestParam("month") Integer month){
 
-        List<GetHistoryStockResponseDto> getHistoryStockResponseDto =logService.gethistoryStock();
+        List<GetHistoryStockResponseDto> getHistoryStockResponseDto =logService.gethistoryStock(code,year,month);
 
         return ResponseEntity.ok(getHistoryStockResponseDto);
     }
