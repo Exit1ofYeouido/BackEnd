@@ -18,10 +18,10 @@ public class ApiService {
     WebClient client = WebClient.create();
 
     @Value("${app.key}")
-    public String APPKEY;
+    private String APPKEY;
 
     @Value("${app.secretkey}")
-    public String APPSECRET;
+    private String APPSECRET;
 
     public int getPrice(String code) {
 
