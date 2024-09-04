@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class KoreaInvestmentApiService {
 
     private final WebClient webClient;
+    private final GeneratedToken generatedToken;
 
     @Value("${korea.investment.api.key}")
     private String apiKey;
@@ -17,11 +18,9 @@ public class KoreaInvestmentApiService {
     @Value("${korea.investment.api.secret}")
     private String apiSecret;
 
-    @Value("${api.token}")
-    private String apiToken;
-
-    public KoreaInvestmentApiService(@Value("${korea.investment.api.url}") String apiUrl) {
+    public KoreaInvestmentApiService(@Value("${korea.investment.api.url}") String apiUrl, GeneratedToken generatedToken) {
         this.webClient = WebClient.create(apiUrl);
+        this.generatedToken = generatedToken;
     }
 
     public Long getCurrentPrice(String stockCode) {
@@ -33,7 +32,7 @@ public class KoreaInvestmentApiService {
                             .queryParam("FID_INPUT_ISCD", stockCode)
                             .queryParam("FID_INPUT_HOUR_1","160000")
                             .build())
-                    .header("authorization", "Bearer " + getToken())
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
                     .header("appkey", apiKey)
                     .header("appsecret", apiSecret)
                     .header("tr_id", "FHPST01060000")
@@ -53,9 +52,5 @@ public class KoreaInvestmentApiService {
         }
 
 
-    }
-
-    private String getToken() {
-        return apiToken;
     }
 }
