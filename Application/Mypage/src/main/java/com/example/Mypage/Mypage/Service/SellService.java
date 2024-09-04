@@ -2,29 +2,49 @@ package com.example.Mypage.Mypage.Service;
 
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
+import com.example.Mypage.Common.Entity.SaleInfo;
 import com.example.Mypage.Common.Entity.StockSellRequestA;
 import com.example.Mypage.Common.Entity.StockSellRequestB;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
+import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
+import com.example.Mypage.Mypage.Webclient.handler.StockPriceSocketHandler;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.client.WebSocketClient;
+import org.springframework.web.socket.client.WebSocketConnectionManager;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SellService {
 
+    public static final String CLOSE_MARKET = "PINGPONG";
+    public static final int TEN_SECOND = 10000;
+
     private final StockSaleRequestARepository stockSaleRequestARepository;
     private final StockSaleRequestBRepository stockSaleRequestBRepository;
     private final MemberStockRepository memberStockRepository;
     private final TradeRepository tradeRepository;
+    private final SaleInfoRepository saleInfoRepository;
+
+    private final StockPriceSocketHandler stockPriceSocketHandler;
+    @Value("${approval.uri}")
+    private String stockPriceURI;
+    private WebSocketConnectionManager connectionManager;
 
     @Transactional
     public boolean saveStockSellRequest(Long memberId, StockSellRequestDto stockSellRequestDto) {
@@ -43,9 +63,56 @@ public class SellService {
             throw new IllegalStateException("보유한 주식을 초과하여 판매할 수 없습니다.");
         }
 
+        //TODO : 예외처리 추가하기
         saveSellRequest(stockSellRequestDto, member);
         return true;
     }
+
+    @Transactional
+    @Scheduled(cron = "30 0 9 * * *")
+    public void updateTodayMarketStatus() {
+        if (connectionManager == null) {
+            WebSocketClient webSocketClient = new StandardWebSocketClient();
+            connectionManager = new WebSocketConnectionManager(webSocketClient, stockPriceSocketHandler,
+                    stockPriceURI);
+            connectionManager.setAutoStartup(true);
+            connectionManager.start();
+        }
+
+        //TODO :orElseThrow로 수정
+        SaleInfo saleInfo = saleInfoRepository.findById(2).orElse(null);
+        if (isOpenStockMarket()) {
+            saleInfo.setIdx(1);
+        } else {
+            saleInfo.setIdx(0);
+        }
+        saleInfoRepository.save(saleInfo);
+        log.info("{} :: update Today marketStatus => {}", LocalDateTime.now(), saleInfo.getIdx());
+    }
+
+    private boolean isOpenStockMarket() {
+        try {
+            for (int i = 0; i < 3; i++) {
+                Thread.sleep(TEN_SECOND);
+                String response = stockPriceSocketHandler.getLatestMessage();
+                String extractTrId = extractTrId(response);
+
+                if (extractTrId.equals(CLOSE_MARKET)) {
+                    log.info("오늘은 비영업일 입니다.");
+                    connectionManager.stop();
+                    return false;
+                }
+            }
+            connectionManager.stop();
+            log.info("영업일 입니다.");
+            return true;
+
+        } catch (InterruptedException e) {
+            log.error("주식 영업일 확인중 오류 발생 => {}", e.getMessage());
+            return false;
+        }
+    }
+
 
     private void saveSellRequest(StockSellRequestDto stockSellRequestDto, Member member) {
         LocalTime now = LocalTime.now();
@@ -58,6 +125,20 @@ public class SellService {
             stockSaleRequestBRepository.save(stockSellRequestDto.toSellRequestB(member));
             StockSellRequestB saveStockSellRequestB = stockSellRequestDto.toSellRequestB(member);
             log.info("StockSaleRequestB 저장 성공 => {}", saveStockSellRequestB);
+        }
+    }
+
+    private String extractTrId(String jsonString) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+            return jsonNode.path("header").path("tr_id").asText();
+        } catch (Exception e) {
+            String stockCode = jsonString.substring(jsonString.length() - 6);
+            if (stockCode.equals("005930")) {
+                return "005930";
+            }
+            throw new NoSuchElementException("실시간 호가 추출과정에서 오류가 발생했습니다.");
         }
     }
 }
