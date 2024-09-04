@@ -18,7 +18,10 @@ public class LogController {
 
     @GetMapping("search-history/stock")
     @Operation(description = "주식 종목별 검색량 조회")
-    public ResponseEntity<?> gethistoryStock
+    public ResponseEntity<?> gethistoryStock(){
+
+        GetHistoryStockResponseDto getHistoryStockResponseDto =
+    }
 
 
 }
