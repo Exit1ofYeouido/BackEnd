@@ -1,6 +1,9 @@
 HELP.md
 .gradle
 build/
+
+# Reward/build/libs/ 디렉토리 내의 모든 파일을 예외 처리
+!/Application/Reward/build/libs
 !Application/Mypage/build/libs
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
