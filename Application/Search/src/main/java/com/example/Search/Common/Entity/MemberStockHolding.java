@@ -10,9 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberStockHolding {
-    @EmbeddedId
-    private HoldingLogKey holdingLogKey;
 
+    @Id
+    @GeneratedValue
+    @Column(name="member_stock_holding_id")
+    private Long id;
+
+    private Long memberId;
 
     @ManyToOne
     @MapsId("code")
