@@ -1,6 +1,6 @@
 project(":application:search") {
 
-	bootJar { enabled = false}
+	bootJar { enabled = true}
 	jar { enabled = false }
 
 	ext {
