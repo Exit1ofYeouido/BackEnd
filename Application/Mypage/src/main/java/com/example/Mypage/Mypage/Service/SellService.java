@@ -15,7 +15,6 @@ import com.example.Mypage.Mypage.Webclient.handler.StockPriceSocketHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +33,9 @@ public class SellService {
 
     public static final String CLOSE_MARKET = "PINGPONG";
     public static final int TEN_SECOND = 10000;
+    public static final int OPEN = 1;
+    public static final int CLOSE = 0;
+    public static final int SALE_TALBE_A = 1;
 
     private final StockSaleRequestARepository stockSaleRequestARepository;
     private final StockSaleRequestBRepository stockSaleRequestBRepository;
@@ -68,6 +70,19 @@ public class SellService {
         return true;
     }
 
+    @Scheduled(cron = "0 0 10,15 * * mon-fri")
+    @Transactional
+    public void processSellRequest() {
+        SaleInfo marketInfo = saleInfoRepository.findById(2)
+                .orElseThrow(() -> new NoSuchElementException("영업 여부 판단 불가"));
+        SaleInfo pendingTable = saleInfoRepository.findById(1)
+                .orElseThrow(() -> new NoSuchElementException("판매대기 테이블 확인 불가"));
+
+        if (marketInfo.getIdx() == CLOSE) {
+            return;
+        }
+    }
+
     @Transactional
     @Scheduled(cron = "30 0 9 * * *")
     public void updateTodayMarketStatus() {
@@ -90,6 +105,19 @@ public class SellService {
         log.info("{} :: update Today marketStatus => {}", LocalDateTime.now(), saleInfo.getIdx());
     }
 
+    @Scheduled(cron = "0 30 9,14 * * mon-fri ")
+    @Transactional
+    public void changeSaleTableIdx() {
+        int todayMarketStatus = saleInfoRepository.findById(2).get().getIdx();
+        SaleInfo saleInfo = saleInfoRepository.findById(1).get();
+
+        if (todayMarketStatus == OPEN) {
+            saleInfo.setIdx((saleInfo.getIdx() + 1) % 2);
+            saleInfoRepository.save(saleInfo);
+        }
+        log.info("{} :: current saleTableIdx => {}", LocalDateTime.now(), todayMarketStatus);
+    }
+
     private boolean isOpenStockMarket() {
         try {
             for (int i = 0; i < 3; i++) {
@@ -98,13 +126,13 @@ public class SellService {
                 String extractTrId = extractTrId(response);
 
                 if (extractTrId.equals(CLOSE_MARKET)) {
-                    log.info("오늘은 비영업일 입니다.");
+                    log.info("{} :: 오늘은 비영업일 입니다.", LocalDateTime.now());
                     connectionManager.stop();
                     return false;
                 }
             }
             connectionManager.stop();
-            log.info("영업일 입니다.");
+            log.info("{} :: 영업일 입니다.", LocalDateTime.now());
             return true;
 
         } catch (InterruptedException e) {
@@ -113,11 +141,11 @@ public class SellService {
         }
     }
 
-
     private void saveSellRequest(StockSellRequestDto stockSellRequestDto, Member member) {
-        LocalTime now = LocalTime.now();
+        SaleInfo pendingTable = saleInfoRepository.findById(1)
+                .orElseThrow(() -> new NoSuchElementException("판매대기 테이블 확인 불가"));
 
-        if (now.isAfter(LocalTime.of(9, 30)) && now.isBefore(LocalTime.of(14, 30))) {
+        if (pendingTable.getIdx() == SALE_TALBE_A) {
             StockSellRequestA saveStockSellRequestA = stockSellRequestDto.toSellRequestA(member);
             stockSaleRequestARepository.save(saveStockSellRequestA);
             log.info("StockSaleRequestA 저장 성공 => {}", saveStockSellRequestA);
@@ -130,6 +158,7 @@ public class SellService {
 
     private String extractTrId(String jsonString) {
         ObjectMapper objectMapper = new ObjectMapper();
+
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonString);
             return jsonNode.path("header").path("tr_id").asText();
