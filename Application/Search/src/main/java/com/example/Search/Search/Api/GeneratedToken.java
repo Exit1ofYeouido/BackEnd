@@ -1,10 +1,10 @@
-package com.example.Search.Api;
+package com.example.Search.Search.Api;
 
 
-import com.example.Search.Common.Entity.Token;
-import com.example.Search.Common.Entity.TokenInfo;
-import com.example.Search.Common.Repository.TokenInfoRepository;
-import com.example.Search.SearchDTO.OauthInfoDTO;
+import com.example.Search.Search.Common.Entity.Token;
+import com.example.Search.Search.Common.Entity.TokenInfo;
+import com.example.Search.Search.Common.Repository.TokenInfoRepository;
+import com.example.Search.Search.SearchDTO.OauthInfoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
