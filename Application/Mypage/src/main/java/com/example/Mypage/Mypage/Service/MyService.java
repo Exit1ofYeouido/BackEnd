@@ -1,6 +1,5 @@
 package com.example.Mypage.Mypage.Service;
 
-
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
@@ -26,10 +25,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
+
 
 
 @Service
@@ -37,8 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyService {
 
 
-    private final MemberRepository memberRepository;
 
+    private final MemberRepository memberRepository;
     private final MemberStockRepository memberStockRepository;
     private final ApiService apiService;
     private final PopupCheckRepository popupCheckRepository;
@@ -57,7 +58,6 @@ public class MyService {
         int allCost = AllAssetsCount(memberStock);
 
         return GetAllMyPageResponseDto.of(account.getPoint(), calcAssetsEarningRate, earningRates, allCost);
-
     }
 
     private String CalcAllAssets(List<MemberStock> memberStocks) {
@@ -99,7 +99,6 @@ public class MyService {
             double stockcount = memberStock.getCount();
             int stockprice = apiService.getPrice(memberStock.getStockCode());
             allCost = (int) (allCost + (stockprice * stockcount));
-
 
         }
         return allCost;
@@ -165,6 +164,7 @@ public class MyService {
                     + giveStockDto.getAmount()));
 
             memberStock.setCount(memberStock.getCount() + giveStockDto.getAmount());
+            memberStock.setAvailableAmount(memberStock.getAvailableAmount() + giveStockDto.getAmount());
             memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdatedAt(LocalDateTime.now());
             memberStockRepository.save(memberStock);
@@ -174,6 +174,7 @@ public class MyService {
                     .member(member)
                     .stockName(giveStockDto.getEnterpriseName())
                     .count(giveStockDto.getAmount())
+                    .availableAmount(giveStockDto.getAmount())
                     .stockCode(giveStockDto.getCode())
                     .averagePrice(giveStockDto.getPrice())
                     .createdAt(LocalDateTime.now())
@@ -196,6 +197,12 @@ public class MyService {
         return GetTutorialCheckResponseDto.of(false);
     }
 
+    @Transactional(readOnly = true)
+    public List<MemberStock> getAllStock(Long memId) {
+        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
+        return memberStocks;
+    }
+
     public void saveTutorialCheck(String type, Long memId) {
 
         PopupCheck popupCheck = PopupCheck
@@ -208,6 +215,7 @@ public class MyService {
     }
 
 
+
     @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
@@ -216,8 +224,8 @@ public class MyService {
     }
 
     // 주식 거래내역 추가
-    private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
 
+    private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
         Trade trade = Trade.builder()
                 .stockName(giveStockDto.getEnterpriseName())
                 .tradeType("입금")
@@ -226,6 +234,7 @@ public class MyService {
                 .createdAt(LocalDateTime.now())
                 .memberStock(memberStock)
                 .build();
+
 
 
         tradeRepository.save(trade);
