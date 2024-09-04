@@ -1,4 +1,4 @@
-package com.example.Reward.Advertisement.Webclient;
+package com.example.Reward.Advertisement.Webclient.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
