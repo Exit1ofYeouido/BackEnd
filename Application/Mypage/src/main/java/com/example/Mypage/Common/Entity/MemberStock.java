@@ -22,7 +22,6 @@ import lombok.Setter;
 @Setter
 public class MemberStock {
 
-
     @Id
     @GeneratedValue
     @Column(name = "member_stock_id")
@@ -38,11 +37,11 @@ public class MemberStock {
 
     private int averagePrice;
 
-
     private String stockCode;
 
-    @Column(unique = true)
     private String stockName;
+
+    private double availableAmount;
 
     private LocalDateTime createdAt;
 

@@ -14,6 +14,7 @@ import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,11 +64,11 @@ public class AccountService {
 
         for (MemberStock memberStock : memberStocks) {
             myStocks.add(MyStocksResponseDto.builder()
+                    .name(memberStock.getStockName())
                     .earningRate(getEarningRate(memberStock))
                     .holdStockCount(memberStock.getCount())
                     .build());
         }
-
         return myStocks;
     }
 
@@ -81,8 +82,8 @@ public class AccountService {
                         .name(trade.getStockName())
                         .type(trade.getTradeType())
                         .amount(String.format("%.6f", trade.getCount()))
-                        .date((trade.getCreatedAt())
-                        ).build())
+                        .date(trade.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
+                        .build())
                 .toList();
     }
 

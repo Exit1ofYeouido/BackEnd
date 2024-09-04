@@ -12,5 +12,4 @@ public interface AccountHistoryRepository extends JpaRepository<AccountHistory, 
 
     @Query("SELECT ah FROM AccountHistory ah WHERE ah.member.id = :memberId ORDER BY ah.createdAt DESC")
     Page<AccountHistory> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
-
 }

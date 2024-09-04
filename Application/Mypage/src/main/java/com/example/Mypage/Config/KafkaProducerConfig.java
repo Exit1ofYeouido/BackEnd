@@ -1,6 +1,7 @@
 package com.example.Mypage.Config;
 
 
+import com.example.Mypage.Mypage.Kafka.Dto.AttendanceDto;
 import com.example.Mypage.Mypage.Kafka.Dto.AuthProduceDTO;
 import com.example.Mypage.Mypage.Kafka.Util.KafkaUtil;
 import java.util.HashMap;
@@ -35,7 +36,8 @@ public class KafkaProducerConfig {
         config.put(ProducerConfig.RETRIES_CONFIG, 3);
         config.put(JsonSerializer.TYPE_MAPPINGS,
                 KafkaUtil.getJsonTypeMapping(
-                        AuthProduceDTO.class
+                        AuthProduceDTO.class,
+                        AttendanceDto.class
                 ));
 
         return new DefaultKafkaProducerFactory<>(config);
