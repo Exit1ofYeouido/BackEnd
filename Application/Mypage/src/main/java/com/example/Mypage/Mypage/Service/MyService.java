@@ -1,6 +1,5 @@
 package com.example.Mypage.Mypage.Service;
 
-
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
@@ -34,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MyService {
 
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
     private final MemberStockRepository memberStockRepository;
     private final ApiService apiService;
     private final PopupCheckRepository popupCheckRepository;
@@ -53,7 +52,6 @@ public class MyService {
         int allCost = AllAssetsCount(memberStock);
 
         return GetAllMyPageResponseDto.of(account.getPoint(), calcAssetsEarningRate, earningRates, allCost);
-
     }
 
     private String CalcAllAssets(List<MemberStock> memberStocks) {

@@ -8,17 +8,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Table(name = "stock_sell_request_a")
-public class StockSellRequestA {
+public class StockSellRequestA implements StockSellRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +36,6 @@ public class StockSellRequestA {
 
     private Double amount;
 
-    private LocalDateTime createdAt;
-
     @Override
     public String toString() {
         return "StockSellRequest{" +
@@ -45,7 +44,6 @@ public class StockSellRequestA {
                 ", enterpriseName='" + enterpriseName + '\'' +
                 ", stockCode='" + stockCode + '\'' +
                 ", amount=" + amount +
-                ", createdAt=" + createdAt +
                 '}';
     }
 
