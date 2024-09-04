@@ -24,7 +24,7 @@ public class LogService {
 
         for (SearchLog searchLog:searchLogs){
             searchLog.getSearchTime();
-            
+
         }
 
 
