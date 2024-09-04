@@ -4,10 +4,10 @@ import com.example.Search.Search.Api.KisService;
 import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
 import com.example.Search.Search.SearchDTO.StockDetailDTO;
 import com.example.Search.Search.SearchDTO.StocksDTO;
-import com.example.Search.Search.Common.Entity.MemberStock;
-import com.example.Search.Search.Common.Repository.MemberStockRepository;
-import com.example.Search.Search.Common.Entity.Stock;
-import com.example.Search.Search.Common.Repository.StockRepository;
+import com.example.Search.Common.Entity.MemberStock;
+import com.example.Search.Common.Repository.MemberStockRepository;
+import com.example.Search.Common.Entity.Stock;
+import com.example.Search.Common.Repository.StockRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 

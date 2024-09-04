@@ -1,4 +1,4 @@
-package com.example.Search.Search.Common.Entity;
+package com.example.Search.Common.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
