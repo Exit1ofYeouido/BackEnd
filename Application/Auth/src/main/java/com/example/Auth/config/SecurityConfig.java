@@ -63,6 +63,8 @@ public class SecurityConfig {
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http
+                .httpBasic(HttpBasicSpec -> HttpBasicSpec.disable());
 
         return http.build();
     }

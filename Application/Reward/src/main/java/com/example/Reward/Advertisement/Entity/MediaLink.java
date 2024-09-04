@@ -13,6 +13,7 @@ public class MediaLink {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="media_link_id")
     private Long id;
 
     private String url;

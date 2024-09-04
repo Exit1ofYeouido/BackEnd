@@ -6,5 +6,6 @@ include 'application:reward'
 include 'application:mypage'
 include 'application:auth'
 include 'application:search'
+include 'application:home'
 
 

@@ -48,7 +48,7 @@ public class TokenService {
 
         RefreshToken savedRefreshToken = tokenRepository.findById(memberId);
 
-        if (!isVaildRefreshToken(refreshToken, savedRefreshToken)) {
+        if (!isValidRefreshToken(refreshToken, savedRefreshToken)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return response;
         }
@@ -59,7 +59,7 @@ public class TokenService {
         updateRefreshToken(memberId, newAccessToken);
 
         response.setHeader("accssToken", newAccessToken);
-        response.setHeader("refreshToken", newRefreshToken);
+        response.addCookie(createCookie("refreshToken", newRefreshToken));
         response.setStatus(HttpServletResponse.SC_CREATED);
 
         return response;
@@ -76,10 +76,18 @@ public class TokenService {
         saveRefreshToken(refresh);
     }
 
-    private boolean isVaildRefreshToken(String refreshToken, RefreshToken savedRefreshToken) {
+    private boolean isValidRefreshToken(String refreshToken, RefreshToken savedRefreshToken) {
         if (refreshToken.equals(savedRefreshToken.getToken())) {
             return true;
         }
         return false;
+    }
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(60 * 60 * 24 * 3);
+        cookie.setHttpOnly(true);
+
+        return cookie;
     }
 }

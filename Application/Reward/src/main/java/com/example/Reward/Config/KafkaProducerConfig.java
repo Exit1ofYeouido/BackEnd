@@ -1,6 +1,6 @@
 package com.example.Reward.Config;
 
-import com.example.Reward.Advertisement.Kafka.Dto.GiveStockDto;
+import com.example.Reward.Common.Kafka.GiveStockDto;
 import com.example.Reward.Common.Util.KafkaUtil;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.RoundRobinPartitioner;
