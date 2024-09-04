@@ -97,7 +97,7 @@ public class MyService {
 
         for (MemberStock memberStock : memberStocks) {
             double stockcount = memberStock.getCount();
-            int stockprice = memberStock.getAveragePrice();
+            int stockprice = apiService.getPrice(memberStock.getStockCode());
             allCost = (int) (allCost + (stockprice * stockcount));
 
 
