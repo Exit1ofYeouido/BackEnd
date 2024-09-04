@@ -22,7 +22,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .addServersItem(new Server().url(url))
                 .info(new Info()
-                        .title("Reward API")
+                        .title("Search API")
                         .version("1.0")
                         .description("광고 리워드,영수증 리워드,출석체크 리워드 API입니다."));
 

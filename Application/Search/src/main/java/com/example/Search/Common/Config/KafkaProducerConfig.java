@@ -1,7 +1,7 @@
 package com.example.Search.Common.Config;
 
-import com.example.Reward.Advertisement.Kafka.Dto.GiveStockDto;
-import com.example.Reward.Common.Util.KafkaUtil;
+
+import com.example.Search.Common.Util.KafkaUtil;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.RoundRobinPartitioner;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -30,7 +30,7 @@ public class KafkaProducerConfig {
         config.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, RoundRobinPartitioner.class.getName());
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        config.put(JsonSerializer.TYPE_MAPPINGS, KafkaUtil.getJsonTypeMapping(GiveStockDto.class));
+        config.put(JsonSerializer.TYPE_MAPPINGS, KafkaUtil.getJsonTypeMapping();
 
         return new DefaultKafkaProducerFactory<>(config);
     }
