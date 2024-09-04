@@ -16,14 +16,14 @@ public class MypageExceptionHandler {
 //    public
 
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGrobalException(Exception e){
-        ErrorResponseDto errorResponseDto=new ErrorResponseDto(
-                e.getMessage(),
-                LocalDateTime.now()
-        );
-        return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<?> handleGrobalException(Exception e){
+//        ErrorResponseDto errorResponseDto=new ErrorResponseDto(
+//                e.getMessage(),
+//                LocalDateTime.now()
+//        );
+//        return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     @ExceptionHandler(NotMemberException.class)
     public ResponseEntity<String> notmemberException(NotMemberException e){

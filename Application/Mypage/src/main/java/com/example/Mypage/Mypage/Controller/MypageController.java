@@ -20,7 +20,6 @@ import java.util.List;
 
 
 @Tag(name = "마이페이지 API")
-
 @RestController
 @RequestMapping("/page")
 @RequiredArgsConstructor

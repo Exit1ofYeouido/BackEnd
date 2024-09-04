@@ -40,6 +40,7 @@ public class GeneratedToken {
                     .builder()
                     .accessToken(ACCESS_TOKEN)
                     .build();
+
             tokenInfoRepository.save(tokenInfo);
             return ACCESS_TOKEN;
         }

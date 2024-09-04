@@ -63,13 +63,12 @@ public class MyService {
         double allCost = 0;
         double currentAllCost = 0;
 
-        if (memberStocks.isEmpty()){
-            return "0";
-        }
+
 
         for (MemberStock memberStock : memberStocks) {
             double stockcount = memberStock.getCount();
             double stockprice = memberStock.getAveragePrice();
+
             double currentprice = apiService.getPrice(memberStock.getStockCode());
 
             allCost = allCost + (stockprice * stockcount);
@@ -82,9 +81,13 @@ public class MyService {
             DecimalFormat df = new DecimalFormat("-#.##");
             return df.format(value);
         }
-        double value = (1 - (allCost / currentAllCost)) * 100;
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(value);
+        else if(currentAllCost > allCost) {
+            double value = (1 - (allCost / currentAllCost)) * 100;
+            DecimalFormat df = new DecimalFormat("#.##");
+            return df.format(value);
+        }else{
+            return "0";
+        }
     }
 
     private int AllAssetsCount(List<MemberStock> memberStocks) {
@@ -118,11 +121,15 @@ public class MyService {
                 DecimalFormat df = new DecimalFormat("-#.##");
                 finalEarningRate = df.format(value);
 
-            } else {
+            }
+            else if(stock<currentStock) {
                 double value = (1 - (stock / currentStock)) * 100;
                 DecimalFormat df = new DecimalFormat("#.##");
                 finalEarningRate = df.format(value);
+            }else{
+                finalEarningRate="0";
             }
+
 
             EarningRate earningRate = EarningRate.builder()
                     .earningRate(finalEarningRate)
