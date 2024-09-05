@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Trade {
+public class StockTradeHistory {
 
     @Id
     @GeneratedValue

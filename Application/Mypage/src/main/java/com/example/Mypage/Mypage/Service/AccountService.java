@@ -3,7 +3,7 @@ package com.example.Mypage.Mypage.Service;
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.AccountHistory;
 import com.example.Mypage.Common.Entity.MemberStock;
-import com.example.Mypage.Common.Entity.Trade;
+import com.example.Mypage.Common.Entity.StockTradeHistory;
 import com.example.Mypage.Common.Repository.AccountHistoryRepository;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
@@ -66,7 +66,7 @@ public class AccountService {
             myStocks.add(MyStocksResponseDto.builder()
                     .name(memberStock.getStockName())
                     .earningRate(getEarningRate(memberStock))
-                    .holdStockCount(memberStock.getCount())
+                    .holdStockCount(memberStock.getAmount())
                     .build());
         }
         return myStocks;
@@ -74,15 +74,15 @@ public class AccountService {
 
     public List<MyStocksHistoryResponseDto> getMyStocksHistory(Long memberId, int index, int limit) {
         Pageable pageable = PageRequest.of(index, limit);
-        Page<Trade> myStockHistoyPage = tradeRepository.findByMemberId(memberId, pageable);
-        List<Trade> trades = myStockHistoyPage.getContent();
+        Page<StockTradeHistory> myStockHistoyPage = tradeRepository.findByMemberId(memberId, pageable);
+        List<StockTradeHistory> stockTradeHistories = myStockHistoyPage.getContent();
 
-        return trades.stream()
-                .map(trade -> MyStocksHistoryResponseDto.builder()
-                        .name(trade.getStockName())
-                        .type(trade.getTradeType())
-                        .amount(String.format("%.6f", trade.getCount()))
-                        .date(trade.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
+        return stockTradeHistories.stream()
+                .map(stockTradeHistory -> MyStocksHistoryResponseDto.builder()
+                        .name(stockTradeHistory.getStockName())
+                        .type(stockTradeHistory.getTradeType())
+                        .amount(String.format("%.6f", stockTradeHistory.getCount()))
+                        .date(stockTradeHistory.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
                         .build())
                 .toList();
     }

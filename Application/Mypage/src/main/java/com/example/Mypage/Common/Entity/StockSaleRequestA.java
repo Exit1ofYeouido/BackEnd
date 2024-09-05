@@ -15,14 +15,15 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
-@Getter
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "stock_sell_request_b")
-public class StockSellRequestB implements StockSellRequest {
+@NoArgsConstructor
+@Getter
+@Table(name = "stock_sale_request_a")
+public class StockSaleRequestA implements StockSaleRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "stock_sell_request_id")
+    @Column(name = "stock_sale_request_id")
     private Long id;
 
     @ManyToOne
@@ -45,4 +46,5 @@ public class StockSellRequestB implements StockSellRequest {
                 ", amount=" + amount +
                 '}';
     }
+
 }

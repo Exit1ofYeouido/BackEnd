@@ -3,12 +3,14 @@ package com.example.Mypage.Mypage.Webclient.Entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -18,10 +20,10 @@ import lombok.NoArgsConstructor;
 public class TokenInfo {
 
     @Id
-    @GeneratedValue
-    @Column(name="type_number")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long typeNumber;
 
-    @Column(name="token_value",columnDefinition = "TEXT")
-    private String accessToken;
+    @Setter
+    @Column(columnDefinition = "TEXT")
+    private String tokenValue;
 }
