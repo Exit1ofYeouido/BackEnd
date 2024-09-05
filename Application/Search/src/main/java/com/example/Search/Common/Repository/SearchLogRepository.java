@@ -17,6 +17,5 @@ public interface SearchLogRepository extends JpaRepository<SearchLog,Long> {
     @Query("SELECT s.searchTime FROM SearchLog s   WHERE FUNCTION('YEAR',s.searchTime)= :year AND FUNCTION('MONTH',s.searchTime)= :month AND s.code=:code AND s.holding=True  ")
     List<GetDate> findByGetStockLogs(String code, Integer year, Integer month);
 
-    @Query("SELECT s.searchTime FROM SearchLog s  WHERE FUNCTION('YEAR',s.searchTime)= :year AND FUNCTION('MONTH',s.searchTime)= :month AND s.code=:code AND s.holding=FALSE ")
-    List<GetDate> findByNotGetStockLogs(String code, Integer year, Integer month);
+
 }

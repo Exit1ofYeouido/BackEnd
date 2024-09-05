@@ -26,26 +26,35 @@ public class LogService {
     private final SearchLogRepository searchLogRepository;
     private final MemberStockHoldingRepository memberStockHoldingRepository;
 
-    public void gethistoryStock(String code, Integer year, Integer month) {
+    public List<GetHistoryStockResponseDto> gethistoryStock(String code, Integer year, Integer month) {
 
         List<GetDate> searchLogs=searchLogRepository.findByYearAndMonth(code,year,month);
         List<GetDate> getstockLogs=searchLogRepository.findByGetStockLogs(code,year,month);
-        List<GetDate> getNotStockLogs=searchLogRepository.findByNotGetStockLogs(code,year,month);
 
         List<GetHistoryStockResponseDto> getHistoryStockResponseDtos =new ArrayList<>();
 
-        HashMap<String,Integer> search=putsum(searchLogs);
-        HashMap<String,Integer> getStock=putsum(getstockLogs);
-        HashMap<String, Integer> getNotStock=putsum(getNotStockLogs);
+        HashMap<String,Integer> search=getDate(searchLogs);
+        HashMap<String,Integer> getStock=getDate(getstockLogs);
 
+        for (String string:search.keySet()){
+            GetHistoryStockResponseDto getHistoryStockResponseDto=new GetHistoryStockResponseDto();
+            Integer getSearchValue=search.get(string);
+            Integer getStockValue=getStock.get(string);
+            getHistoryStockResponseDto.builder()
+                    .date(string)
+                    .totalCount(getSearchValue)
+                    .holdingCount(getStockValue)
+                    .notHoldingCount(getSearchValue-getStockValue);
+            getHistoryStockResponseDtos.add(getHistoryStockResponseDto);
+        }
 
-
+        return getHistoryStockResponseDtos;
     }
 
-    private HashMap<String,Integer> putsum(List<GetDate> getDates){
+    private HashMap<String,Integer> getDate(List<GetDate> getDates){
         HashMap<String,Integer>  temp=new HashMap<>();
         for (GetDate getDate :getDates){
-            String date=getDate.getStartTime();
+            String date=format(getDate.getsearchTime(),"yyyy-MM-dd");
             temp.put(date,temp.get(date)+1);
         }
 
