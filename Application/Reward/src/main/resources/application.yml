@@ -25,6 +25,9 @@ spring:
         use_sql_comments: true
         format_sql: true
     defer-datasource-initialization: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
