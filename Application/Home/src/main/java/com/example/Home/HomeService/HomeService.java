@@ -65,6 +65,7 @@ public class HomeService {
 
     private Map<String, Long> getStockPrices(List<String> stockCodes) {
         Map<String, Long> stockPrices = stockCodes.stream()
+                .distinct()
                 .collect(Collectors.toMap(
                         code -> code,
                         koreaInvestmentApiService::getCurrentPrice

@@ -19,10 +19,10 @@ public class GeneratedToken {
 
     private final TokenInfoRepository tokenInfoRepository;
 
-    @Value("${APP_KEY}")
+    @Value("${app.key}")
     private String APPKEY ;
 
-    @Value("${APP_SECRETKEY}")
+    @Value("${app.secretkey}")
     private String APPSECRET ;
 
     public static String ACCESS_TOKEN;
