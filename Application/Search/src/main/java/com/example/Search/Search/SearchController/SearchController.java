@@ -4,6 +4,7 @@ package com.example.Search.Search.SearchController;
 
 import com.example.Search.Search.Api.KisService;
 import com.example.Search.Search.SearchDTO.StockDetailDTO;
+import com.example.Search.Search.SearchDTO.StockPriceListDTO;
 import com.example.Search.Search.SearchDTO.StocksDTO;
 import com.example.Search.Search.SearchService.SearchService;
 import org.springframework.web.bind.annotation.*;

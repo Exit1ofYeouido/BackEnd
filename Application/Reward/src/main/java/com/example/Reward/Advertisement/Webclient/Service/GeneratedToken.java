@@ -15,7 +15,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -36,20 +35,19 @@ public class GeneratedToken {
     @Transactional
     public String getAccessToken() {
 
-        Optional<TokenInfo> tokenInfos=tokenInfoRepository.findById(1L);
+        List<TokenInfo> tokenInfos=tokenInfoRepository.findAll();
 
 
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
             TokenInfo tokenInfo = TokenInfo
                     .builder()
-                    .id(1L)
                     .accessToken(ACCESS_TOKEN)
                     .build();
             tokenInfoRepository.save(tokenInfo);
             return ACCESS_TOKEN;
         }
-        String Is_ACCESS_TOKEN = tokenInfos.get().getAccessToken();
+        String Is_ACCESS_TOKEN = tokenInfos.get(0).getAccessToken();
 
         return Is_ACCESS_TOKEN;
     }
