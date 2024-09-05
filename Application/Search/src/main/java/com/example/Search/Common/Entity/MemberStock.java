@@ -39,7 +39,7 @@ public class MemberStock {
 
     private String stockName;
 
-    private double availableAmount;
+    private Double availableAmount;
 
     private LocalDateTime createdAt;
 

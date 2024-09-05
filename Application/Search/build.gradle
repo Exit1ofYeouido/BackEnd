@@ -18,6 +18,7 @@ project(":application:search") {
 		implementation 'mysql:mysql-connector-java:8.0.33'
 		implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
 		implementation 'org.springframework.kafka:spring-kafka'
+
 	}
 
 	dependencyManagement {

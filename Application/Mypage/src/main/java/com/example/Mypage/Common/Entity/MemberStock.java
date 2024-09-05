@@ -1,10 +1,18 @@
 package com.example.Mypage.Common.Entity;
 
 
-import jakarta.persistence.*;
-import lombok.*;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Builder
@@ -14,31 +22,28 @@ import java.time.LocalDateTime;
 @Setter
 public class MemberStock {
 
-
     @Id
     @GeneratedValue
+    @Column(name = "member_stock_id")
     private Long id;
 
-    private double count;
-
-
-    private int averagePrice;
-
-    @Column(unique = true)
-    private String stockCode;
-
-    @Column(unique = true)
-    private String stockName;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updateAt;
 
     @ManyToOne
-    @JoinColumn(name="member_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
 
+    private double amount;
 
+    private int averagePrice;
 
+    private String stockCode;
+
+    private String stockName;
+
+    private double availableAmount;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

@@ -1,5 +1,6 @@
 package com.example.Search.Search.SearchService;
 
+
 import com.example.Search.Search.Api.KisService;
 import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
 import com.example.Search.Search.SearchDTO.StockDetailDTO;
@@ -77,21 +78,24 @@ public class SearchService {
         String previousRate = kisService.getPreviousRate(stock.getCode());
         return new StocksDTO(stock.getName(), stock.getCode(), currentPrice.intValue(), previousPrice, previousRate);
     }
-    public StockDetailDTO getStockByCode(String code, String period,Long memberId) {
+    public StockDetailDTO getStockByCode(String code, Long memberId) {
         Optional<Stock> stockOptional = stockRepository.findById(code);
         if (stockOptional.isPresent()) {
             Stock stock = stockOptional.get();
             Long currentPrice = kisService.getCurrentPrice(stock.getCode());
             String previousPrice = kisService.getPreviousPrice(stock.getCode());
             String previousRate = kisService.getPreviousRate(stock.getCode());
-            List<DailyStockPriceDTO> stockPriceList = kisService.getStockPriceList(stock.getCode(), period);
 
-//            Double stockCount = memberStockRepository.findStockCountByMemberIdAndStockCode(memberId, stock.getCode()).orElse(0.0);
-            Double availableAmount = memberStockRepository.findAvailableCountByMemberIdAndStockCode(memberId,stock.getCode()).orElse(0.0);
-            return new StockDetailDTO(stock.getName(), stock.getCode(), currentPrice.intValue(),availableAmount, previousPrice, previousRate, stockPriceList);
+            Double availableAmount = memberStockRepository.findAvailableCountByMemberIdAndStockCode(memberId, stock.getCode()).orElse(0.0);
+            return new StockDetailDTO(stock.getName(), stock.getCode(), currentPrice.intValue(), availableAmount, previousPrice, previousRate);
         } else {
             return null;
         }
+    }
+
+    public StockPriceListDTO getStockPriceList(String code, String period) {
+        List<DailyStockPriceDTO> stockPriceList = kisService.getStockPriceList(code, period);
+        return new StockPriceListDTO(stockPriceList);
     }
 
     public List<StocksDTO> searchSimilarStocks(String keyword) {

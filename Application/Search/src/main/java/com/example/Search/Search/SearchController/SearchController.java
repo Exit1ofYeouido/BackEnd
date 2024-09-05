@@ -1,6 +1,7 @@
 package com.example.Search.Search.SearchController;
 
 
+
 import com.example.Search.Search.Api.KisService;
 import com.example.Search.Search.SearchDTO.StockDetailDTO;
 import com.example.Search.Search.SearchDTO.StocksDTO;
@@ -27,9 +28,15 @@ public class SearchController {
 
     @GetMapping("/search/stock/{code}")
     public StockDetailDTO getStock(@PathVariable String code,
-                                   @RequestParam(defaultValue = "1M") String period,
                                    @RequestHeader String memberId) {
-        return searchService.getStockByCode(code, period, Long.valueOf(memberId));
+        return searchService.getStockByCode(code, Long.valueOf(memberId));
+    }
+
+    @GetMapping("/search/stockPriceList/{code}")
+    public StockPriceListDTO getStockPriceList(@PathVariable String code,
+                                               @RequestParam(defaultValue = "1M") String period) {
+
+        return searchService.getStockPriceList(code, period);
     }
 
     @GetMapping("/search/stocks/keyword")

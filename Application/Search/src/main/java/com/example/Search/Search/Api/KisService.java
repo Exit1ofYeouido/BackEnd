@@ -17,11 +17,13 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class KisService {
 
-    private final WebClient webClient;
     private final GeneratedToken generatedToken;
+    public static final String REST_BASE_URL = "https://openapi.koreainvestment.com:9443";
 
+    WebClient webClient=WebClient.create(REST_BASE_URL);
 
     @Value("${app.key}")
     private String apiKey;
@@ -29,14 +31,7 @@ public class KisService {
     @Value("${app.secret}")
     private String apiSecret;
 
-    public KisService(@Value("${korea.investment.api.url}") String apiUrl, GeneratedToken generatedToken) {
-        this.webClient = WebClient.builder()
-                .baseUrl(apiUrl)
-                .defaultHeader("appkey", apiKey)
-                .defaultHeader("appsecret", apiSecret)
-                .build();
-        this.generatedToken = generatedToken;
-    }
+
 
     public Long getCurrentPrice(String stockCode) {
         try {

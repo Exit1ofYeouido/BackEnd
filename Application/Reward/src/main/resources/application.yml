@@ -41,11 +41,9 @@ cloud:
       s3:
         bucket: ${CLOUD_AWS_S3_BUCKET}
 
-authorization: ${AUTHORIZATION}
-
 bootstrap:
   server: ${BOOTSTRAP_SERVER}
 app:
   key: ${APP_KEY}
-  secretkey: ${APP_SECRETKEY}
+  secretkey: ${APP_SECRET}
 
