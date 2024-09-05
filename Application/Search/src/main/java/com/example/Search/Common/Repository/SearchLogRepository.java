@@ -1,6 +1,7 @@
 package com.example.Search.Common.Repository;
 
 import com.example.Search.Common.Entity.SearchLog;
+import com.example.Search.Log.Dto.out.GetSearchLogMemberDto;
 import com.example.Search.Log.Dto.out.MemberStockCountByYearDto;
 import com.example.Search.Log.Dto.out.MemberStockCountDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -41,4 +42,12 @@ public interface SearchLogRepository extends JpaRepository<SearchLog,Long> {
             "GROUP BY FUNCTION('MONTH', CAST(s.searchTime AS date)) " +
             "ORDER BY FUNCTION('MONTH', CAST(s.searchTime AS date))")
     List<MemberStockCountByYearDto> countByMemberIdAndEnterpriseNameWithYear(Long memberId, String enterpriseName, int year);
+
+    @Query("SELECT new com.example.Search.Log.Dto.out.GetSearchLogMemberDto(s.enterpriseName, COUNT(s)) " +
+            "FROM SearchLog s " +
+            "WHERE s.memberId = :memberId " +
+            "AND FUNCTION('YEAR', CAST(s.searchTime AS date)) = :year " +
+            "AND FUNCTION('MONTH', CAST(s.searchTime AS date)) = :month " +
+            "GROUP BY s.enterpriseName")
+    List<GetSearchLogMemberDto> findByMemberIdWithYearAndMonth(Long memberId, int year, int month);
 }

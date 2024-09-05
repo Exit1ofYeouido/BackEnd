@@ -6,10 +6,7 @@ import com.example.Search.Common.Entity.SearchLog;
 import com.example.Search.Common.Repository.MemberStockHoldingRepository;
 import com.example.Search.Common.Repository.SearchLogRepository;
 import com.example.Search.Common.Repository.StockRepository;
-import com.example.Search.Log.Dto.out.GetHistoryStockResponseDto;
-import com.example.Search.Log.Dto.out.GetSearchLogMemberStockDto;
-import com.example.Search.Log.Dto.out.MemberStockCountByYearDto;
-import com.example.Search.Log.Dto.out.MemberStockCountDto;
+import com.example.Search.Log.Dto.out.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -148,5 +145,15 @@ public class LogService {
                     .build();
         }
 
+    }
+
+    public List<GetSearchLogMemberDto> getLogMember(Long memberId, int year, int month) {
+        List<GetSearchLogMemberDto> getSearchLogMemberDtos = searchLogRepository.findByMemberIdWithYearAndMonth(memberId, year, month);
+        for(GetSearchLogMemberDto getSearchLogMemberDto : getSearchLogMemberDtos) {
+            String stockCode = stockRepository.findByName(getSearchLogMemberDto.getEnterpriseName()).getCode();
+            Optional<MemberStockHolding> memberStockHolding = memberStockHoldingRepository.findByMemberIdAndStockCode(memberId, stockCode);
+            getSearchLogMemberDto.setHolding(memberStockHolding.isPresent());
+        }
+        return getSearchLogMemberDtos;
     }
 }
