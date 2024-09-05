@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 public class GetHistoryStockResponseDto {
 
-    private LocalDateTime date;
+    private String date;
 
     private Integer totalCount;
 

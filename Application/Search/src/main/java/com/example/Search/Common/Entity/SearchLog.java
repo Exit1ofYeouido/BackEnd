@@ -17,13 +17,11 @@ public class SearchLog {
     @Column(name = "search_log_id")
     private Long id;
 
+    private Long memberId;
 
+    private String code;
 
-    @ManyToOne
-    @JoinColumn(name = "code", referencedColumnName = "code")
-    private Stock stock;
-
-    private LocalDateTime searchTime;
+    private String searchTime;
 
     private Boolean holding;
 }

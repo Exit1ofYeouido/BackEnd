@@ -19,7 +19,6 @@ public class MemberStockHolding {
     private Long memberId;
 
     @ManyToOne
-    @MapsId("code")
-    @JoinColumn(name = "code", referencedColumnName = "code")
-    Stock stock;
+    @JoinColumn(name = "code")
+    private Stock stock;
 }
