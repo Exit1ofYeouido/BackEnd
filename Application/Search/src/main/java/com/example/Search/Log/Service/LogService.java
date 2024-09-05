@@ -41,7 +41,7 @@ public class LogService {
         List<SearchLog> searchLogs=searchLogRepository.findByYearAndMonth(enterpriseName,year,month);
         List<SearchLog> getstockLogs=searchLogRepository.findByGetStockLogs(enterpriseName,year,month);
 
-        
+
         HashMap<String,Integer> search=getDate(searchLogs);
         HashMap<String,Integer> getStock=getDate(getstockLogs);
         Map<String, Integer> sortedsearch = new TreeMap<>(search);

@@ -65,7 +65,6 @@ public class GeneratedToken {
                 .bodyToMono(Token.class);
 
         Token token = mono.block();
-        System.out.println(token);
         if (token == null) {
             throw new RuntimeException("액세스 토큰을 가져올 수 없습니다.");
         }
