@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MyService {
@@ -235,7 +235,7 @@ public class MyService {
                 .stockName(giveStockDto.getEnterpriseName())
                 .tradeType("in")
                 .member(member)
-                .count(giveStockDto.getAmount())
+                .amount(giveStockDto.getAmount())
                 .createdAt(LocalDateTime.now())
                 .memberStock(memberStock)
                 .build();
