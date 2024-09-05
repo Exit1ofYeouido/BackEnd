@@ -19,4 +19,6 @@ public interface StockRepository extends JpaRepository<Stock,String> {
     List<Stock> findRandomStocks(Pageable pageable);
 
     Stock findByCode(String code);
+
+    Stock findByName(String enterpriseName);
 }

@@ -2,6 +2,8 @@ package com.example.Search.Log.Controller;
 
 import com.example.Search.Log.Dto.out.GetDate;
 import com.example.Search.Log.Dto.out.GetHistoryStockResponseDto;
+import com.example.Search.Log.Dto.out.GetSearchLogMemberStockDto;
+import com.example.Search.Log.Dto.out.MemberStockCountDto;
 import com.example.Search.Log.Service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,6 +36,13 @@ public class LogController {
         List<GetHistoryStockResponseDto> getHistoryStockResponseDtos=logService.gethistoryStock(enterpriseName,year,month);
 
         return ResponseEntity.ok(getHistoryStockResponseDtos);
+    }
+
+    @GetMapping("/search-history/member-stock")
+    @Operation(description = "주식 종목, 회원 지정하여 검색량 조회")
+    public ResponseEntity<GetSearchLogMemberStockDto> getSearchLogMemberStock(@RequestParam("memberId") String memberId, @RequestParam("enterpriseName") String enterpriseName, @RequestParam("year") String year, @RequestParam("month") String month) {
+        GetSearchLogMemberStockDto getSearchLogMemberStockDto = logService.getLogMemberStock(Long.valueOf(memberId), enterpriseName, Integer.parseInt(year), Integer.parseInt(month));
+        return ResponseEntity.ok(getSearchLogMemberStockDto);
     }
 
 
