@@ -24,4 +24,11 @@ public class SearchLog {
     private String searchTime;
 
     private Boolean holding;
+
+    public SearchLog(Long memberId, String enterpriseName, String searchTime, Boolean holding) {
+        this.memberId = memberId;
+        this.enterpriseName = enterpriseName;
+        this.searchTime = searchTime;
+        this.holding = holding;
+    }
 }

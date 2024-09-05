@@ -16,7 +16,6 @@ public class KafkaService {
 
     @KafkaListener(topics="give-stock", groupId = "search")
     public void listener(GiveStockDTO giveStockDTO) {
-        System.out.println(giveStockDTO.getCode());
         Stock stock = stockRepository.findByCode(giveStockDTO.getCode());
         MemberStockHolding memberStockHolding = new MemberStockHolding(giveStockDTO.getMemId(), stock);
         memberStockHoldingRepository.save(memberStockHolding);
