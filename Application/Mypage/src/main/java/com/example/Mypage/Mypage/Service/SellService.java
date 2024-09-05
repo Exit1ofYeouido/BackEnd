@@ -19,6 +19,7 @@ import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
+import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import com.example.Mypage.Mypage.Webclient.handler.StockPriceSocketHandler;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,6 +47,7 @@ public class SellService {
     public static final int OPEN = 1;
     public static final int CLOSE = 0;
     public static final int SALE_TABLE_A = 1;
+    public static final String OPEN_STATUS = "005930";
 
     private final StockSaleRequestARepository stockSaleRequestARepository;
     private final StockSaleRequestBRepository stockSaleRequestBRepository;
@@ -133,8 +135,7 @@ public class SellService {
             connectionManager.start();
         }
 
-        //TODO :orElseThrow로 수정
-        SaleInfo saleInfo = saleInfoRepository.findById(2).orElse(null);
+        SaleInfo saleInfo = saleInfoRepository.findById(2).orElseThrow(() -> new IllegalStateException("SaleInfo Table 상태를 확인하세요."));
         if (isOpenStockMarket()) {
             saleInfo.setIdx(1);
         } else {
@@ -203,8 +204,8 @@ public class SellService {
             return jsonNode.path("header").path("tr_id").asText();
         } catch (Exception e) {
             String stockCode = jsonString.substring(jsonString.length() - 6);
-            if (stockCode.equals("005930")) {
-                return "005930";
+            if (stockCode.equals(OPEN_STATUS)) {
+                return OPEN_STATUS;
             }
             throw new NoSuchElementException("실시간 호가 추출과정에서 오류가 발생했습니다.");
         }
@@ -225,35 +226,36 @@ public class SellService {
                 updateExistingStock(completedStockSale, sellRequest.getAmount());
             }
 
-            //멤버 포인트 지급 및 거래내역 업데이트
             Long memberId = sellRequest.getMember().getId();
-            // 포인트 지급
-            Account memberAccount = accountRepository.findByMemberId(memberId).orElse(null);
+
+            Account memberAccount = accountRepository.findByMemberId(memberId).orElseThrow(() -> new AccountNotFoundException("포인트를 지급할 계좌 탐색과정에서 오류 발생"));
             int sellPrice = getSellPrice(sellRequest, curStockPrice);
             int afterHoldPoint = memberAccount.getPoint() + sellPrice;
             memberAccount.setPoint(afterHoldPoint);
             accountRepository.save(memberAccount);
 
-            // 포인트 거래내역 추가
-            accountHistoryRepository.save(AccountHistory.builder()
-                    .requestPoint(sellPrice)
-                    .resultPoint(afterHoldPoint)
-                    .type("입금")
-                    .createdAt(LocalDateTime.now())
-                    .account(memberAccount)
-                    .member(sellRequest.getMember())
-                    .build());
+            accountHistoryRepository.save(newAccountHistory(sellRequest, sellPrice, afterHoldPoint, memberAccount));
 
-            //보유,주식 차감
             updateMemberStockInfo(memberId, sellRequest);
         }
     }
 
+    private static <T extends StockSellRequest> AccountHistory newAccountHistory(T sellRequest, int sellPrice, int afterHoldPoint,
+                                                                     Account memberAccount) {
+        return AccountHistory.builder()
+                .requestPoint(sellPrice)
+                .resultPoint(afterHoldPoint)
+                .type("입금")
+                .createdAt(LocalDateTime.now())
+                .account(memberAccount)
+                .member(sellRequest.getMember())
+                .build();
+    }
+
     @Transactional
     public void updateMemberStockInfo(Long memberId, StockSellRequest sellRequest) {
-        //TODO : orElseThrow로 변경하기
         MemberStock memberStock = memberStockRepository.findByMemberIdAndStockCode(memberId,
-                sellRequest.getStockCode()).orElse(null);
+                sellRequest.getStockCode()).orElseThrow(() -> new AccountNotFoundException("유저의 보유주식 탐색과정에서 오류가 발생했습니다."));
 
         memberStock.setCount(memberStock.getCount() - sellRequest.getAmount());
         memberStockRepository.save(memberStock);

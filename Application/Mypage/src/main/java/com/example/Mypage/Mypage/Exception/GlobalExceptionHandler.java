@@ -16,17 +16,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateIdException.class)
     public ResponseEntity<String> handleDuplicateIdException(DuplicateIdException e) {
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(PessimisticLockException.class)
     public ResponseEntity<String> handlePessimisticLockException(PessimisticLockException e) {
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body("잠시 후 다시 시도해주세요.");
+                .body("Lock 오류");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException e) {
+        log.error(e.getMessage());
         String errorMessage = e.getBindingResult().getFieldErrors()
                 .stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
@@ -36,16 +39,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<String> handleAccountNotFoundException(AccountNotFoundException e) {
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(MemberNotFoundException.class)
     public ResponseEntity<String> handleMemberNotFoundException(MemberNotFoundException e) {
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(ExtractTrIdException.class)
     public ResponseEntity<ErrorResponseDto> handleExtractTrIdException(ExtractTrIdException e) {
+        log.error(e.getMessage());
         ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
                 .message(e.getMessage())
                 .time(LocalDateTime.now())
