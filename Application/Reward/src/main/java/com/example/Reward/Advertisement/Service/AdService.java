@@ -102,6 +102,7 @@ public class AdService {
     @Transactional
     public GiveStockResponseDto giveStock(Long mediaId, GiveStockRequestDto giveStockRequestDto,Long memId) {
 
+
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
 
         MediaHistory mediaHistory=mediaHistoryRepository.findByMemberIdAndMediaLinkId(memId,mediaLink.get().getId());

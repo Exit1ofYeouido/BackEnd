@@ -38,3 +38,8 @@ app:
 approval:
   key: ${APPROVAL_KEY}
   uri: ${MARKET_INFO_URI}
+
+coolsms:
+  apikey: ${SMS_KEY}
+  apisecret: ${SMS_SECRETKEY}
+  fromnumber: ${PHONE}

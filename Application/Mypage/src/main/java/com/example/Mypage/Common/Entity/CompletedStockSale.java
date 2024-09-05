@@ -30,7 +30,7 @@ public class CompletedStockSale {
     @Setter
     private double amount;
 
-    private int price;
+    private int soldPrice;
 
     private LocalDateTime soldTime;
 }
