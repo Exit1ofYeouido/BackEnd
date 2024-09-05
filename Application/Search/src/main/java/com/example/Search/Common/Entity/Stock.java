@@ -9,7 +9,7 @@ import lombok.Getter;
 public class Stock {
 
     @Id
-    @Column(name = "code", columnDefinition = "char(6)")
+    @Column(name = "stock_code", columnDefinition = "char(6)")
     private String code;
 
     @Column(name = "name")
