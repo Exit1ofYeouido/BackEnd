@@ -43,7 +43,7 @@ public class GeneratedToken {
             ACCESS_TOKEN = generateAccessToken();
             TokenInfo tokenInfo = TokenInfo
                     .builder()
-                    .id(1L)
+                    .typeNumber(1L)
                     .accessToken(ACCESS_TOKEN)
                     .build();
             tokenInfoRepository.save(tokenInfo);
