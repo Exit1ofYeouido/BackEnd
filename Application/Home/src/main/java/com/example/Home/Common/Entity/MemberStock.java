@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "member_stock")
 public class MemberStock {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_stock_id")
@@ -22,8 +23,7 @@ public class MemberStock {
     @Column(name="stock_code", columnDefinition = "char(6)")
     private String code;
 
-    @Column(name = "count")
-    private Double count;
+    private Double amount;
 
     @Setter
     @Column(name = "average_price")
@@ -33,16 +33,6 @@ public class MemberStock {
 
     private LocalDate updatedAt;
 
-    public Long getAveragePrice() {
-        return averagePrice;
-    }
+    private Double availableAmount;
 
-
-    public String getCode() {
-        return code;
-    }
-
-    public Double getCount() {
-        return count;
-    }
 }

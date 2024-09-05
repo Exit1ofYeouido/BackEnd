@@ -7,7 +7,7 @@ public class HomeResponseDTO {
     private int totalPoint;
     private int totalStock;
     private int totalAssets;
-    private double totalEarningRate;
+    private Double totalEarningRate;
     private String brandLogoUri;
 
     public HomeResponseDTO(int totalPoint, int totalStock, int totalAssets, double totalEarningRate, String brandLogoUri) {

@@ -60,7 +60,7 @@ public class LogService {
     private HashMap<String,Integer> getDate(List<SearchLog> getDates) throws ParseException {
         HashMap<String,Integer>  temp=new HashMap<>();
 
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd:HH:mm");
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat( "yyyy-MM-dd");
 
         for (SearchLog searchLog :getDates){
@@ -75,7 +75,7 @@ public class LogService {
     private HashMap<String,Integer> getAllDate(List<SearchLog> getDates) throws ParseException {
         HashMap<String,Integer>  temp=new HashMap<>();
 
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd:HH:mm");
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat( "yyyy-MM");
 
         for (SearchLog searchLog :getDates){
