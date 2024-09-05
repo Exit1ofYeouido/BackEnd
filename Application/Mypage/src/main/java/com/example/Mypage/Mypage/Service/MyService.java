@@ -4,7 +4,7 @@ import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
 import com.example.Mypage.Common.Entity.PopupCheck;
-import com.example.Mypage.Common.Entity.Trade;
+import com.example.Mypage.Common.Entity.StockTradeHistory;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberRepository;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
@@ -60,7 +60,7 @@ public class MyService {
         double currentAllCost = 0;
 
         for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getCount();
+            double stockcount = memberStock.getAmount();
             double stockprice = memberStock.getAveragePrice();
             double currentprice = apiService.getPrice(memberStock.getStockCode());
 
@@ -83,7 +83,7 @@ public class MyService {
         int allCost = 0;
 
         for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getCount();
+            double stockcount = memberStock.getAmount();
             int stockprice = memberStock.getAveragePrice();
             allCost = (int) (allCost + (stockprice * stockcount));
 
@@ -96,7 +96,7 @@ public class MyService {
         List<EarningRate> top3EarningRates = new ArrayList<>();
 
         for (MemberStock memberStock : memberStocks) {
-            double stockCount = memberStock.getCount();
+            double stockCount = memberStock.getAmount();
             int stockPrice = memberStock.getAveragePrice();
             int currentPrice = apiService.getPrice(memberStock.getStockCode());
 
@@ -142,12 +142,14 @@ public class MyService {
                 , giveStockDto.getMemId());
 
         if (memberStock != null) {
-            int avgPrice = (int) ((memberStock.getCount() * memberStock.getAveragePrice() +
-                    giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getCount()
+            int avgPrice = (int) ((memberStock.getAmount() * memberStock.getAveragePrice() +
+                    giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getAmount()
                     + giveStockDto.getAmount()));
 
-            memberStock.setCount(memberStock.getCount() + giveStockDto.getAmount());
-            memberStock.setAvailableAmount(memberStock.getAvailableAmount() + giveStockDto.getAmount());
+            double sumAvailableAmount = calcAvailableAmount(memberStock.getAvailableAmount(),giveStockDto.getAmount());
+
+            memberStock.setAmount(memberStock.getAmount() + giveStockDto.getAmount());
+            memberStock.setAvailableAmount(sumAvailableAmount);
             memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdatedAt(LocalDateTime.now());
             memberStockRepository.save(memberStock);
@@ -156,7 +158,7 @@ public class MyService {
             MemberStock new_memberStock = MemberStock.builder()
                     .member(member)
                     .stockName(giveStockDto.getEnterpriseName())
-                    .count(giveStockDto.getAmount())
+                    .amount(giveStockDto.getAmount())
                     .availableAmount(giveStockDto.getAmount())
                     .stockCode(giveStockDto.getCode())
                     .averagePrice(giveStockDto.getPrice())
@@ -166,6 +168,14 @@ public class MyService {
             memberStockRepository.save(new_memberStock);
         }
         addStockTrade(giveStockDto, member, memberStock);
+    }
+
+    private double calcAvailableAmount(double originAmount, double newAmount) {
+        double sumAmount = originAmount + newAmount;
+        if(sumAmount >= 1) {
+            return sumAmount - 1;
+        }
+        return sumAmount;
     }
 
 
@@ -198,17 +208,17 @@ public class MyService {
     }
 
     private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
-        Trade trade = Trade.builder()
+        StockTradeHistory stockTradeHistory = StockTradeHistory.builder()
                 .stockName(giveStockDto.getEnterpriseName())
-                .tradeType("입금")
+                .tradeType("in")
                 .member(member)
                 .count(giveStockDto.getAmount())
                 .createdAt(LocalDateTime.now())
                 .memberStock(memberStock)
                 .build();
 
-        tradeRepository.save(trade);
-        log.info("주식 거래내역 저장 성공 => {}", trade.getId());
+        tradeRepository.save(stockTradeHistory);
+        log.info("주식 거래내역 저장 성공 => {}", stockTradeHistory.getId());
 
     }
 }

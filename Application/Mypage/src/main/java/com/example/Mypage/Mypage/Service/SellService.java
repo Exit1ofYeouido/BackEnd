@@ -6,10 +6,10 @@ import com.example.Mypage.Common.Entity.CompletedStockSale;
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
 import com.example.Mypage.Common.Entity.SaleInfo;
-import com.example.Mypage.Common.Entity.StockSellRequest;
-import com.example.Mypage.Common.Entity.StockSellRequestA;
-import com.example.Mypage.Common.Entity.StockSellRequestB;
-import com.example.Mypage.Common.Entity.Trade;
+import com.example.Mypage.Common.Entity.StockSaleRequest;
+import com.example.Mypage.Common.Entity.StockSaleRequestA;
+import com.example.Mypage.Common.Entity.StockSaleRequestB;
+import com.example.Mypage.Common.Entity.StockTradeHistory;
 import com.example.Mypage.Common.Repository.AccountHistoryRepository;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.CompletedStockSaleRepository;
@@ -18,6 +18,7 @@ import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
+import com.example.Mypage.Common.Sms.MessageUtil;
 import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
@@ -46,7 +47,7 @@ public class SellService {
     public static final int TEN_SECOND = 10000;
     public static final int OPEN = 1;
     public static final int CLOSE = 0;
-    public static final int SALE_TABLE_A = 1;
+    public static final int SALE_TABLE_A = 0;
     public static final String OPEN_STATUS = "005930";
 
     private final StockSaleRequestARepository stockSaleRequestARepository;
@@ -58,6 +59,7 @@ public class SellService {
     private final TradeRepository tradeRepository;
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
+    private final MessageUtil messageUtil;
 
     @Value("${approval.uri}")
     private String stockPriceURI;
@@ -86,7 +88,7 @@ public class SellService {
         return true;
     }
 
-    @Scheduled(cron = "0 0 10,15 * * mon-fri")
+    @Scheduled(cron = "00 42 10,15 * * mon-fri")
     @Transactional
     public void processSellRequest() {
         SaleInfo marketInfo = saleInfoRepository.findById(2)
@@ -107,11 +109,11 @@ public class SellService {
 
         try {
             if (currentSaleTable == SALE_TABLE_A) {
-                List<StockSellRequestA> sellRequests = stockSaleRequestARepository.findAll();
+                List<StockSaleRequestA> sellRequests = stockSaleRequestARepository.findAll();
                 processStockSellRequests(sellRequests, soldTime);
                 stockSaleRequestARepository.deleteAll();
             } else {
-                List<StockSellRequestB> sellRequests = stockSaleRequestBRepository.findAll();
+                List<StockSaleRequestB> sellRequests = stockSaleRequestBRepository.findAll();
                 processStockSellRequests(sellRequests, soldTime);
                 stockSaleRequestBRepository.deleteAll();
             }
@@ -186,13 +188,13 @@ public class SellService {
                 .orElseThrow(() -> new NoSuchElementException("판매대기 테이블 확인 불가"));
 
         if (pendingTable.getIdx() == SALE_TABLE_A) {
-            StockSellRequestA saveStockSellRequestA = stockSellRequestDto.toSellRequestA(member);
-            stockSaleRequestARepository.save(saveStockSellRequestA);
-            log.info("StockSaleRequestA 저장 성공 => {}", saveStockSellRequestA);
+            StockSaleRequestA saveStockSaleRequestA = stockSellRequestDto.toSellRequestA(member);
+            stockSaleRequestARepository.save(saveStockSaleRequestA);
+            log.info("StockSaleRequestA 저장 성공 => {}", saveStockSaleRequestA);
         } else {
             stockSaleRequestBRepository.save(stockSellRequestDto.toSellRequestB(member));
-            StockSellRequestB saveStockSellRequestB = stockSellRequestDto.toSellRequestB(member);
-            log.info("StockSaleRequestB 저장 성공 => {}", saveStockSellRequestB);
+            StockSaleRequestB saveStockSaleRequestB = stockSellRequestDto.toSellRequestB(member);
+            log.info("StockSaleRequestB 저장 성공 => {}", saveStockSaleRequestB);
         }
     }
 
@@ -211,7 +213,7 @@ public class SellService {
         }
     }
 
-    private <T extends StockSellRequest> void processStockSellRequests(List<T> sellRequests, LocalDateTime soldTime) {
+    private <T extends StockSaleRequest> void processStockSellRequests(List<T> sellRequests, LocalDateTime soldTime) {
         for (T sellRequest : sellRequests) {
             String curStockCode = sellRequest.getStockCode();
             CompletedStockSale completedStockSale = completedStockSaleRepository.findByStockCodeAndSoldTime(
@@ -222,7 +224,7 @@ public class SellService {
                 curStockPrice = apiService.getPrice(curStockCode);
                 completedStockSaleRepository.save(newSellStock(sellRequest, curStockPrice, soldTime));
             } else {
-                curStockPrice = completedStockSale.getPrice();
+                curStockPrice = completedStockSale.getSoldPrice();
                 updateExistingStock(completedStockSale, sellRequest.getAmount());
             }
 
@@ -240,12 +242,12 @@ public class SellService {
         }
     }
 
-    private static <T extends StockSellRequest> AccountHistory newAccountHistory(T sellRequest, int sellPrice, int afterHoldPoint,
-                                                                     Account memberAccount) {
+    private static <T extends StockSaleRequest> AccountHistory newAccountHistory(T sellRequest, int sellPrice, int afterHoldPoint,
+                                                                                 Account memberAccount) {
         return AccountHistory.builder()
                 .requestPoint(sellPrice)
                 .resultPoint(afterHoldPoint)
-                .type("입금")
+                .type("in")
                 .createdAt(LocalDateTime.now())
                 .account(memberAccount)
                 .member(sellRequest.getMember())
@@ -253,31 +255,31 @@ public class SellService {
     }
 
     @Transactional
-    public void updateMemberStockInfo(Long memberId, StockSellRequest sellRequest) {
+    public void updateMemberStockInfo(Long memberId, StockSaleRequest sellRequest) {
         MemberStock memberStock = memberStockRepository.findByMemberIdAndStockCode(memberId,
                 sellRequest.getStockCode()).orElseThrow(() -> new AccountNotFoundException("유저의 보유주식 탐색과정에서 오류가 발생했습니다."));
 
-        memberStock.setCount(memberStock.getCount() - sellRequest.getAmount());
+        memberStock.setAmount(memberStock.getAmount() - sellRequest.getAmount());
         memberStockRepository.save(memberStock);
 
-        tradeRepository.save(Trade.builder()
+        tradeRepository.save(StockTradeHistory.builder()
                 .memberStock(memberStock)
                 .member(sellRequest.getMember())
                 .stockName(sellRequest.getEnterpriseName())
                 .count(sellRequest.getAmount())
-                .tradeType("출금")
+                .tradeType("out")
                 .build()
         );
     }
 
-    private <T extends StockSellRequest> int getSellPrice(T sellRequest, double curStockPrice) {
+    private <T extends StockSaleRequest> int getSellPrice(T sellRequest, double curStockPrice) {
         return (int) (curStockPrice * sellRequest.getAmount());
     }
 
-    private CompletedStockSale newSellStock(StockSellRequest sellRequest, int curStockPrice,
+    private CompletedStockSale newSellStock(StockSaleRequest sellRequest, int curStockPrice,
                                             LocalDateTime soldTime) {
         return CompletedStockSale.builder()
-                .price(curStockPrice)
+                .soldPrice(curStockPrice)
                 .amount(sellRequest.getAmount())
                 .soldTime(soldTime)
                 .enterpriseName(sellRequest.getEnterpriseName())

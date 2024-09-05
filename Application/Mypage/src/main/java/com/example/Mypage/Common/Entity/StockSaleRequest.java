@@ -1,6 +1,6 @@
 package com.example.Mypage.Common.Entity;
 
-public interface StockSellRequest {
+public interface StockSaleRequest {
     
     Long getId();
 

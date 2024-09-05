@@ -33,7 +33,7 @@ public class MemberStock {
     private Member member;
 
 
-    private double count;
+    private double amount;
 
     private int averagePrice;
 

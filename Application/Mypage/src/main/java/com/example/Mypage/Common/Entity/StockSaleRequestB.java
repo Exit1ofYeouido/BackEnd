@@ -15,12 +15,11 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Table(name = "stock_sell_request_a")
-public class StockSellRequestA implements StockSellRequest {
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "stock_sale_request_b")
+public class StockSaleRequestB implements StockSaleRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stock_sell_request_id")
@@ -46,5 +45,4 @@ public class StockSellRequestA implements StockSellRequest {
                 ", amount=" + amount +
                 '}';
     }
-
 }
