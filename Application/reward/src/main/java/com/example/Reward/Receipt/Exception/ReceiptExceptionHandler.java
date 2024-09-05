@@ -84,15 +84,4 @@ public class ReceiptExceptionHandler {
                 .build();
         return ResponseEntity.badRequest().body(response);
     }
-
-    @ExceptionHandler(ExistingReceiptException.class)
-    private ResponseEntity<ReceiptErrorResponse> handler(ExistingReceiptException e) {
-        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
-                .status(e.getStatus())
-                .message(e.getMessage())
-                .data(e.getUrl())
-                .build();
-        return ResponseEntity.badRequest().body(response);
-    }
-
 }
