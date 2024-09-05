@@ -1,9 +1,6 @@
 package com.example.Reward.Advertisement.Webclient;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,10 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TokenInfo {
 
-    @Id
-    @GeneratedValue
-    private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    @Id
+    private Long typeNumber;
+
+    @Column(name="token_value",columnDefinition = "TEXT")
     private String accessToken;
 }

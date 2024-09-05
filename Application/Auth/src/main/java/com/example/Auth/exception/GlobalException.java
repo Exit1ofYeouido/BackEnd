@@ -36,13 +36,11 @@ public class GlobalException {
     }
 
     @ExceptionHandler(MembernameNotValidException.class)
-    public ResponseEntity<String> handleUsernameTooShort(MembernameNotValidException e) {
+    public ResponseEntity<ErrorResult> handleUsernameTooShort(MembernameNotValidException e) {
         ErrorResult errorResult = ErrorResult.builder()
                 .error("유효하지 않은 형식입니다.")
                 .message(e.getMessage())
                 .build();
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.badRequest().body(errorResult);
     }
-
-
 }

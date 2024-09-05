@@ -19,7 +19,6 @@ public class KafkaConsumeConfig {
 
     public KafkaConsumeConfig(@Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
         this.bootstrapServers = bootstrapServers;
-        System.out.println(bootstrapServers);
     }
 
     @Bean

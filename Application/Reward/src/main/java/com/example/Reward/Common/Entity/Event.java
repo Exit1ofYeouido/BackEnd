@@ -15,14 +15,13 @@ public class Event {
     @Column(name="event_id")
     private Long id;
 
-    @Column(name="code")
     private String stockCode;
 
     private String enterpriseName;
 
-    private LocalDateTime create_at;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime update_at;
+    private LocalDateTime updatedAt;
 
     private Double rewardAmount;
 

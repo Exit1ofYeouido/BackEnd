@@ -1,6 +1,5 @@
 package com.example.Reward.Attendance.Service;
 
-import com.example.Reward.Advertisement.Kafka.Dto.Stock;
 import com.example.Reward.Attendance.Dto.out.AttendResponseDTO;
 import com.example.Reward.Attendance.Dto.out.GetAttendanceResponseDTO;
 import com.example.Reward.Attendance.Dto.out.Reward;
@@ -31,12 +30,12 @@ public class AttendanceService {
         Attendance attendance = attendanceRepository.findByMemberId(memberId);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate recentAttendDate = LocalDate.parse(attendance.getRecent(), formatter);
+        LocalDate recentAttendDate = LocalDate.parse(attendance.getLastAttendanceDate(), formatter);
         LocalDate today = LocalDate.now();
         int currentMonth = today.getMonthValue();
         boolean isChecked = recentAttendDate.equals(today);
         int recentMonth = recentAttendDate.getMonthValue();
-        int count = (currentMonth==recentMonth) ? attendance.getCount() : 0;
+        int count = (currentMonth==recentMonth) ? attendance.getAttendanceCount() : 0;
 
         GetAttendanceResponseDTO getAttendanceResponseDTO = GetAttendanceResponseDTO.builder()
                 .isChecked(isChecked)
@@ -47,20 +46,21 @@ public class AttendanceService {
         return getAttendanceResponseDTO;
     }
 
+    @Transactional
     public Boolean attend(Long memberId) {
         Attendance attendance = attendanceRepository.findByMemberId(memberId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate recentAttendDate = LocalDate.parse(attendance.getRecent(), formatter);
+        LocalDate recentAttendDate = LocalDate.parse(attendance.getLastAttendanceDate(), formatter);
         LocalDate today = LocalDate.now();
         if(recentAttendDate.equals(today)) {
             throw new AlreadyAttendedException();
         }
         int currentMonth = today.getMonthValue();
         int recentMonth = recentAttendDate.getMonthValue();
-        attendance.setRecent(today.toString());
-        attendance.setCount((currentMonth==recentMonth) ? attendance.getCount()+1 : 1);
+        attendance.setLastAttendanceDate(today.toString());
+        attendance.setAttendanceCount((currentMonth==recentMonth) ? attendance.getAttendanceCount()+1 : 1);
         attendanceRepository.save(attendance);
-        return attendance.getCount() % 5 == 0;
+        return attendance.getAttendanceCount() % 5 == 0;
     }
 
     public StockInfoDTO getRandomStock(Long memberId) {
@@ -81,7 +81,7 @@ public class AttendanceService {
     @Transactional
     public AttendResponseDTO giveStock(Long memberId, StockInfoDTO stockInfoDTO, Integer priceOfStock, Double amountOfStock) {
         giveStockService.giveStock(memberId, stockInfoDTO.getEnterpriseName(), stockInfoDTO.getContentId(), priceOfStock, amountOfStock);
-        Event event = eventRepository.findByEnterpriseNameContaining(stockInfoDTO.getEnterpriseName());
+        Event event = eventRepository.findByEnterpriseNameContainingAndContentId(stockInfoDTO.getEnterpriseName(), stockInfoDTO.getContentId());
         event.setRewardAmount(event.getRewardAmount()-amountOfStock);
         eventRepository.save(event);
         Reward reward = Reward.builder()
