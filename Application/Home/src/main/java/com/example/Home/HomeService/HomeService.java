@@ -59,7 +59,7 @@ public class HomeService {
                 .collect(Collectors.toList()));
 
         return memberStocks.stream()
-                .mapToInt(stock -> (int) (stock.getCount() * stockPrices.getOrDefault(stock.getCode(), 0L)))
+                .mapToInt(stock -> (int) (stock.getAmount() * stockPrices.getOrDefault(stock.getCode(), 0L)))
                 .sum();
     }
 
@@ -88,9 +88,9 @@ public class HomeService {
             System.out.println("current price: " + currentPrice);
             long purchasePrice = memberStock.getAveragePrice();
             System.out.println("average price: " + purchasePrice);
-            double currentValue = memberStock.getCount() * currentPrice;
+            double currentValue = memberStock.getAmount() * currentPrice;
             System.out.println("current value: " + currentValue);
-            double purchaseValue = memberStock.getCount() * purchasePrice;
+            double purchaseValue = memberStock.getAmount() * purchasePrice;
             System.out.println("purchase value: " + purchaseValue);
 
             totalCurrentValue += currentValue;

@@ -12,14 +12,14 @@ public class KoreaInvestmentApiService {
     private final WebClient webClient;
     private final GeneratedToken generatedToken;
 
-    @Value("${korea.investment.api.key}")
+    @Value("${APP_KEY}")
     private String apiKey;
 
-    @Value("${korea.investment.api.secret}")
+    @Value("${APP_SECRETKEY}")
     private String apiSecret;
 
-    public KoreaInvestmentApiService(@Value("${korea.investment.api.url}") String apiUrl, GeneratedToken generatedToken) {
-        this.webClient = WebClient.create(apiUrl);
+    public KoreaInvestmentApiService( GeneratedToken generatedToken) {
+        this.webClient = WebClient.create("https://openapi.koreainvestment.com:9443");
         this.generatedToken = generatedToken;
     }
 
