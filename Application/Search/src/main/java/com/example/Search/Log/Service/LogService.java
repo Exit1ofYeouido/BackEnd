@@ -8,6 +8,7 @@ import com.example.Search.Common.Repository.SearchLogRepository;
 import com.example.Search.Common.Repository.StockRepository;
 import com.example.Search.Log.Dto.out.GetHistoryStockResponseDto;
 import com.example.Search.Log.Dto.out.GetSearchLogMemberStockDto;
+import com.example.Search.Log.Dto.out.MemberStockCountByYearDto;
 import com.example.Search.Log.Dto.out.MemberStockCountDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -131,10 +132,21 @@ public class LogService {
         String stockCode = stockRepository.findByName(enterpriseName).getCode();
         Optional<MemberStockHolding> memberStockHolding = memberStockHoldingRepository.findByMemberIdAndStockCode(memberId, stockCode);
         boolean isHolding = memberStockHolding.isPresent();
-        List<MemberStockCountDto> memberStockCountDtos = searchLogRepository.countByMemberIdAndEnterpriseName(memberId, enterpriseName, year, month);
-        return GetSearchLogMemberStockDto.builder()
-                .isHolding(isHolding)
-                .countResult(memberStockCountDtos)
-                .build();
+
+        if(month==0) {
+            List<MemberStockCountByYearDto> memberStockCountByYearDtos = searchLogRepository.countByMemberIdAndEnterpriseNameWithYear(memberId, enterpriseName, year);
+            return GetSearchLogMemberStockDto.builder()
+                    .isHolding(isHolding)
+                    .countResult(memberStockCountByYearDtos)
+                    .build();
+        }
+        else {
+            List<MemberStockCountDto> memberStockCountDtos = searchLogRepository.countByMemberIdAndEnterpriseNameWithYearAndMonth(memberId, enterpriseName, year, month);
+            return GetSearchLogMemberStockDto.builder()
+                    .isHolding(isHolding)
+                    .countResult(memberStockCountDtos)
+                    .build();
+        }
+
     }
 }

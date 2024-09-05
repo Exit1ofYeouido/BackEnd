@@ -5,13 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetSearchLogMemberStockDto {
-    private Boolean isHolding;
-    private List<?> countResult;
+public class MemberStockCountByYearDto {
+    private int month;
+    private Long totalCount;
 }
