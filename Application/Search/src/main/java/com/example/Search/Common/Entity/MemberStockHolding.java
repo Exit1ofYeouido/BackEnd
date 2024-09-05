@@ -1,26 +1,24 @@
 package com.example.Search.Common.Entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Getter
 @Entity
-@Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenInfo {
+public class MemberStockHolding {
 
     @Id
-    @Column(name="type_number")
+    @GeneratedValue
+    @Column(name="member_stock_holding_id")
     private Long id;
 
-    @Column(name="TOKEN_VALUE",columnDefinition = "TEXT")
-    private String accessToken;
+    private Long memberId;
 
+    @ManyToOne
+    @JoinColumn(name = "stock_code")
+    private Stock stock;
 }

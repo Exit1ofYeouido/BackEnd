@@ -1,4 +1,4 @@
-package com.example.Search.SearchDTO;
+package com.example.Search.Search.SearchDTO;
 
 public class MyStocksDTO {
     private String stockName;

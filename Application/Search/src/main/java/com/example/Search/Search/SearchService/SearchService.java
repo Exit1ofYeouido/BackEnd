@@ -1,10 +1,11 @@
-package com.example.Search.SearchService;
+package com.example.Search.Search.SearchService;
 
-import com.example.Search.Api.KisService;
-import com.example.Search.SearchDTO.DailyStockPriceDTO;
-import com.example.Search.SearchDTO.StockDetailDTO;
-import com.example.Search.SearchDTO.StockPriceListDTO;
-import com.example.Search.SearchDTO.StocksDTO;
+
+import com.example.Search.Search.Api.KisService;
+import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
+import com.example.Search.Search.SearchDTO.StockDetailDTO;
+import com.example.Search.Search.SearchDTO.StockPriceListDTO;
+import com.example.Search.Search.SearchDTO.StocksDTO;
 import com.example.Search.Common.Entity.MemberStock;
 import com.example.Search.Common.Repository.MemberStockRepository;
 import com.example.Search.Common.Entity.Stock;

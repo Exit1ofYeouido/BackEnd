@@ -1,7 +1,7 @@
-package com.example.Search.Api;
+package com.example.Search.Search.Api;
 
-import com.example.Search.SearchDTO.CurrentPriceDTO;
-import com.example.Search.SearchDTO.DailyStockPriceDTO;
+import com.example.Search.Search.SearchDTO.CurrentPriceDTO;
+import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +22,15 @@ import java.util.List;
 public class KisService {
 
     private final GeneratedToken generatedToken;
+
     public static final String REST_BASE_URL = "https://openapi.koreainvestment.com:9443";
 
     WebClient webClient=WebClient.create(REST_BASE_URL);
 
-    @Value("${korea.investment.api.key}")
+    @Value("${app.key}")
     private String apiKey;
 
-    @Value("${korea.investment.api.secret}")
+    @Value("${app.secret}")
     private String apiSecret;
 
 

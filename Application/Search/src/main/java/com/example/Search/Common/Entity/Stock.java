@@ -5,9 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Entity
-@Table(name = "stock",indexes = {
-        @Index(name = "idx_stock_name",columnList = "name")
-})
+@Table
 public class Stock {
 
     @Id

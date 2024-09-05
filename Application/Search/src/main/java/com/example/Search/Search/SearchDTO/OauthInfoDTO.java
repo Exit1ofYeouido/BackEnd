@@ -1,4 +1,4 @@
-package com.example.Search.SearchDTO;
+package com.example.Search.Search.SearchDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

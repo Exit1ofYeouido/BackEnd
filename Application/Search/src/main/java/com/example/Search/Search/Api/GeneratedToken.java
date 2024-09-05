@@ -1,10 +1,10 @@
-package com.example.Search.Api;
+package com.example.Search.Search.Api;
 
 
 import com.example.Search.Common.Entity.Token;
 import com.example.Search.Common.Entity.TokenInfo;
 import com.example.Search.Common.Repository.TokenInfoRepository;
-import com.example.Search.SearchDTO.OauthInfoDTO;
+import com.example.Search.Search.SearchDTO.OauthInfoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,10 +20,10 @@ public class GeneratedToken {
 
     private final TokenInfoRepository tokenInfoRepository;
 
-    @Value("${korea.investment.api.key}")
+    @Value("${app.key}")
     private String APPKEY ;
 
-    @Value("${korea.investment.api.secret}")
+    @Value("${app.secret}")
     private String APPSECRET ;
 
     public static String ACCESS_TOKEN;
@@ -31,19 +32,22 @@ public class GeneratedToken {
 
     public String getAccessToken() {
 
-        List<TokenInfo> tokenInfos=tokenInfoRepository.findAll();
+        Optional<TokenInfo> tokenInfos=tokenInfoRepository.findById(1L);
 
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
-            System.out.println(ACCESS_TOKEN);
+
             TokenInfo tokenInfo = TokenInfo
                     .builder()
+                    .id(1L)
                     .accessToken(ACCESS_TOKEN)
                     .build();
+
             tokenInfoRepository.save(tokenInfo);
+
             return ACCESS_TOKEN;
         }
-        String Is_ACCESS_TOKEN = tokenInfos.get(0).getAccessToken();
+        String Is_ACCESS_TOKEN = tokenInfos.get().getAccessToken();
 
         return Is_ACCESS_TOKEN;
     }
