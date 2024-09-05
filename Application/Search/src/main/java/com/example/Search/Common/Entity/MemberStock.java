@@ -1,5 +1,4 @@
-package com.example.Mypage.Common.Entity;
-
+package com.example.Search.Common.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,16 +21,15 @@ import lombok.Setter;
 @Setter
 public class MemberStock {
 
+
     @Id
     @GeneratedValue
     @Column(name = "member_stock_id")
     private Long id;
 
-
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
-
 
     private double count;
 
@@ -41,7 +39,7 @@ public class MemberStock {
 
     private String stockName;
 
-    private double availableAmount;
+    private Double availableAmount;
 
     private LocalDateTime createdAt;
 

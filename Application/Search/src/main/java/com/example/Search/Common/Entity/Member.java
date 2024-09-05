@@ -1,4 +1,4 @@
-package com.example.Mypage.Common.Entity;
+package com.example.Search.Common.Entity;
 
 
 import jakarta.persistence.Column;
@@ -6,35 +6,43 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "account_id")
+    @Column(name = "member_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private String name;
 
-    @Setter
-    private Integer point;
+    private Date birth;
 
-    private String accountNumber;
+    private Character sex;
+
+    @Email
+    private String email;
+
+    private String memberName;
+
+    private String phoneNumber;
+
+    private String role;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
 }
