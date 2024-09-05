@@ -23,7 +23,7 @@ public class StockSaleRequestA implements StockSaleRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "stock_sell_request_id")
+    @Column(name = "stock_sale_request_id")
     private Long id;
 
     @ManyToOne

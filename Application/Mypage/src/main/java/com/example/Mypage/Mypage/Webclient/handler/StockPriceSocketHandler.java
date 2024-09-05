@@ -33,13 +33,11 @@ public class StockPriceSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String[] stockInfo = message.getPayload().split("\\^");
         if (stockInfo.length >= 30) {
-            // 장이 열려있는 경우
             messageQueue.offer(stockInfo[0]);
         }
-        if (stockInfo.length >= 1) {
-//            log.info("Received Stock Price => {}", stockInfo[0]);
-            messageQueue.offer(stockInfo[0]);
 
+        if (stockInfo.length >= 1) {
+            messageQueue.offer(stockInfo[0]);
         }
     }
 

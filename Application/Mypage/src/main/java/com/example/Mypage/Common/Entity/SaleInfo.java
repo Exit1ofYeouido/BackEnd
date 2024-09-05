@@ -12,7 +12,7 @@ import lombok.Setter;
 public class SaleInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int typeNumber;
 
     @Setter
     private int idx;
