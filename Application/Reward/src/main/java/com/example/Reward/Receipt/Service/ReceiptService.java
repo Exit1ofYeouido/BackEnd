@@ -183,7 +183,7 @@ public class ReceiptService {
             }
         }
         if(!longest.isEmpty()) {
-            return longest;
+            return eventRepository.findByEnterpriseNameContaining(longest).getEnterpriseName();
         }
         throw new StockNotFoundException(storeName, receiptURL);
     }
