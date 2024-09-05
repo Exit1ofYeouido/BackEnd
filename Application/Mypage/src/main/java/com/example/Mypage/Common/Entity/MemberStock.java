@@ -1,12 +1,8 @@
 package com.example.Mypage.Common.Entity;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,13 +16,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
+@Table(name="member_stock")
 public class MemberStock {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_stock_id")
     private Long id;
-
 
     @ManyToOne
     @JoinColumn(name = "member_id")

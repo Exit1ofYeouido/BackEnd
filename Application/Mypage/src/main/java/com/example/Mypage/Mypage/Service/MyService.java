@@ -152,7 +152,7 @@ public class MyService {
 
     }
 
-    @Transactional
+
     public void giveStock(GiveStockDto giveStockDto) {
 
         Member member = memberRepository.findById(giveStockDto.getMemId())
