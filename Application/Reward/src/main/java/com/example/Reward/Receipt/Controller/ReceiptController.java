@@ -59,7 +59,7 @@ public class ReceiptController {
     @PostMapping("/")
     @Operation(description = "사용자 확인 후 영수증 정보 저장 및 리워드 제공")
     public ResponseEntity<RewardResponseDTO> rewardStock(@RequestHeader("memberId") String memberId, @RequestBody RewardRequestDTO rewardRequestDTO) {
-        Integer priceOfStock = giveStockService.getPrice(rewardRequestDTO.getEnterpriseName());
+        Integer priceOfStock = giveStockService.getPrice(rewardRequestDTO.getEnterpriseName(), 2L);
         Double amountOfStock = giveStockService.calDecimalStock(priceOfStock);
         RewardResponseDTO rewardResponseDTO = receiptService.giveStockAndSaveReceipt(Long.valueOf(memberId), rewardRequestDTO, priceOfStock, amountOfStock);
         return ResponseEntity.ok(rewardResponseDTO);

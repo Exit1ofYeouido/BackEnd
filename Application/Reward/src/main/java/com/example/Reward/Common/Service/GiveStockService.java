@@ -27,9 +27,9 @@ public class GiveStockService {
     private final GeneratedToken generatedToken;
     private static final String STOCK_BASE_URL = "https://openapi.koreainvestment.com:9443";
 
-    public Integer getPrice(String enterpriseName) {
+    public Integer getPrice(String enterpriseName, Long contentId) {
         try {
-            String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, 2L).getStockCode();
+            String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, contentId).getStockCode();
             Mono<PresentPriceDTO> response = webClient.get()
                     .uri(STOCK_BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-price?FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={param}", stockCode)
                     .header("authorization", "Bearer " + generatedToken.getAccessToken())
