@@ -20,7 +20,7 @@ public class TokenInfo {
     @Column(name="type_number")
     private Long id;
 
-    @Column(name="TOKEN_VALUE",columnDefinition = "TEXT")
+    @Column(name="token_value",columnDefinition = "TEXT")
     private String accessToken;
 
 }
