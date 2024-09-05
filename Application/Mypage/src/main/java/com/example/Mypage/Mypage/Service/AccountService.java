@@ -3,13 +3,20 @@ package com.example.Mypage.Mypage.Service;
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.AccountHistory;
 import com.example.Mypage.Common.Entity.MemberStock;
+import com.example.Mypage.Common.Entity.SaleInfo;
+import com.example.Mypage.Common.Entity.StockSaleRequest;
 import com.example.Mypage.Common.Entity.StockTradeHistory;
 import com.example.Mypage.Common.Repository.AccountHistoryRepository;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
+import com.example.Mypage.Common.Repository.SaleInfoRepository;
+import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
+import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
@@ -17,6 +24,7 @@ import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +43,9 @@ public class AccountService {
     private final ApiService apiService;
     private final MemberStockRepository memberStockRepository;
     private final TradeRepository tradeRepository;
+    private final StockSaleRequestARepository stockSaleRequestARepository;
+    private final StockSaleRequestBRepository stockSaleRequestBRepository;
+    private final SaleInfoRepository saleInfoRepository;
 
     public GetPointResponseDto getPoint(Long memberId) {
         try {
@@ -81,10 +92,46 @@ public class AccountService {
                 .map(stockTradeHistory -> MyStocksHistoryResponseDto.builder()
                         .name(stockTradeHistory.getStockName())
                         .type(stockTradeHistory.getTradeType())
-                        .amount(String.format("%.6f", stockTradeHistory.getCount()))
+                        .amount(String.format("%.6f", stockTradeHistory.getAmount()))
                         .date(stockTradeHistory.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
                         .build())
                 .toList();
+    }
+
+    public MyStockSaleRequestsResponseDto getMyStocksSaleRequests(Long memberId) {
+        SaleInfo saleInfo = saleInfoRepository.findById(1)
+                .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
+        int index = (saleInfo.getIdx() + 1)  % 2;
+
+        List<? extends StockSaleRequest> stockSaleRequests;
+
+        if(index == 0) {
+            stockSaleRequests = stockSaleRequestARepository.findAllByMemberId(memberId);
+        }
+        else{
+            stockSaleRequests = stockSaleRequestBRepository.findAllByMemberId(memberId);
+        }
+        List<MyStockSaleRequestResponseDto> responseDtos = stockSaleRequests.stream()
+                .map(MyStockSaleRequestResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new MyStockSaleRequestsResponseDto(responseDtos);
+    }
+
+    public boolean deleteMyStocksSaleRequest(Long saleId) {
+        SaleInfo saleInfo = saleInfoRepository.findById(1)
+                .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
+        //TODO : 로직완성하기
+        int index = (saleInfo.getIdx() + 1)  % 2;
+
+        if(index == 0) {
+            StockSaleRequest stockSaleRequestA = stockSaleRequestARepository.findById(saleId).orElse(null);
+
+        }
+        else {
+            stockSaleRequestBRepository.deleteById(saleId);
+        }
+        return true;
     }
 
     private String getEarningRate(MemberStock memberStock) {
