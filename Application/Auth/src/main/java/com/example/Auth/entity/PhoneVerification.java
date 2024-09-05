@@ -19,5 +19,4 @@ public class PhoneVerification {
 
     @Indexed
     private String verificationCode;
-
 }

@@ -22,31 +22,28 @@ import lombok.Setter;
 @Setter
 public class MemberStock {
 
-
     @Id
     @GeneratedValue
-    @Column(name="member_stock_id")
+    @Column(name = "member_stock_id")
     private Long id;
 
-    private double count;
-
-    private int averagePrice;
-
-
-    private String stockCode;
-
-    private String stockName;
-
-    @Column(unique = true)
-    private String account;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
 
+    private double amount;
+
+    private int averagePrice;
+
+    private String stockCode;
+
+    private String stockName;
+
+    private double availableAmount;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

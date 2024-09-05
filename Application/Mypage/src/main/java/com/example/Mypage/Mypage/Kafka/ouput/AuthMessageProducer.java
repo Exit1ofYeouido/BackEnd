@@ -17,9 +17,7 @@ public class AuthMessageProducer {
 
         try {
             ProducerRecord<String, Object> record = new ProducerRecord<>(topic, message);
-            System.out.println(kafkaTemplate.send(record).get());
-//            log.info("Auth로 메시지 전송완료. 토픽 : {}, 파티션 : {} , 오프셋: {}", metadata.topic(), metadata.partition(),
-//                    metadata.offset());
+            log.info("회원가입 Auth 요청 => {}", kafkaTemplate.send(record).get());
         } catch (Exception e) {
             e.printStackTrace();
         }

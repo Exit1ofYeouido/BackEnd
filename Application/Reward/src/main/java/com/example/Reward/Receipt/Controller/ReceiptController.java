@@ -41,9 +41,9 @@ public class ReceiptController {
         String extension = receiptService.getExtension(receiptImg);
         String receiptURL = receiptService.uploadReceiptToS3(receiptImg);
         String receiptData = receiptService.convertImage(receiptImg);
-        AnalyzeReceiptDTO analyzeReceiptDTO = receiptService.analyzeReceipt(receiptData, extension);
+        AnalyzeReceiptDTO analyzeReceiptDTO = receiptService.analyzeReceipt(receiptURL, receiptData, extension);
         GetEnterpriseListDTO getEnterpriseListDTO = receiptService.getEnterpriseList();
-        String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseListDTO.getEnterprises(), analyzeReceiptDTO.getStoreName());
+        String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseListDTO.getEnterprises(), analyzeReceiptDTO.getStoreName(), receiptURL);
         CheckReceiptResponseDTO checkReceiptResponseDTO = CheckReceiptResponseDTO.builder()
                 .find(checkedEnterpriseName.isEmpty() ? false:true)
                 .storeName(analyzeReceiptDTO.getStoreName())
@@ -59,7 +59,7 @@ public class ReceiptController {
     @PostMapping("/")
     @Operation(description = "사용자 확인 후 영수증 정보 저장 및 리워드 제공")
     public ResponseEntity<RewardResponseDTO> rewardStock(@RequestHeader("memberId") String memberId, @RequestBody RewardRequestDTO rewardRequestDTO) {
-        Integer priceOfStock = giveStockService.getPrice(rewardRequestDTO.getEnterpriseName());
+        Integer priceOfStock = giveStockService.getPrice(rewardRequestDTO.getEnterpriseName(), 2L);
         Double amountOfStock = giveStockService.calDecimalStock(priceOfStock);
         RewardResponseDTO rewardResponseDTO = receiptService.giveStockAndSaveReceipt(Long.valueOf(memberId), rewardRequestDTO, priceOfStock, amountOfStock);
         return ResponseEntity.ok(rewardResponseDTO);

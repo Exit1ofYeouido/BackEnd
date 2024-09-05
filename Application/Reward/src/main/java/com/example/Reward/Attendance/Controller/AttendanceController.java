@@ -38,7 +38,7 @@ public class AttendanceController {
             return ResponseEntity.ok(attendResponseDTO);
         }
         StockInfoDTO randomStock = attendanceService.getRandomStock(Long.valueOf(memberId));
-        Integer priceOfStock = giveStockService.getPrice(randomStock.getEnterpriseName());
+        Integer priceOfStock = giveStockService.getPrice(randomStock.getEnterpriseName(), randomStock.getContentId());
         Double amountOfStock = giveStockService.calDecimalStock(priceOfStock);
         AttendResponseDTO attendResponseDTO = attendanceService.giveStock(Long.valueOf(memberId), randomStock, priceOfStock, amountOfStock);
         return ResponseEntity.ok(attendResponseDTO);

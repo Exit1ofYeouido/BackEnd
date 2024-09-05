@@ -1,19 +1,20 @@
 package com.example.Mypage.Mypage.Service;
 
-
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
 import com.example.Mypage.Common.Entity.PopupCheck;
+import com.example.Mypage.Common.Entity.StockTradeHistory;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberRepository;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
 import com.example.Mypage.Common.Repository.PopupCheckRepository;
+import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
-import com.example.Mypage.Mypage.Exception.NotMemberException;
+import com.example.Mypage.Mypage.Exception.MemberNotFoundException;
 import com.example.Mypage.Mypage.Kafka.Dto.GiveStockDto;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.text.DecimalFormat;
@@ -21,50 +22,56 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
+
+
 
 @Service
 @RequiredArgsConstructor
 public class MyService {
 
-    private MemberRepository memberRepository;
+
+
+    private final MemberRepository memberRepository;
     private final MemberStockRepository memberStockRepository;
     private final ApiService apiService;
     private final PopupCheckRepository popupCheckRepository;
     private final AccountRepository accountRepository;
-
-    //TODO : 더미데이터를 넣어서 포인트로직 검증하기
-    //TODO: orElse() 변경
+    private final TradeRepository tradeRepository;
 
     @Transactional(readOnly = true)
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
 
         Account account = accountRepository.findByMemberId(memId).orElseThrow(
-                ()-> new AccountNotFoundException("계좌가 존재하지않습니다.")
+                () -> new AccountNotFoundException("계좌가 존재하지않습니다.")
         );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
-        String calcAssetsEarningRate = CalcAllAsssets(memberStock);
+        String calcAssetsEarningRate = CalcAllAssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
         int allCost = AllAssetsCount(memberStock);
 
         return GetAllMyPageResponseDto.of(account.getPoint(), calcAssetsEarningRate, earningRates, allCost);
-
     }
 
-    private String CalcAllAsssets(List<MemberStock> memberStocks) {
+    private String CalcAllAssets(List<MemberStock> memberStocks) {
 
         double allCost = 0;
         double currentAllCost = 0;
 
+
+
         for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getCount();
+            double stockcount = memberStock.getAmount();
             double stockprice = memberStock.getAveragePrice();
-            double currentprice = apiService.getPrise(memberStock.getStockCode());
+
+            double currentprice = apiService.getPrice(memberStock.getStockCode());
 
             allCost = allCost + (stockprice * stockcount);
             currentAllCost = currentAllCost + (currentprice * stockcount);
@@ -76,19 +83,22 @@ public class MyService {
             DecimalFormat df = new DecimalFormat("-#.##");
             return df.format(value);
         }
-        double value = (1 - (allCost / currentAllCost)) * 100;
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(value);
+        else if(currentAllCost > allCost) {
+            double value = (1 - (allCost / currentAllCost)) * 100;
+            DecimalFormat df = new DecimalFormat("#.##");
+            return df.format(value);
+        }else{
+            return "0";
+        }
     }
 
     private int AllAssetsCount(List<MemberStock> memberStocks) {
         int allCost = 0;
 
         for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getCount();
-            int stockprice = memberStock.getAveragePrice();
+            double stockcount = memberStock.getAmount();
+            int stockprice = apiService.getPrice(memberStock.getStockCode());
             allCost = (int) (allCost + (stockprice * stockcount));
-
 
         }
         return allCost;
@@ -99,9 +109,9 @@ public class MyService {
         List<EarningRate> top3EarningRates = new ArrayList<>();
 
         for (MemberStock memberStock : memberStocks) {
-            double stockCount = memberStock.getCount();
+            double stockCount = memberStock.getAmount();
             int stockPrice = memberStock.getAveragePrice();
-            int currentPrice = apiService.getPrise(memberStock.getStockCode());
+            int currentPrice = apiService.getPrice(memberStock.getStockCode());
 
             double stock = stockCount * stockPrice;
             double currentStock = stockCount * currentPrice;
@@ -112,11 +122,15 @@ public class MyService {
                 DecimalFormat df = new DecimalFormat("-#.##");
                 finalEarningRate = df.format(value);
 
-            } else {
+            }
+            else if(stock<currentStock) {
                 double value = (1 - (stock / currentStock)) * 100;
                 DecimalFormat df = new DecimalFormat("#.##");
                 finalEarningRate = df.format(value);
+            }else{
+                finalEarningRate="0";
             }
+
 
             EarningRate earningRate = EarningRate.builder()
                     .earningRate(finalEarningRate)
@@ -138,28 +152,31 @@ public class MyService {
     @Transactional
     public void giveStock(GiveStockDto giveStockDto) {
 
+        Member member = memberRepository.findById(giveStockDto.getMemId())
+                .orElseThrow(() -> new MemberNotFoundException("주식을 증정할 유저를 찾을 수 없습니다." + giveStockDto.getMemId()));
 
-        Optional<Member> member = memberRepository.findById(giveStockDto.getMemId());
-        member.orElseThrow(()-> new NotMemberException(giveStockDto.getMemId()));
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
                 , giveStockDto.getMemId());
 
         if (memberStock != null) {
-            memberStock.setCount(memberStock.getCount() + giveStockDto.getAmount());
-            int avgPrice = (int) ((memberStock.getCount() * memberStock.getAveragePrice() +
-                    giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getCount()
+            int avgPrice = (int) ((memberStock.getAmount() * memberStock.getAveragePrice() +
+                    giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getAmount()
                     + giveStockDto.getAmount()));
 
+            double sumAvailableAmount = calcAvailableAmount(memberStock.getAvailableAmount(),giveStockDto.getAmount());
 
+            memberStock.setAmount(memberStock.getAmount() + giveStockDto.getAmount());
+            memberStock.setAvailableAmount(sumAvailableAmount);
             memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdatedAt(LocalDateTime.now());
             memberStockRepository.save(memberStock);
 
         } else {
             MemberStock new_memberStock = MemberStock.builder()
-                    .member(member.get())
+                    .member(member)
                     .stockName(giveStockDto.getEnterpriseName())
-                    .count(giveStockDto.getAmount())
+                    .amount(giveStockDto.getAmount())
+                    .availableAmount(giveStockDto.getAmount())
                     .stockCode(giveStockDto.getCode())
                     .averagePrice(giveStockDto.getPrice())
                     .createdAt(LocalDateTime.now())
@@ -167,6 +184,15 @@ public class MyService {
                     .build();
             memberStockRepository.save(new_memberStock);
         }
+        addStockTrade(giveStockDto, member, memberStock);
+    }
+
+    private double calcAvailableAmount(double originAmount, double newAmount) {
+        double sumAmount = originAmount + newAmount;
+        if(sumAmount >= 1) {
+            return sumAmount - 1;
+        }
+        return sumAmount;
     }
 
 
@@ -181,6 +207,8 @@ public class MyService {
         return GetTutorialCheckResponseDto.of(false);
     }
 
+
+
     public void saveTutorialCheck(String type, Long memId) {
 
         PopupCheck popupCheck = PopupCheck
@@ -192,10 +220,27 @@ public class MyService {
 
     }
 
+
     @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
-        List<MemberStock> memberStocks=memberStockRepository.findByMemberId(memId);
-
+        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
         return memberStocks;
+
+    }
+
+    // 주식 거래내역 추가
+
+    private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
+        StockTradeHistory stockTradeHistory = StockTradeHistory.builder()
+                .stockName(giveStockDto.getEnterpriseName())
+                .tradeType("in")
+                .member(member)
+                .count(giveStockDto.getAmount())
+                .createdAt(LocalDateTime.now())
+                .memberStock(memberStock)
+                .build();
+
+        tradeRepository.save(stockTradeHistory);
+        log.info("주식 거래내역 저장 성공 => {}", stockTradeHistory.getId());
     }
 }
