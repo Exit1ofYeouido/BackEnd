@@ -19,8 +19,9 @@ public class TokenInfo {
 
     @Id
     @GeneratedValue
+    @Column(name="type_number")
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name="token_value",columnDefinition = "TEXT")
     private String accessToken;
 }

@@ -25,13 +25,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
+
+
+
+
 @Service
 @RequiredArgsConstructor
 public class MyService {
+
+
 
     private final MemberRepository memberRepository;
     private final MemberStockRepository memberStockRepository;
@@ -59,9 +65,12 @@ public class MyService {
         double allCost = 0;
         double currentAllCost = 0;
 
+
+
         for (MemberStock memberStock : memberStocks) {
             double stockcount = memberStock.getCount();
             double stockprice = memberStock.getAveragePrice();
+
             double currentprice = apiService.getPrice(memberStock.getStockCode());
 
             allCost = allCost + (stockprice * stockcount);
@@ -74,9 +83,13 @@ public class MyService {
             DecimalFormat df = new DecimalFormat("-#.##");
             return df.format(value);
         }
-        double value = (1 - (allCost / currentAllCost)) * 100;
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(value);
+        else if(currentAllCost > allCost) {
+            double value = (1 - (allCost / currentAllCost)) * 100;
+            DecimalFormat df = new DecimalFormat("#.##");
+            return df.format(value);
+        }else{
+            return "0";
+        }
     }
 
     private int AllAssetsCount(List<MemberStock> memberStocks) {
@@ -84,7 +97,7 @@ public class MyService {
 
         for (MemberStock memberStock : memberStocks) {
             double stockcount = memberStock.getCount();
-            int stockprice = memberStock.getAveragePrice();
+            int stockprice = apiService.getPrice(memberStock.getStockCode());
             allCost = (int) (allCost + (stockprice * stockcount));
 
         }
@@ -109,11 +122,15 @@ public class MyService {
                 DecimalFormat df = new DecimalFormat("-#.##");
                 finalEarningRate = df.format(value);
 
-            } else {
+            }
+            else if(stock<currentStock) {
                 double value = (1 - (stock / currentStock)) * 100;
                 DecimalFormat df = new DecimalFormat("#.##");
                 finalEarningRate = df.format(value);
+            }else{
+                finalEarningRate="0";
             }
+
 
             EarningRate earningRate = EarningRate.builder()
                     .earningRate(finalEarningRate)
@@ -180,11 +197,7 @@ public class MyService {
         return GetTutorialCheckResponseDto.of(false);
     }
 
-    @Transactional(readOnly = true)
-    public List<MemberStock> getAllStock(Long memId) {
-        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
-        return memberStocks;
-    }
+
 
     public void saveTutorialCheck(String type, Long memId) {
 
@@ -197,6 +210,16 @@ public class MyService {
 
     }
 
+
+    @Transactional(readOnly = true)
+    public List<MemberStock> getAllStock(Long memId) {
+        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
+        return memberStocks;
+
+    }
+
+    // 주식 거래내역 추가
+
     private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
         Trade trade = Trade.builder()
                 .stockName(giveStockDto.getEnterpriseName())
@@ -207,8 +230,11 @@ public class MyService {
                 .memberStock(memberStock)
                 .build();
 
+
+
         tradeRepository.save(trade);
-        log.info("주식 거래내역 저장 성공 => {}", trade.getId());
 
     }
+
+
 }

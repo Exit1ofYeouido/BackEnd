@@ -1,11 +1,13 @@
-package com.example.Mypage.Mypage.Webclient.Service;
+package com.example.Reward.Advertisement.Webclient.Service;
 
 
-
-import com.example.Mypage.Mypage.Webclient.Entity.TokenInfo;
-import com.example.Mypage.Mypage.Webclient.Dto.OauthInfoDto;
-import com.example.Mypage.Mypage.Webclient.Repository.TokenInfoRepository;
-import com.example.Mypage.Mypage.Webclient.Entity.Token;
+import com.example.Reward.Advertisement.Exception.NotAccessTokenException;
+import com.example.Reward.Advertisement.Webclient.OauthInfo;
+import com.example.Reward.Advertisement.Webclient.Token;
+import com.example.Reward.Advertisement.Webclient.TokenInfo;
+import com.example.Reward.Common.Repository.TokenInfoRepository;
+import jakarta.transaction.Transactional;
+import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,7 +15,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -31,21 +32,22 @@ public class GeneratedToken {
 
     WebClient client=WebClient.create();
 
+    @Transactional
     public String getAccessToken() {
 
-        Optional<TokenInfo> tokenInfos=tokenInfoRepository.findById(1L);
+        List<TokenInfo> tokenInfos=tokenInfoRepository.findAll();
+
 
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
             TokenInfo tokenInfo = TokenInfo
                     .builder()
-                    .id(1L)
                     .accessToken(ACCESS_TOKEN)
                     .build();
             tokenInfoRepository.save(tokenInfo);
             return ACCESS_TOKEN;
         }
-        String Is_ACCESS_TOKEN = tokenInfos.get().getAccessToken();
+        String Is_ACCESS_TOKEN = tokenInfos.get(0).getAccessToken();
 
         return Is_ACCESS_TOKEN;
     }
@@ -53,22 +55,23 @@ public class GeneratedToken {
     public String generateAccessToken(){
 
         String url = "https://openapi.koreainvestment.com:9443" + "/oauth2/tokenP";
-        OauthInfoDto bodyOauthInfoDto = OauthInfoDto.builder()
+        OauthInfo bodyOauthInfo=OauthInfo.builder()
                 .grant_type("client_credentials")
                 .appkey(APPKEY)
                 .appsecret(APPSECRET)
                 .build();
 
+
         Mono<Token> mono = client.post()
                 .uri(url)
                 .header("content-type", "application/json")
-                .bodyValue(bodyOauthInfoDto)
+                .bodyValue(bodyOauthInfo)
                 .retrieve()
                 .bodyToMono(Token.class);
 
         Token token = mono.block();
         if (token == null) {
-            throw new RuntimeException("액세스 토큰을 가져올 수 없습니다.");
+            throw new NotAccessTokenException();
         }
 
         ACCESS_TOKEN = token.getAccess_token();
