@@ -69,9 +69,9 @@ public class AdService {
                 GetInfoResponseDto getInfoResponseDto = GetInfoResponseDto
                         .builder()
                         .name(medialink.getEnterpriseName())
-                        .thumbnail(medialink.getThumnail())
+                        .thumbnail(medialink.getThumbnail())
                         .mediaId(medialink.getId())
-                        .thumbnailName(medialink.getThumnailName())
+                        .thumbnailName(medialink.getThumbnailName())
                         .build();
 
                 lists.add(medialink.getEnterpriseName());
@@ -101,6 +101,7 @@ public class AdService {
 
     @Transactional
     public GiveStockResponseDto giveStock(Long mediaId, GiveStockRequestDto giveStockRequestDto,Long memId) {
+
 
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
 
@@ -139,7 +140,7 @@ public class AdService {
     @Transactional(readOnly=true)
     public DetailEnterPriseResponseDto getEnterpriseDetail(String enterpriseName) {
 
-        Event event=eventRepository.findByEnterpriseNameContaining(enterpriseName);
+        Event event=eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, 1L);
         return DetailEnterPriseResponseDto.of(event);
     }
 }

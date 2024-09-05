@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -37,19 +38,20 @@ public class GeneratedToken {
 
     public String getAccessToken() {
 
-        List<TokenInfo> tokenInfos=tokenInfoRepository.findAll();
+        Optional<TokenInfo> tokenInfos=tokenInfoRepository.findById(1L);
 
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
-            System.out.println(ACCESS_TOKEN);
             TokenInfo tokenInfo = TokenInfo
                     .builder()
                     .tokenValue(ACCESS_TOKEN)
+                    .id(1L)
                     .build();
             tokenInfoRepository.save(tokenInfo);
             return ACCESS_TOKEN;
         }
-        String Is_ACCESS_TOKEN = tokenInfos.get(0).getTokenValue();
+
+        String Is_ACCESS_TOKEN = tokenInfos.get().getTokenValue();
 
         return Is_ACCESS_TOKEN;
     }

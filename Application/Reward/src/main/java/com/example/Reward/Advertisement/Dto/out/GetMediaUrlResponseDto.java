@@ -21,7 +21,7 @@ public class GetMediaUrlResponseDto {
 
         return GetMediaUrlResponseDto.builder()
                 .mediaId(mediaLink.get().getId())
-                .uri(mediaLink.get().getUrl()).build();
+                .uri(mediaLink.get().getUri()).build();
 
 
     }

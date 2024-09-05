@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @Tag(name = "마이페이지 API")
-
 @RestController
 @RequestMapping("/page")
 @RequiredArgsConstructor
