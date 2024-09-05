@@ -244,5 +244,6 @@ public class MyService {
                 .build();
 
         tradeRepository.save(stockTradeHistory);
+
     }
 }

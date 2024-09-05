@@ -4,6 +4,7 @@ import com.example.Search.Search.SearchDTO.CurrentPriceDTO;
 import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 public class KisService {
 
     private final GeneratedToken generatedToken;
+
     public static final String REST_BASE_URL = "https://openapi.koreainvestment.com:9443";
 
     WebClient webClient=WebClient.create(REST_BASE_URL);
