@@ -139,7 +139,7 @@ public class AdService {
     @Transactional(readOnly=true)
     public DetailEnterPriseResponseDto getEnterpriseDetail(String enterpriseName) {
 
-        Event event=eventRepository.findByEnterpriseNameContaining(enterpriseName);
+        Event event=eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, 1L);
         return DetailEnterPriseResponseDto.of(event);
     }
 }
