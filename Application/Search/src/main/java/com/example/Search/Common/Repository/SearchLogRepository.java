@@ -50,4 +50,11 @@ public interface SearchLogRepository extends JpaRepository<SearchLog,Long> {
             "AND FUNCTION('MONTH', CAST(s.searchTime AS date)) = :month " +
             "GROUP BY s.enterpriseName")
     List<GetSearchLogMemberDto> findByMemberIdWithYearAndMonth(Long memberId, int year, int month);
+
+    @Query("SELECT new com.example.Search.Log.Dto.out.GetSearchLogMemberDto(s.enterpriseName, COUNT(s)) " +
+            "FROM SearchLog s " +
+            "WHERE s.memberId = :memberId " +
+            "AND FUNCTION('YEAR', CAST(s.searchTime AS date)) = :year " +
+            "GROUP BY s.enterpriseName")
+    List<GetSearchLogMemberDto> findByMemberIdWithYear(Long memberId, int year);
 }

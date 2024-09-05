@@ -148,12 +148,19 @@ public class LogService {
     }
 
     public List<GetSearchLogMemberDto> getLogMember(Long memberId, int year, int month) {
-        List<GetSearchLogMemberDto> getSearchLogMemberDtos = searchLogRepository.findByMemberIdWithYearAndMonth(memberId, year, month);
-        for(GetSearchLogMemberDto getSearchLogMemberDto : getSearchLogMemberDtos) {
+        List<GetSearchLogMemberDto> getSearchLogMemberDtos;
+        if(month==0) {
+            getSearchLogMemberDtos = searchLogRepository.findByMemberIdWithYear(memberId, year);
+        }
+        else {
+            getSearchLogMemberDtos = searchLogRepository.findByMemberIdWithYearAndMonth(memberId, year, month);
+        }
+        for (GetSearchLogMemberDto getSearchLogMemberDto : getSearchLogMemberDtos) {
             String stockCode = stockRepository.findByName(getSearchLogMemberDto.getEnterpriseName()).getCode();
             Optional<MemberStockHolding> memberStockHolding = memberStockHoldingRepository.findByMemberIdAndStockCode(memberId, stockCode);
             getSearchLogMemberDto.setHolding(memberStockHolding.isPresent());
         }
         return getSearchLogMemberDtos;
+
     }
 }
