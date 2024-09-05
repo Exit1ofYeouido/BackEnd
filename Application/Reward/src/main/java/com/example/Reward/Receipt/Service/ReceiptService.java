@@ -200,12 +200,12 @@ public class ReceiptService {
 
             ReceiptLog receiptLog = ReceiptLog.builder()
                     .receiptLogKey(ReceiptLogKey.builder()
-                            .approvalNum(rewardRequestDTO.getApprovalNum())
+                            .approvalNumber(rewardRequestDTO.getApprovalNum())
                             .dealTime(rewardRequestDTO.getDealTime())
                             .build())
-                    .store(rewardRequestDTO.getStoreName())
+                    .storeName(rewardRequestDTO.getStoreName())
                     .price(rewardRequestDTO.getPrice())
-                    .imgUrl(rewardRequestDTO.getImgURL())
+                    .imgPath(rewardRequestDTO.getImgURL())
                     .enterpriseName(rewardRequestDTO.getEnterpriseName())
                     .memberId(memberId)
                     .build();

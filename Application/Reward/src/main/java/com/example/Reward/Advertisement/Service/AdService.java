@@ -69,9 +69,9 @@ public class AdService {
                 GetInfoResponseDto getInfoResponseDto = GetInfoResponseDto
                         .builder()
                         .name(medialink.getEnterpriseName())
-                        .thumbnail(medialink.getThumnail())
+                        .thumbnail(medialink.getThumbnail())
                         .mediaId(medialink.getId())
-                        .thumbnailName(medialink.getThumnailName())
+                        .thumbnailName(medialink.getThumbnailName())
                         .build();
 
                 lists.add(medialink.getEnterpriseName());

@@ -17,13 +17,13 @@ public class Attendance {
     private Long attendanceId;
     private Long memberId;
     @Setter
-    private int count;
+    private int attendanceCount;
     @Setter
-    private String recent;
+    private String lastAttendanceDate;
 
-    public Attendance(Long memberId, String recent) {
+    public Attendance(Long memberId, String lastAttendanceDate) {
         this.memberId = memberId;
-        this.count = 0;
-        this.recent = recent;
+        this.attendanceCount = 0;
+        this.lastAttendanceDate = lastAttendanceDate;
     }
 }
