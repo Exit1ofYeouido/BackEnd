@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 public class TokenInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="type_number")
     private Long id;
 
