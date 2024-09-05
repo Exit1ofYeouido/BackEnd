@@ -82,7 +82,7 @@ public class AttendanceService {
     @Transactional
     public AttendResponseDTO giveStock(Long memberId, StockInfoDTO stockInfoDTO, Integer priceOfStock, Double amountOfStock) {
         giveStockService.giveStock(memberId, stockInfoDTO.getEnterpriseName(), stockInfoDTO.getContentId(), priceOfStock, amountOfStock);
-        Event event = eventRepository.findByEnterpriseNameContaining(stockInfoDTO.getEnterpriseName());
+        Event event = eventRepository.findByEnterpriseNameContainingAndContentId(stockInfoDTO.getEnterpriseName(), stockInfoDTO.getContentId());
         event.setRewardAmount(event.getRewardAmount()-amountOfStock);
         eventRepository.save(event);
         Reward reward = Reward.builder()
