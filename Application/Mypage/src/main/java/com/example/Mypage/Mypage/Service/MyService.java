@@ -64,6 +64,9 @@ public class MyService {
 
         double allCost = 0;
         double currentAllCost = 0;
+        if (memberStocks.isEmpty()){
+            return "0";
+        }
 
 
 
@@ -149,7 +152,7 @@ public class MyService {
 
     }
 
-    @Transactional
+
     public void giveStock(GiveStockDto giveStockDto) {
 
         Member member = memberRepository.findById(giveStockDto.getMemId())
@@ -241,5 +244,6 @@ public class MyService {
                 .build();
 
         tradeRepository.save(stockTradeHistory);
+
     }
 }

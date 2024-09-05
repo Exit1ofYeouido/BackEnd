@@ -20,7 +20,6 @@ import lombok.Setter;
 public class TokenInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long typeNumber;
 
     @Setter

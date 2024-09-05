@@ -1,5 +1,6 @@
-package com.example.Search.SearchDTO;
+package com.example.Search.Search.SearchDTO;
 
+import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
 import lombok.Getter;
 
 import java.util.List;

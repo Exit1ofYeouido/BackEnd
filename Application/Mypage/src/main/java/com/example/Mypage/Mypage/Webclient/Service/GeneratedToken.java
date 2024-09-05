@@ -45,7 +45,7 @@ public class GeneratedToken {
             TokenInfo tokenInfo = TokenInfo
                     .builder()
                     .tokenValue(ACCESS_TOKEN)
-                    .id(1L)
+                    .typeNumber(1L)
                     .build();
             tokenInfoRepository.save(tokenInfo);
             return ACCESS_TOKEN;
@@ -58,10 +58,7 @@ public class GeneratedToken {
 
     public String getSocketToken() {
         TokenInfo tokenInfos = tokenInfoRepository.findById(2L).orElseThrow(() -> new NotFoundTokenException("소켓 통신 접근키를 찾을 수 없습니다."));
-
-        String APPROVAL_TOKEN = tokenInfos.getTokenValue();
-
-        return APPROVAL_TOKEN;
+        return tokenInfos.getTokenValue();
     }
 
     public String generateAccessToken(){

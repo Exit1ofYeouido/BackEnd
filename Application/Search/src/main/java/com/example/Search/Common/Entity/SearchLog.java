@@ -1,26 +1,27 @@
 package com.example.Search.Common.Entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
 @Entity
-@Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenInfo {
-
+public class SearchLog {
     @Id
-    @Column(name="type_number")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "search_log_id")
     private Long id;
 
-    @Column(name="TOKEN_VALUE",columnDefinition = "TEXT")
-    private String accessToken;
+    private Long memberId;
 
+    private String enterpriseName;
+
+    private String searchTime;
+
+    private Boolean holding;
 }
