@@ -32,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -93,7 +94,8 @@ public class AccountService {
                         .name(stockTradeHistory.getStockName())
                         .type(stockTradeHistory.getTradeType())
                         .amount(String.format("%.6f", stockTradeHistory.getAmount()))
-                        .date(stockTradeHistory.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
+                        .date(stockTradeHistory.getCreatedAt()
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
                         .build())
                 .toList();
     }
@@ -101,14 +103,13 @@ public class AccountService {
     public MyStockSaleRequestsResponseDto getMyStocksSaleRequests(Long memberId) {
         SaleInfo saleInfo = saleInfoRepository.findById(1)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
-        int index = (saleInfo.getIdx() + 1)  % 2;
+        int index = (saleInfo.getIdx() + 1) % 2;
 
         List<? extends StockSaleRequest> stockSaleRequests;
 
-        if(index == 0) {
+        if (index == 0) {
             stockSaleRequests = stockSaleRequestARepository.findAllByMemberId(memberId);
-        }
-        else{
+        } else {
             stockSaleRequests = stockSaleRequestBRepository.findAllByMemberId(memberId);
         }
         List<MyStockSaleRequestResponseDto> responseDtos = stockSaleRequests.stream()
@@ -118,19 +119,28 @@ public class AccountService {
         return new MyStockSaleRequestsResponseDto(responseDtos);
     }
 
-    public boolean deleteMyStocksSaleRequest(Long saleId) {
+    @Transactional
+    public boolean deleteMyStocksSaleRequest(Long saleId, Long memberId) {
         SaleInfo saleInfo = saleInfoRepository.findById(1)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
-        //TODO : 로직완성하기
-        int index = (saleInfo.getIdx() + 1)  % 2;
 
-        if(index == 0) {
-            StockSaleRequest stockSaleRequestA = stockSaleRequestARepository.findById(saleId).orElse(null);
+        StockSaleRequest stockSaleRequest;
 
-        }
-        else {
+        int index = (saleInfo.getIdx() + 1) % 2;
+
+        if (index == 0) {
+            stockSaleRequest = stockSaleRequestARepository.findById(saleId).orElse(null);
+            stockSaleRequestARepository.deleteById(saleId);
+        } else {
+            stockSaleRequest = stockSaleRequestBRepository.findById(saleId).orElse(null);
             stockSaleRequestBRepository.deleteById(saleId);
         }
+
+        MemberStock memberStock = memberStockRepository.findByMemberIdAndStockCode(memberId,
+                        stockSaleRequest.getStockCode())
+                .orElseThrow(() -> new NoSuchElementException("판매를 취소과정에서 오류가 발생했습니다."));
+
+        memberStock.setAvailableAmount(memberStock.getAvailableAmount() + stockSaleRequest.getAmount());
         return true;
     }
 

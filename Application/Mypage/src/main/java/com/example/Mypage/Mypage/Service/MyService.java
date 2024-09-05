@@ -25,18 +25,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MyService {
-
 
 
     private final MemberRepository memberRepository;
@@ -65,8 +61,6 @@ public class MyService {
         double allCost = 0;
         double currentAllCost = 0;
 
-
-
         for (MemberStock memberStock : memberStocks) {
             double stockcount = memberStock.getAmount();
             double stockprice = memberStock.getAveragePrice();
@@ -82,12 +76,11 @@ public class MyService {
             double value = (1 - (currentAllCost / allCost)) * 100;
             DecimalFormat df = new DecimalFormat("-#.##");
             return df.format(value);
-        }
-        else if(currentAllCost > allCost) {
+        } else if (currentAllCost > allCost) {
             double value = (1 - (allCost / currentAllCost)) * 100;
             DecimalFormat df = new DecimalFormat("#.##");
             return df.format(value);
-        }else{
+        } else {
             return "0";
         }
     }
@@ -122,15 +115,13 @@ public class MyService {
                 DecimalFormat df = new DecimalFormat("-#.##");
                 finalEarningRate = df.format(value);
 
-            }
-            else if(stock<currentStock) {
+            } else if (stock < currentStock) {
                 double value = (1 - (stock / currentStock)) * 100;
                 DecimalFormat df = new DecimalFormat("#.##");
                 finalEarningRate = df.format(value);
-            }else{
-                finalEarningRate="0";
+            } else {
+                finalEarningRate = "0";
             }
-
 
             EarningRate earningRate = EarningRate.builder()
                     .earningRate(finalEarningRate)
@@ -163,7 +154,7 @@ public class MyService {
                     giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getAmount()
                     + giveStockDto.getAmount()));
 
-            double sumAvailableAmount = calcAvailableAmount(memberStock.getAvailableAmount(),giveStockDto.getAmount());
+            double sumAvailableAmount = calcAvailableAmount(memberStock.getAvailableAmount(), giveStockDto.getAmount());
 
             memberStock.setAmount(memberStock.getAmount() + giveStockDto.getAmount());
             memberStock.setAvailableAmount(sumAvailableAmount);
@@ -189,7 +180,7 @@ public class MyService {
 
     private double calcAvailableAmount(double originAmount, double newAmount) {
         double sumAmount = originAmount + newAmount;
-        if(sumAmount >= 1) {
+        if (sumAmount >= 1) {
             return sumAmount - 1;
         }
         return sumAmount;
@@ -208,7 +199,6 @@ public class MyService {
     }
 
 
-
     public void saveTutorialCheck(String type, Long memId) {
 
         PopupCheck popupCheck = PopupCheck
@@ -219,7 +209,6 @@ public class MyService {
         popupCheckRepository.save(popupCheck);
 
     }
-
 
     @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
