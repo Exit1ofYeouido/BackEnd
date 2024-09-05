@@ -191,6 +191,8 @@ public class ReceiptService {
     @Transactional
     public RewardResponseDTO giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
         try {
+            int existReceiptLogCount = receiptLogRepository.countByApprovalNumAndDealTime(rewardRequestDTO.getApprovalNum(), rewardRequestDTO.getDealTime());
+            if(existReceiptLogCount > 0) throw new ExistingReceiptException(rewardRequestDTO.getImgURL());
             giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(), 2L, priceOfStock, amountOfStock);
             Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
             event.setRewardAmount(event.getRewardAmount() - amountOfStock);
@@ -214,7 +216,9 @@ public class ReceiptService {
                     .amount(amountOfStock)
                     .build();
             return rewardResponseDTO;
-        } catch (Exception e) {
+        } catch (ExistingReceiptException e) {
+            throw e;
+        } catch (GiveStockErrorException e) {
             throw new GiveStockErrorException();
         }
     }
