@@ -20,6 +20,7 @@ import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
+import com.example.Mypage.Mypage.Exception.BadRequestException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -129,10 +130,12 @@ public class AccountService {
         int index = (saleInfo.getIdx() + 1) % 2;
 
         if (index == 0) {
-            stockSaleRequest = stockSaleRequestARepository.findById(saleId).orElse(null);
+            stockSaleRequest = stockSaleRequestARepository.findById(saleId)
+                    .orElseThrow(() -> new BadRequestException("보유한 주식만 취소요청이 가능합니다."));
             stockSaleRequestARepository.deleteById(saleId);
         } else {
-            stockSaleRequest = stockSaleRequestBRepository.findById(saleId).orElse(null);
+            stockSaleRequest = stockSaleRequestBRepository.findById(saleId)
+                    .orElseThrow(() -> new BadRequestException("보유한 주식만 취소요청이 가능합니다."));
             stockSaleRequestBRepository.deleteById(saleId);
         }
 
