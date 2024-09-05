@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
@@ -27,6 +28,7 @@ public class GiveStockService {
     private final GeneratedToken generatedToken;
     private static final String STOCK_BASE_URL = "https://openapi.koreainvestment.com:9443";
 
+    @Transactional
     public Integer getPrice(String enterpriseName, Long contentId) {
         try {
             String stockCode = eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, contentId).getStockCode();
@@ -45,6 +47,7 @@ public class GiveStockService {
         }
     }
 
+    @Transactional
     public Double calDecimalStock(Integer priceOfStock) {
         BigDecimal price = new BigDecimal(Integer.toString(priceOfStock));
         return BigDecimal.valueOf(100).divide(price, 6, BigDecimal.ROUND_DOWN).doubleValue();
