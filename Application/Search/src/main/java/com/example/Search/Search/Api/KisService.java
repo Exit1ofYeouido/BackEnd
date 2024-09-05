@@ -22,6 +22,7 @@ import java.util.List;
 public class KisService {
 
     private final GeneratedToken generatedToken;
+
     public static final String REST_BASE_URL = "https://openapi.koreainvestment.com:9443";
 
     WebClient webClient=WebClient.create(REST_BASE_URL);
