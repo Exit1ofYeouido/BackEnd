@@ -33,5 +33,4 @@ springdoc:
 
 app:
   key: ${APP_KEY}
-  secret: ${APP_SECRETKEY}
-  url: ${KOREA_INVESTMENT_API_URL}
+  secret: ${APP_SECRET}
