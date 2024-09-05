@@ -40,6 +40,7 @@ public class ReceiptService {
     private static final String OCR_BASE_URL = "https://1l8mnx9ap5.apigw.ntruss.com";
     private final GetLongestCommonSubstring getLongestCommonSubstring;
 
+    @Transactional
     public GetEnterpriseListDTO getEnterpriseList() throws NoStockException {
         List<String> enterpriseList = new ArrayList<>();
         List<Event> eventEnterprises = eventRepository.findByRewardAmountGreaterThanEqualAndContentId(1L,2L);
@@ -54,7 +55,7 @@ public class ReceiptService {
                 .enterprises(enterpriseList)
                 .build();
     }
-
+    @Transactional
     public String getExtension(MultipartFile receiptImg) {
         String originalFileName = receiptImg.getOriginalFilename();
         if(originalFileName != null && originalFileName.contains(".")) {
@@ -80,6 +81,7 @@ public class ReceiptService {
         }
     }
 
+    @Transactional
     public String uploadReceiptToS3(MultipartFile receiptImg) throws IOException {
         try {
             ObjectMetadata metadata = new ObjectMetadata();
@@ -94,11 +96,13 @@ public class ReceiptService {
         }
     }
 
+    @Transactional
     public String convertImage(MultipartFile receiptImg) throws IOException {
         byte[] fileBytes = receiptImg.getBytes();
         return Base64.getEncoder().encodeToString(fileBytes);
     }
 
+    @Transactional
     public AnalyzeReceiptDTO analyzeReceipt(String receiptURL, String receiptData, String extension) {
         try {
             String url = OCR_BASE_URL + "/custom/v1/33600/7421306ff3c576bde6b6088961ce77f253b4467347f9348761bde666036c3538/document/receipt";
@@ -174,6 +178,7 @@ public class ReceiptService {
         }
     }
 
+    @Transactional
     public String checkEnterpriseName(List<String> enterprises, String storeName, String receiptURL) {
         String longest = "";
         for(String name : enterprises) {
@@ -183,7 +188,7 @@ public class ReceiptService {
             }
         }
         if(!longest.isEmpty()) {
-            return longest;
+            return eventRepository.findByEnterpriseNameContaining(longest).getEnterpriseName();
         }
         throw new StockNotFoundException(storeName, receiptURL);
     }
@@ -191,6 +196,8 @@ public class ReceiptService {
     @Transactional
     public RewardResponseDTO giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
         try {
+            int existReceiptLogCount = receiptLogRepository.countByApprovalNumberAndDealTime(rewardRequestDTO.getApprovalNum(), rewardRequestDTO.getDealTime());
+            if(existReceiptLogCount > 0) throw new ExistingReceiptException(rewardRequestDTO.getImgURL());
             giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(), 2L, priceOfStock, amountOfStock);
             Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
             event.setRewardAmount(event.getRewardAmount() - amountOfStock);
@@ -198,12 +205,12 @@ public class ReceiptService {
 
             ReceiptLog receiptLog = ReceiptLog.builder()
                     .receiptLogKey(ReceiptLogKey.builder()
-                            .approvalNum(rewardRequestDTO.getApprovalNum())
+                            .approvalNumber(rewardRequestDTO.getApprovalNum())
                             .dealTime(rewardRequestDTO.getDealTime())
                             .build())
-                    .store(rewardRequestDTO.getStoreName())
+                    .storeName(rewardRequestDTO.getStoreName())
                     .price(rewardRequestDTO.getPrice())
-                    .imgUrl(rewardRequestDTO.getImgURL())
+                    .imgPath(rewardRequestDTO.getImgURL())
                     .enterpriseName(rewardRequestDTO.getEnterpriseName())
                     .memberId(memberId)
                     .build();
@@ -214,7 +221,9 @@ public class ReceiptService {
                     .amount(amountOfStock)
                     .build();
             return rewardResponseDTO;
-        } catch (Exception e) {
+        } catch (ExistingReceiptException e) {
+            throw e;
+        } catch (GiveStockErrorException e) {
             throw new GiveStockErrorException();
         }
     }

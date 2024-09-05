@@ -15,7 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 public class ReceiptLogKey implements Serializable {
     @Column
-    private String approvalNum;
+    private String approvalNumber;
     @Column
     private String dealTime;
 
@@ -24,11 +24,11 @@ public class ReceiptLogKey implements Serializable {
         if (this == o) return true;
         if (!(o instanceof ReceiptLogKey)) return false;
         ReceiptLogKey that = (ReceiptLogKey) o;
-        return approvalNum.equals(that.approvalNum) && dealTime.equals(that.dealTime);
+        return approvalNumber.equals(that.approvalNumber) && dealTime.equals(that.dealTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(approvalNum, dealTime);
+        return Objects.hash(approvalNumber, dealTime);
     }
 }

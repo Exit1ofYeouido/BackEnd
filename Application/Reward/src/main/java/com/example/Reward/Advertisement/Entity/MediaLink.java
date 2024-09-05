@@ -16,11 +16,11 @@ public class MediaLink {
     @Column(name="media_link_id")
     private Long id;
 
-    private String url;
+    private String uri;
 
-    private String thumnail;
+    private String thumbnail;
 
-    private String thumnailName;
+    private String thumbnailName;
 
     private String enterpriseName;
 
