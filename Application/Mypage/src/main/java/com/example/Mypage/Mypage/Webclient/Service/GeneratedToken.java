@@ -45,7 +45,7 @@ public class GeneratedToken {
             TokenInfo tokenInfo = TokenInfo
                     .builder()
                     .tokenValue(ACCESS_TOKEN)
-                    .id(1L)
+                    .typeNumber(1L)
                     .build();
             tokenInfoRepository.save(tokenInfo);
             return ACCESS_TOKEN;
