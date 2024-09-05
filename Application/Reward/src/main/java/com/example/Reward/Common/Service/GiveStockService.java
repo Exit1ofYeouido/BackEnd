@@ -60,7 +60,7 @@ public class GiveStockService {
                 .amount(amountOfStock)
                 .build();
 
-        kafkaTemplate.send("test-mo", giveStockProduceDTO);
+        kafkaTemplate.send("give-stock", giveStockProduceDTO);
     }
 
     public void giveAdStock(Long memId, double stockAmount, String code, String enterpriseName, int cost) {
