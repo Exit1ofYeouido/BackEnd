@@ -191,7 +191,7 @@ public class ReceiptService {
     @Transactional
     public RewardResponseDTO giveStockAndSaveReceipt(Long memberId, RewardRequestDTO rewardRequestDTO, Integer priceOfStock, Double amountOfStock) {
         try {
-            int existReceiptLogCount = receiptLogRepository.countByApprovalNumAndDealTime(rewardRequestDTO.getApprovalNum(), rewardRequestDTO.getDealTime());
+            int existReceiptLogCount = receiptLogRepository.countByApprovalNumberAndDealTime(rewardRequestDTO.getApprovalNum(), rewardRequestDTO.getDealTime());
             if(existReceiptLogCount > 0) throw new ExistingReceiptException(rewardRequestDTO.getImgURL());
             giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(), 2L, priceOfStock, amountOfStock);
             Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
