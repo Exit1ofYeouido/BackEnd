@@ -241,6 +241,5 @@ public class MyService {
                 .build();
 
         tradeRepository.save(stockTradeHistory);
-        log.info("주식 거래내역 저장 성공 => {}", stockTradeHistory.getId());
     }
 }
