@@ -64,7 +64,7 @@ public class SellService {
     @Value("${approval.uri}")
     private String stockPriceURI;
     private WebSocketConnectionManager connectionManager;
-    private final StockPriceSocketHandler stockPriceSocketHandler;
+    private StockPriceSocketHandler stockPriceSocketHandler;
 
     @Transactional
     public boolean saveStockSellRequest(Long memberId, StockSellRequestDto stockSellRequestDto) {
@@ -88,7 +88,7 @@ public class SellService {
         return true;
     }
 
-    @Scheduled(cron = "00 42 10,15 * * mon-fri")
+    @Scheduled(cron = "0 0 10,17 * * mon-fri")
     @Transactional
     public void processSellRequest() {
         SaleInfo marketInfo = saleInfoRepository.findById(2)
@@ -120,8 +120,8 @@ public class SellService {
             log.info("{} :: 소수점 주식 판매 종합 및 정산 완료", now);
 
         } catch (Exception e) {
+            //TODO: 커스텀 Exception 처리하기
             log.error("{} :: 소수점 판매 취합과정에서 오류가 발생했습니다. => {}", LocalDateTime.now(), e.getMessage());
-            //커스텀 Exception 처리하기
         }
 
     }
@@ -129,6 +129,10 @@ public class SellService {
     @Transactional
     @Scheduled(cron = "30 0 9 * * *")
     public void updateTodayMarketStatus() {
+        String approvalKey = apiService.updateMarketAccessKey();
+
+        stockPriceSocketHandler = new StockPriceSocketHandler(approvalKey, OPEN_STATUS);
+
         if (connectionManager == null) {
             WebSocketClient webSocketClient = new StandardWebSocketClient();
             connectionManager = new WebSocketConnectionManager(webSocketClient, stockPriceSocketHandler,
@@ -162,6 +166,7 @@ public class SellService {
 
     private boolean isOpenStockMarket() {
         try {
+            //TODO : 장 여부 확인에서 오류가 안발생하는지 추가 테스트 진행하기
             for (int i = 0; i < 3; i++) {
                 Thread.sleep(TEN_SECOND);
                 String response = stockPriceSocketHandler.getLatestMessage();
@@ -237,7 +242,7 @@ public class SellService {
             accountRepository.save(memberAccount);
 
             accountHistoryRepository.save(newAccountHistory(sellRequest, sellPrice, afterHoldPoint, memberAccount));
-
+            messageUtil.sendMessage("[StockCraft] 체결 알리미 \n 종목명 : " + sellRequest.getEnterpriseName() + "\n 판매금액 : " + sellPrice ,sellRequest.getMember().getPhoneNumber() + "원");
             updateMemberStockInfo(memberId, sellRequest);
         }
     }

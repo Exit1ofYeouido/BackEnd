@@ -3,7 +3,6 @@ package com.example.Mypage.Mypage.Webclient.Service;
 import com.example.Mypage.Mypage.Webclient.Dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -42,6 +41,10 @@ public class ApiService {
         int cost = Integer.parseInt(result.getOutput().getStck_prpr());
 
         return cost;
+    }
+
+    public String updateMarketAccessKey() {
+        return generatedToken.updateSocketToken();
     }
 
 

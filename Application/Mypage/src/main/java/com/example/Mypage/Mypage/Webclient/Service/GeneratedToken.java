@@ -2,11 +2,14 @@ package com.example.Mypage.Mypage.Webclient.Service;
 
 
 
+import com.example.Mypage.Mypage.Exception.NotFoundTokenException;
+import com.example.Mypage.Mypage.Webclient.Entity.ApprovalKey;
 import com.example.Mypage.Mypage.Webclient.Entity.TokenInfo;
 import com.example.Mypage.Mypage.Webclient.Dto.OauthInfoDto;
 import com.example.Mypage.Mypage.Webclient.Repository.TokenInfoRepository;
 import com.example.Mypage.Mypage.Webclient.Entity.Token;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class GeneratedToken {
@@ -27,6 +31,7 @@ public class GeneratedToken {
     private String APPSECRET ;
 
     public static String ACCESS_TOKEN;
+    public static String SOCKET_TOKEN;
 
     WebClient client=WebClient.create();
 
@@ -39,14 +44,22 @@ public class GeneratedToken {
             System.out.println(ACCESS_TOKEN);
             TokenInfo tokenInfo = TokenInfo
                     .builder()
-                    .accessToken(ACCESS_TOKEN)
+                    .tokenValue(ACCESS_TOKEN)
                     .build();
             tokenInfoRepository.save(tokenInfo);
             return ACCESS_TOKEN;
         }
-        String Is_ACCESS_TOKEN = tokenInfos.get(0).getAccessToken();
+        String Is_ACCESS_TOKEN = tokenInfos.get(0).getTokenValue();
 
         return Is_ACCESS_TOKEN;
+    }
+
+    public String getSocketToken() {
+        TokenInfo tokenInfos = tokenInfoRepository.findById(2L).orElseThrow(() -> new NotFoundTokenException("소켓 통신 접근키를 찾을 수 없습니다."));
+
+        String APPROVAL_TOKEN = tokenInfos.getTokenValue();
+
+        return APPROVAL_TOKEN;
     }
 
     public String generateAccessToken(){
@@ -74,5 +87,36 @@ public class GeneratedToken {
 
         return ACCESS_TOKEN;
 
+    }
+
+    public String updateSocketToken(){
+
+        String url = "https://openapi.koreainvestment.com:9443/oauth2/Approval";
+
+        OauthInfoDto bodyOauthInfoDto = OauthInfoDto.builder()
+                .grant_type("client_credentials")
+                .appkey(APPKEY)
+                .secretkey(APPSECRET)
+                .build();
+
+        Mono<ApprovalKey> mono = client.post()
+                .uri(url)
+                .header("content-type", "application/json")
+                .bodyValue(bodyOauthInfoDto)
+                .retrieve()
+                .bodyToMono(ApprovalKey.class);
+
+        ApprovalKey approvalKey = mono.block();
+        if (approvalKey == null) {
+            throw new RuntimeException("소켓 접속키를 가져올 수 없습니다.");
+        }
+
+        SOCKET_TOKEN = approvalKey.getApproval_key();
+
+        TokenInfo tokenInfo = tokenInfoRepository.findById(2L).orElse(null);
+        tokenInfo.setTokenValue(SOCKET_TOKEN);
+        tokenInfoRepository.save(tokenInfo);
+
+        return SOCKET_TOKEN;
     }
 }
