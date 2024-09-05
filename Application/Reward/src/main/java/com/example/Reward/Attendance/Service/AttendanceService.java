@@ -47,6 +47,7 @@ public class AttendanceService {
         return getAttendanceResponseDTO;
     }
 
+    @Transactional
     public Boolean attend(Long memberId) {
         Attendance attendance = attendanceRepository.findByMemberId(memberId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
