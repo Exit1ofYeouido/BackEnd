@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 public class ReceiptLog {
     @EmbeddedId
     private ReceiptLogKey receiptLogKey;
-    private String store;
+    private String storeName;
     private String price;
-    private String imgUrl;
+    private String imgPath;
     private String enterpriseName;
     private Long memberId;
 }

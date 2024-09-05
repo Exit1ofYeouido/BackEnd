@@ -15,7 +15,6 @@ public class Event {
     @Column(name="event_id")
     private Long id;
 
-    @Column(name="code")
     private String stockCode;
 
     private String enterpriseName;
