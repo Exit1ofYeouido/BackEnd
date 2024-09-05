@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class KafkaService {
@@ -17,7 +19,10 @@ public class KafkaService {
     @KafkaListener(topics="give-stock", groupId = "search")
     public void listener(GiveStockDTO giveStockDTO) {
         Stock stock = stockRepository.findByCode(giveStockDTO.getCode());
-        MemberStockHolding memberStockHolding = new MemberStockHolding(giveStockDTO.getMemId(), stock);
-        memberStockHoldingRepository.save(memberStockHolding);
+        Optional<MemberStockHolding> isHolding = memberStockHoldingRepository.findByMemberIdAndStockCode(giveStockDTO.getMemId(), giveStockDTO.getCode());
+        if(isHolding.isEmpty()) {
+            MemberStockHolding memberStockHolding = new MemberStockHolding(giveStockDTO.getMemId(), stock);
+            memberStockHoldingRepository.save(memberStockHolding);
+        }
     }
 }
