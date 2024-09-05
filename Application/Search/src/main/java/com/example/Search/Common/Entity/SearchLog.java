@@ -19,7 +19,7 @@ public class SearchLog {
 
     private Long memberId;
 
-    private String code;
+    private String enterpriseName;
 
     private String searchTime;
 

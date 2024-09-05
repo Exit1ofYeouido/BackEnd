@@ -19,6 +19,6 @@ public class MemberStockHolding {
     private Long memberId;
 
     @ManyToOne
-    @JoinColumn(name = "code")
+    @JoinColumn(name = "stock_code")
     private Stock stock;
 }

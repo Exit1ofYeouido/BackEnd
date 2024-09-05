@@ -19,10 +19,10 @@ public class GeneratedToken {
 
     private final TokenInfoRepository tokenInfoRepository;
 
-    @Value("${korea.investment.api.key}")
+    @Value("${app.key}")
     private String APPKEY ;
 
-    @Value("${korea.investment.api.secret}")
+    @Value("${app.secret}")
     private String APPSECRET ;
 
     public static String ACCESS_TOKEN;
@@ -35,9 +35,10 @@ public class GeneratedToken {
 
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
-            System.out.println(ACCESS_TOKEN);
+
             TokenInfo tokenInfo = TokenInfo
                     .builder()
+                    .id(1L)
                     .accessToken(ACCESS_TOKEN)
                     .build();
             tokenInfoRepository.save(tokenInfo);

@@ -23,10 +23,10 @@ public class KisService {
     private final GeneratedToken generatedToken;
 
 
-    @Value("${korea.investment.api.key}")
+    @Value("${app.key}")
     private String apiKey;
 
-    @Value("${korea.investment.api.secret}")
+    @Value("${app.secret}")
     private String apiSecret;
 
     public KisService(@Value("${korea.investment.api.url}") String apiUrl, GeneratedToken generatedToken) {

@@ -30,7 +30,7 @@ public class KafkaConsumeConfig {
         config.put(ConsumerConfig.GROUP_ID_CONFIG,"group_1");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,StringDeserializer.class);
-        config.put(JsonSerializer.TYPE_MAPPINGS, KafkaUtil.getJsonTypeMapping();
+
 
         return new DefaultKafkaConsumerFactory<>(config);
     }

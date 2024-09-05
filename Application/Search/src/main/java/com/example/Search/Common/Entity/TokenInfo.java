@@ -18,9 +18,10 @@ public class TokenInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="type_number")
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name="TOKEN_VALUE",columnDefinition = "TEXT")
     private String accessToken;
 
 }
