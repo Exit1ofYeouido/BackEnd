@@ -60,7 +60,7 @@ public class MyService {
 
         double allCost = 0;
         double currentAllCost = 0;
-        if (memberStocks.isEmpty()){
+        if (memberStocks.isEmpty()) {
             return "0";
         }
 
@@ -166,7 +166,7 @@ public class MyService {
             memberStockRepository.save(memberStock);
 
         } else {
-            MemberStock new_memberStock = MemberStock.builder()
+            memberStock = MemberStock.builder()
                     .member(member)
                     .stockName(giveStockDto.getEnterpriseName())
                     .amount(giveStockDto.getAmount())
@@ -176,8 +176,9 @@ public class MyService {
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
-            memberStockRepository.save(new_memberStock);
+            memberStockRepository.save(memberStock);
         }
+
         addStockTrade(giveStockDto, member, memberStock);
     }
 

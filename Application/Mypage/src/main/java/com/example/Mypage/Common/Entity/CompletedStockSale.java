@@ -30,6 +30,7 @@ public class CompletedStockSale {
     @Setter
     private double amount;
 
+    @Column(name = "sold_price")
     private int soldPrice;
 
     private LocalDateTime soldTime;
