@@ -56,7 +56,7 @@ public class TokenService {
         String newAccessToken = jwtUtil.createJwt("access", memberId, role, TokenExpiration.ACCESS);
         String newRefreshToken = jwtUtil.createJwt("refresh", memberId, role, TokenExpiration.REFRESH);
 
-        updateRefreshToken(memberId, newAccessToken);
+        updateRefreshToken(memberId, newRefreshToken);
 
         response.setHeader("accssToken", newAccessToken);
         response.addCookie(createCookie("refreshToken", newRefreshToken));
