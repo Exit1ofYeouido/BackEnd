@@ -50,11 +50,4 @@ public class AdController {
         return ResponseEntity.ok(giveStockResponseDto);
 
     }
-
-    @GetMapping("/detail")
-    @Operation(description = "기업 세부정보 소개")
-    public ResponseEntity<DetailEnterPriseResponseDto> detailEnterprise(@RequestParam ("enterpriseName") String enterpriseName){
-        DetailEnterPriseResponseDto detailEnterPriseResponseDto=adService.getEnterpriseDetail(enterpriseName);
-        return ResponseEntity.ok(detailEnterPriseResponseDto);
-    }
 }
