@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 public interface AuthRepository extends JpaRepository<MemberAuth, Long> {
 
     public Optional<MemberAuth> findByMemberName(String memberName);
-    
+
     public boolean existsByMemberName(String memberName);
+
+    public boolean existsByPhoneNumber(String phoneNumber);
 }
