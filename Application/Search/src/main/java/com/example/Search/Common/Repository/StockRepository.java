@@ -17,4 +17,8 @@ public interface StockRepository extends JpaRepository<Stock,String> {
 
     @Query(value = "SELECT s FROM Stock s ORDER BY RAND()")
     List<Stock> findRandomStocks(Pageable pageable);
+
+    Stock findByCode(String code);
+
+    Stock findByName(String enterpriseName);
 }
