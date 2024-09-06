@@ -136,11 +136,4 @@ public class AdService {
         return GiveStockResponseDto.givetostock(giveStockRequestDto.getEnterpriseName(),resultDto.getAmount());
 
     }
-
-    @Transactional(readOnly=true)
-    public DetailEnterPriseResponseDto getEnterpriseDetail(String enterpriseName) {
-
-        Event event=eventRepository.findByEnterpriseNameContainingAndContentId(enterpriseName, 1L);
-        return DetailEnterPriseResponseDto.of(event);
-    }
 }
