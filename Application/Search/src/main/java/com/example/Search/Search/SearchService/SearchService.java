@@ -35,7 +35,7 @@ public class SearchService {
     public List<StocksDTO> getStocks(Long memberId) {
         List<StocksDTO> result = new ArrayList<>();
 
-        List<MemberStock> memberStocks = memberStockRepository.findTop5ByMemberIdOrderByCountDesc(memberId, PageRequest.of(0, 5));
+        List<MemberStock> memberStocks = memberStockRepository.findTop5ByMemberIdOrderByAmountDesc(memberId, PageRequest.of(0, 5));
         List<String> memberStockCodes = new ArrayList<>();
 
         for (MemberStock memberStock : memberStocks) {
@@ -87,7 +87,7 @@ public class SearchService {
             String previousPrice = kisService.getPreviousPrice(stock.getCode());
             String previousRate = kisService.getPreviousRate(stock.getCode());
 
-            Double availableAmount = memberStockRepository.findAvailableCountByMemberIdAndStockCode(memberId, stock.getCode()).orElse(0.0);
+            Double availableAmount = memberStockRepository.findAvailableAmountByMemberIdAndStockCode(memberId, stock.getCode()).orElse(0.0);
             return new StockDetailDTO(stock.getName(), stock.getCode(), currentPrice.intValue(), availableAmount, previousPrice, previousRate);
         } else {
             return null;

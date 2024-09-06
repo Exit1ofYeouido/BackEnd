@@ -28,7 +28,7 @@ public class StockTradeHistory {
 
     private String tradeType;
 
-    private double count;
+    private double amount;
 
     private LocalDateTime createdAt;
 

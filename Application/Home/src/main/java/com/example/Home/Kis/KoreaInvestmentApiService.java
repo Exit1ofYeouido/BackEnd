@@ -1,5 +1,6 @@
 package com.example.Home.Kis;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -7,21 +8,19 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class KoreaInvestmentApiService {
 
-    private final WebClient webClient;
     private final GeneratedToken generatedToken;
 
-    @Value("${korea.investment.api.key}")
+    @Value("${app.key}")
     private String apiKey;
 
-    @Value("${korea.investment.api.secret}")
+    @Value("${app.secretkey}")
     private String apiSecret;
 
-    public KoreaInvestmentApiService(@Value("${korea.investment.api.url}") String apiUrl, GeneratedToken generatedToken) {
-        this.webClient = WebClient.create(apiUrl);
-        this.generatedToken = generatedToken;
-    }
+
+    WebClient webClient=WebClient.create("https://openapi.koreainvestment.com:9443");
 
     public Long getCurrentPrice(String stockCode) {
         try {

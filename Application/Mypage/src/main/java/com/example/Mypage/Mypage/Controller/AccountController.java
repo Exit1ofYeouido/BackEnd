@@ -2,6 +2,7 @@ package com.example.Mypage.Mypage.Controller;
 
 import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
@@ -12,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -60,14 +63,30 @@ public class AccountController {
 
     @PostMapping("/stocks/sell")
     @Operation(description = "나의 주식 판매하기")
-    public ResponseEntity<?> sellMyStock(@RequestHeader("memberId") Long memberId,
-                                         @RequestBody StockSellRequestDto stockSellRequestDto) {
+    public ResponseEntity<String> sellMyStock(@RequestHeader("memberId") Long memberId,
+                                              @RequestBody StockSellRequestDto stockSellRequestDto) {
         if (sellService.saveStockSellRequest(memberId, stockSellRequestDto)) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(stockSellRequestDto.getStockName() + "주식 " + stockSellRequestDto.getSellAmount()
                             + "개 판매등록을 하였습니다.");
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("판매 요청에 실패했습니다.");
+    }
 
+    @GetMapping("/stocks/pending")
+    @Operation(description = "나의 소수점 주식 판매대기 목록 조회")
+    public ResponseEntity<MyStockSaleRequestsResponseDto> getMySellPendingStocks(
+            @RequestHeader("memberId") Long memberId) {
+        MyStockSaleRequestsResponseDto myStockSaleRequestsResponseDto = accountService.getMyStocksSaleRequests(
+                memberId);
+        return new ResponseEntity<>(myStockSaleRequestsResponseDto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/api/my/stocks/pending/{saleId}")
+    @Operation(description = "나의 소수점 주식 판매요청 취소")
+    public ResponseEntity<String> cancelMySellPendingStocks(@RequestHeader("memberId") Long memberId,
+                                                            @PathVariable("saleId") Long saleId) {
+        accountService.deleteMyStocksSaleRequest(saleId, memberId);
+        return ResponseEntity.ok("return ResponseEntity.ok(\"정상적으로 주문 취소처리되었습니다.\");");
     }
 }

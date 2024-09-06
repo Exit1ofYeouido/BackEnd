@@ -1,10 +1,7 @@
 package com.example.Home.Common.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -16,10 +13,9 @@ import java.time.LocalDateTime;
 public class TokenInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long typeNumber;
 
     @Column(columnDefinition = "TEXT")
-    private String accessToken;
+    private String tokenValue;
 
 }

@@ -21,4 +21,9 @@ public class MemberStockHolding {
     @ManyToOne
     @JoinColumn(name = "stock_code")
     private Stock stock;
+
+    public MemberStockHolding(Long memberId, Stock stock) {
+        this.memberId = memberId;
+        this.stock = stock;
+    }
 }

@@ -31,9 +31,6 @@ springdoc:
   default-produces-media-type: application/json;charset=UTF-8
   packages-to-scan: com.example
 
-korea:
-  investment:
-    api:
-      key: ${APP_KEY}
-      secret: ${APP_SECRET}
-      url: ${KOREA_INVESTMENT_API_URL}
+app:
+  key: ${APP_KEY}
+  secretkey: ${APP_SECRET}

@@ -91,7 +91,7 @@ public class SellService {
         return true;
     }
 
-    @Scheduled(cron = "0 0 10,17 * * mon-fri")
+    @Scheduled(cron = "0 0 10,15 * * mon-fri")
     @Transactional
     public void processSellRequest() {
         SaleInfo marketInfo = saleInfoRepository.findById(2)
@@ -144,7 +144,8 @@ public class SellService {
             connectionManager.start();
         }
 
-        SaleInfo saleInfo = saleInfoRepository.findById(2).orElseThrow(() -> new IllegalStateException("SaleInfo Table 상태를 확인하세요."));
+        SaleInfo saleInfo = saleInfoRepository.findById(2)
+                .orElseThrow(() -> new IllegalStateException("SaleInfo Table 상태를 확인하세요."));
         if (isOpenStockMarket()) {
             saleInfo.setIdx(1);
         } else {
@@ -238,19 +239,23 @@ public class SellService {
 
             Long memberId = sellRequest.getMember().getId();
 
-            Account memberAccount = accountRepository.findByMemberId(memberId).orElseThrow(() -> new AccountNotFoundException("포인트를 지급할 계좌 탐색과정에서 오류 발생"));
+            Account memberAccount = accountRepository.findByMemberId(memberId)
+                    .orElseThrow(() -> new AccountNotFoundException("포인트를 지급할 계좌 탐색과정에서 오류 발생"));
             int sellPrice = getSellPrice(sellRequest, curStockPrice);
             int afterHoldPoint = memberAccount.getPoint() + sellPrice;
             memberAccount.setPoint(afterHoldPoint);
             accountRepository.save(memberAccount);
 
             accountHistoryRepository.save(newAccountHistory(sellRequest, sellPrice, afterHoldPoint, memberAccount));
-            messageUtil.sendMessage("[StockCraft] 체결 알리미 \n 종목명 : " + sellRequest.getEnterpriseName() + "\n 판매금액 : " + sellPrice ,sellRequest.getMember().getPhoneNumber() + "원");
+            messageUtil.sendMessage(
+                    "[StockCraft] 체결 알리미 \n 종목명 : " + sellRequest.getEnterpriseName() + "\n 판매금액 : " + sellPrice,
+                    sellRequest.getMember().getPhoneNumber() + "원");
             updateMemberStockInfo(memberId, sellRequest);
         }
     }
 
-    private static <T extends StockSaleRequest> AccountHistory newAccountHistory(T sellRequest, int sellPrice, int afterHoldPoint,
+    private static <T extends StockSaleRequest> AccountHistory newAccountHistory(T sellRequest, int sellPrice,
+                                                                                 int afterHoldPoint,
                                                                                  Account memberAccount) {
         return AccountHistory.builder()
                 .requestPoint(sellPrice)
@@ -265,7 +270,8 @@ public class SellService {
     @Transactional
     public void updateMemberStockInfo(Long memberId, StockSaleRequest sellRequest) {
         MemberStock memberStock = memberStockRepository.findByMemberIdAndStockCode(memberId,
-                sellRequest.getStockCode()).orElseThrow(() -> new AccountNotFoundException("유저의 보유주식 탐색과정에서 오류가 발생했습니다."));
+                        sellRequest.getStockCode())
+                .orElseThrow(() -> new AccountNotFoundException("유저의 보유주식 탐색과정에서 오류가 발생했습니다."));
 
         memberStock.setAmount(memberStock.getAmount() - sellRequest.getAmount());
         memberStockRepository.save(memberStock);
@@ -274,7 +280,7 @@ public class SellService {
                 .memberStock(memberStock)
                 .member(sellRequest.getMember())
                 .stockName(sellRequest.getEnterpriseName())
-                .count(sellRequest.getAmount())
+                .amount(sellRequest.getAmount())
                 .tradeType("out")
                 .build()
         );

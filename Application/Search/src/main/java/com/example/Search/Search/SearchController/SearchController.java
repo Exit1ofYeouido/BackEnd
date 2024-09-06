@@ -2,6 +2,7 @@ package com.example.Search.Search.SearchController;
 
 
 
+import com.example.Search.Log.Service.LogService;
 import com.example.Search.Search.Api.KisService;
 import com.example.Search.Search.SearchDTO.StockDetailDTO;
 import com.example.Search.Search.SearchDTO.StockPriceListDTO;
@@ -18,10 +19,12 @@ public class SearchController {
 
     private final SearchService searchService;
     private final KisService kisService;
+    private final LogService logService;
 
-    public SearchController(SearchService searchService, KisService kisService) {
+    public SearchController(SearchService searchService, KisService kisService, LogService logService) {
         this.searchService = searchService;
         this.kisService = kisService;
+        this.logService = logService;
     }
 
     @GetMapping("/stocks")
@@ -32,6 +35,7 @@ public class SearchController {
     @GetMapping("/stock/{code}")
     public StockDetailDTO getStock(@PathVariable String code,
                                    @RequestHeader String memberId) {
+        logService.recordSearchLog(Long.valueOf(memberId), code);
         return searchService.getStockByCode(code, Long.valueOf(memberId));
     }
 
