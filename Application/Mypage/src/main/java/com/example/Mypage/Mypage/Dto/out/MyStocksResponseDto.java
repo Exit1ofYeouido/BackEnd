@@ -13,5 +13,6 @@ public class MyStocksResponseDto {
 
     private String name;
     private Double holdStockCount;
+    private int averagePrice;
     private String earningRate;
 }

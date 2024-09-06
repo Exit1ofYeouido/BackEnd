@@ -79,6 +79,7 @@ public class AccountService {
             myStocks.add(MyStocksResponseDto.builder()
                     .name(memberStock.getStockName())
                     .earningRate(getEarningRate(memberStock))
+                    .averagePrice(memberStock.getAveragePrice())
                     .holdStockCount(memberStock.getAmount())
                     .build());
         }
