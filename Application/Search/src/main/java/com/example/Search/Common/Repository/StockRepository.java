@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface StockRepository extends JpaRepository<Stock,String> {
-    @Query(value = "SELECT * FROM mo.stock s WHERE s.code NOT IN :excludeCodes ORDER BY RAND() LIMIT :limitCount", nativeQuery = true)
+    @Query(value = "SELECT s FROM Stock s WHERE s.code NOT IN :excludeCodes ORDER BY RAND() LIMIT :limitCount")
     List<Stock> findRandomStocksExcluding(@Param("excludeCodes") List<String> excludeCodes, @Param("limitCount") int limitCount);
 
     @Query(value = "SELECT s FROM Stock s WHERE s.name LIKE %:keyword% ORDER BY s.name")
