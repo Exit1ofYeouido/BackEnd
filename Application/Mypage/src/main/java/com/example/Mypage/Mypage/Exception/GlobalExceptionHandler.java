@@ -2,6 +2,7 @@ package com.example.Mypage.Mypage.Exception;
 
 import jakarta.persistence.PessimisticLockException;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -57,5 +58,25 @@ public class GlobalExceptionHandler {
                 .time(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errorResponseDto);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoSuchElementException(NoSuchElementException e) {
+        log.error(e.getMessage());
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .message(e.getMessage())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadRequestException(BadRequestException e) {
+        log.error(e.getMessage());
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .message(e.getMessage())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
     }
 }

@@ -3,20 +3,29 @@ package com.example.Mypage.Mypage.Service;
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.AccountHistory;
 import com.example.Mypage.Common.Entity.MemberStock;
+import com.example.Mypage.Common.Entity.SaleInfo;
+import com.example.Mypage.Common.Entity.StockSaleRequest;
 import com.example.Mypage.Common.Entity.StockTradeHistory;
 import com.example.Mypage.Common.Repository.AccountHistoryRepository;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
+import com.example.Mypage.Common.Repository.SaleInfoRepository;
+import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
+import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
+import com.example.Mypage.Mypage.Exception.BadRequestException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +33,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -35,6 +45,9 @@ public class AccountService {
     private final ApiService apiService;
     private final MemberStockRepository memberStockRepository;
     private final TradeRepository tradeRepository;
+    private final StockSaleRequestARepository stockSaleRequestARepository;
+    private final StockSaleRequestBRepository stockSaleRequestBRepository;
+    private final SaleInfoRepository saleInfoRepository;
 
     public GetPointResponseDto getPoint(Long memberId) {
         try {
@@ -81,10 +94,57 @@ public class AccountService {
                 .map(stockTradeHistory -> MyStocksHistoryResponseDto.builder()
                         .name(stockTradeHistory.getStockName())
                         .type(stockTradeHistory.getTradeType())
-                        .amount(String.format("%.6f", stockTradeHistory.getCount()))
-                        .date(stockTradeHistory.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
+                        .amount(String.format("%.6f", stockTradeHistory.getAmount()))
+                        .date(stockTradeHistory.getCreatedAt()
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
                         .build())
                 .toList();
+    }
+
+    public MyStockSaleRequestsResponseDto getMyStocksSaleRequests(Long memberId) {
+        SaleInfo saleInfo = saleInfoRepository.findById(1)
+                .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
+        int index = (saleInfo.getIdx() + 1) % 2;
+
+        List<? extends StockSaleRequest> stockSaleRequests;
+
+        if (index == 0) {
+            stockSaleRequests = stockSaleRequestARepository.findAllByMemberId(memberId);
+        } else {
+            stockSaleRequests = stockSaleRequestBRepository.findAllByMemberId(memberId);
+        }
+        List<MyStockSaleRequestResponseDto> responseDtos = stockSaleRequests.stream()
+                .map(MyStockSaleRequestResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new MyStockSaleRequestsResponseDto(responseDtos);
+    }
+
+    @Transactional
+    public boolean deleteMyStocksSaleRequest(Long saleId, Long memberId) {
+        SaleInfo saleInfo = saleInfoRepository.findById(1)
+                .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
+
+        StockSaleRequest stockSaleRequest;
+
+        int index = (saleInfo.getIdx() + 1) % 2;
+
+        if (index == 0) {
+            stockSaleRequest = stockSaleRequestARepository.findById(saleId)
+                    .orElseThrow(() -> new BadRequestException("보유한 주식만 취소요청이 가능합니다."));
+            stockSaleRequestARepository.deleteById(saleId);
+        } else {
+            stockSaleRequest = stockSaleRequestBRepository.findById(saleId)
+                    .orElseThrow(() -> new BadRequestException("보유한 주식만 취소요청이 가능합니다."));
+            stockSaleRequestBRepository.deleteById(saleId);
+        }
+
+        MemberStock memberStock = memberStockRepository.findByMemberIdAndStockCode(memberId,
+                        stockSaleRequest.getStockCode())
+                .orElseThrow(() -> new NoSuchElementException("판매를 취소과정에서 오류가 발생했습니다."));
+
+        memberStock.setAvailableAmount(memberStock.getAvailableAmount() + stockSaleRequest.getAmount());
+        return true;
     }
 
     private String getEarningRate(MemberStock memberStock) {
