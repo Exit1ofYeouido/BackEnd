@@ -33,4 +33,4 @@ springdoc:
 
 app:
   key: ${APP_KEY}
-  secret: ${APP_SECRET}
+  secret: ${APP_SECRETKEY}
