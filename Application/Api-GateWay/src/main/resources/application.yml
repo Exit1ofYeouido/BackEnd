@@ -48,7 +48,7 @@ spring:
           filters:
             - RewritePath=${service-url}/my/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
-            - RewritePath=${service-url}/mypage/(?<path>.*),/$\{path}
+            - RewritePath=${service-url}/my/(?<path>.*),/$\{path}
         - id: reward
           uri: http://43.203.224.71:8083
           predicates:
@@ -70,7 +70,7 @@ spring:
           filters:
               - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
         - id: home
-          uri: http://43.203.198.57:8086
+          uri: http://3.38.192.206:8086
           predicates:
             - Path= ${service-url}/home/**
           filters:
@@ -94,6 +94,8 @@ springdoc:
         name: API Gateway Service
       - url: ${service-url}/basic/v3/api-docs
         name: Basic
+      - url: ${service-url}/auth/v3/api-docs
+        name: Auth
       - url: ${service-url}/my/v3/api-docs
         name: Mypage
       - url: ${service-url}/reward/v3/api-docs
