@@ -1,6 +1,5 @@
 package com.example.Mypage.Mypage.Dto.out;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +15,6 @@ public class GetPointHistoryResponseDto {
     private Integer requestPoint;
     private Integer resultPoint;
     private String type;
-    private LocalDateTime createdAt;
+    private String date;
 
 }

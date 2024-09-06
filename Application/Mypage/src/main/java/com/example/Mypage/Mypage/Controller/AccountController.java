@@ -82,7 +82,7 @@ public class AccountController {
         return new ResponseEntity<>(myStockSaleRequestsResponseDto, HttpStatus.OK);
     }
 
-    @DeleteMapping("/api/my/stocks/pending/{saleId}")
+    @DeleteMapping("/stocks/pending/{saleId}")
     @Operation(description = "나의 소수점 주식 판매요청 취소")
     public ResponseEntity<String> cancelMySellPendingStocks(@RequestHeader("memberId") Long memberId,
                                                             @PathVariable("saleId") Long saleId) {

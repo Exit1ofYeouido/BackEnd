@@ -79,6 +79,7 @@ public class AccountService {
             myStocks.add(MyStocksResponseDto.builder()
                     .name(memberStock.getStockName())
                     .earningRate(getEarningRate(memberStock))
+                    .averagePrice(memberStock.getAveragePrice())
                     .holdStockCount(memberStock.getAmount())
                     .build());
         }
@@ -168,7 +169,8 @@ public class AccountService {
                         .requestPoint(accountHistory.getRequestPoint())
                         .resultPoint(accountHistory.getResultPoint())
                         .type(accountHistory.getType())
-                        .createdAt(accountHistory.getCreatedAt())
+                        .date(accountHistory.getCreatedAt()
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
                         .build())
                 .collect(Collectors.toList());
     }
