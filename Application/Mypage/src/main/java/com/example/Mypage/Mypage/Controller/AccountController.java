@@ -5,6 +5,7 @@ import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.SellService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,6 +60,15 @@ public class AccountController {
                                                                                @RequestParam(defaultValue = "5") int size) {
 
         return ResponseEntity.ok(accountService.getMyStocksHistory(memberId, index, size));
+    }
+
+    @GetMapping("/stocks/pre-sell/{stockCode}")
+    @Operation(description = "나의 주식 판매수량 조건확인 api")
+    public ResponseEntity<StockSaleConditionResponseDto> getMyStockSellCondition(
+            @RequestHeader("memberId") Long memberId, @PathVariable String stockCode) {
+        StockSaleConditionResponseDto stockSaleConditionResponseDto = accountService.getCurrentStocksSellCondition(
+                memberId, stockCode);
+        return ResponseEntity.ok(stockSaleConditionResponseDto);
     }
 
     @PostMapping("/stocks/sell")

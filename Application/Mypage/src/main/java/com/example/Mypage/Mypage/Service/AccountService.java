@@ -19,9 +19,11 @@ import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.BadRequestException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
+import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,7 @@ public class AccountService {
 
     public static final int PENDING_TABLE_ID = 1;
     public static final int MARKET_TABLE_ID = 2;
+    public static final double MIN_SALE_PRICE = 1000;
 
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
@@ -87,6 +90,16 @@ public class AccountService {
                     .build());
         }
         return myStocks;
+    }
+
+    @Transactional
+    public StockSaleConditionResponseDto getCurrentStocksSellCondition(Long memberId, String stockCode) {
+        int curStockPrice = apiService.getPrice(stockCode);
+        double minSaleAmount = MIN_SALE_PRICE / (double) curStockPrice;
+
+        MemberStock memberStock = memberStockRepository.findByMemberIdAndStockCode(memberId, stockCode).orElse(null);
+
+        return createResponseDto(memberStock, minSaleAmount);
     }
 
     public List<MyStocksHistoryResponseDto> getMyStocksHistory(Long memberId, int index, int limit) {
@@ -176,5 +189,21 @@ public class AccountService {
                                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private StockSaleConditionResponseDto createResponseDto(MemberStock memberStock, double minSaleAmount) {
+        String holdingAmount = memberStock != null ? formatSellAmount(memberStock.getAvailableAmount()) : "0";
+        boolean isSellable = memberStock != null;
+
+        return StockSaleConditionResponseDto.builder()
+                .holdingAmount(holdingAmount)
+                .minSaleAmount(formatSellAmount(minSaleAmount))
+                .isSellable(isSellable)
+                .build();
+    }
+
+    private String formatSellAmount(double amount) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.######");
+        return decimalFormat.format(amount);
     }
 }
