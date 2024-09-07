@@ -1,22 +1,22 @@
 package com.example.Search.Search.SearchService;
 
 
+import com.example.Search.Common.Entity.MemberStock;
+import com.example.Search.Common.Entity.Stock;
+import com.example.Search.Common.Repository.MemberStockRepository;
+import com.example.Search.Common.Repository.StockRepository;
 import com.example.Search.Search.Api.KisService;
 import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
+import com.example.Search.Search.SearchDTO.SearchResponseDto;
 import com.example.Search.Search.SearchDTO.StockDetailDTO;
 import com.example.Search.Search.SearchDTO.StockPriceListDTO;
 import com.example.Search.Search.SearchDTO.StocksDTO;
-import com.example.Search.Common.Entity.MemberStock;
-import com.example.Search.Common.Repository.MemberStockRepository;
-import com.example.Search.Common.Entity.Stock;
-import com.example.Search.Common.Repository.StockRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SearchService {
@@ -26,7 +26,8 @@ public class SearchService {
     private final MemberStockRepository memberStockRepository;
 
 
-    public SearchService(StockRepository stockRepository, KisService kisService, MemberStockRepository memberStockRepository) {
+    public SearchService(StockRepository stockRepository, KisService kisService,
+                         MemberStockRepository memberStockRepository) {
         this.stockRepository = stockRepository;
         this.kisService = kisService;
         this.memberStockRepository = memberStockRepository;
@@ -35,7 +36,8 @@ public class SearchService {
     public List<StocksDTO> getStocks(Long memberId) {
         List<StocksDTO> result = new ArrayList<>();
 
-        List<MemberStock> memberStocks = memberStockRepository.findTop5ByMemberIdOrderByAmountDesc(memberId, PageRequest.of(0, 5));
+        List<MemberStock> memberStocks = memberStockRepository.findTop5ByMemberIdOrderByAmountDesc(memberId,
+                PageRequest.of(0, 5));
         List<String> memberStockCodes = new ArrayList<>();
 
         for (MemberStock memberStock : memberStocks) {
@@ -53,7 +55,6 @@ public class SearchService {
         if (remainingCount > 0) {
             List<Stock> randomStocks;
             if (memberStockCodes.isEmpty()) {
-
                 randomStocks = stockRepository.findRandomStocks(PageRequest.of(0, remainingCount));
             } else {
 
@@ -73,29 +74,34 @@ public class SearchService {
 
         return result;
     }
-    private StocksDTO createStocksDTO (Stock stock){
-        Long currentPrice = kisService.getCurrentPrice(stock.getCode());
-        String previousPrice = kisService.getPreviousPrice(stock.getCode());
-        String previousRate = kisService.getPreviousRate(stock.getCode());
-        return new StocksDTO(stock.getName(), stock.getCode(), currentPrice.intValue(), previousPrice, previousRate);
+
+    private StocksDTO createStocksDTO(Stock stock) {
+
+        SearchResponseDto searchResponseDto = kisService.getCurrentPrice(stock.getCode());
+
+        return new StocksDTO(stock.getName(), stock.getCode(), searchResponseDto.getCurrentPrice().intValue(),
+                searchResponseDto.getPreviousPrice(), searchResponseDto.getPreviousRate());
     }
+
     public StockDetailDTO getStockByCode(String code, Long memberId) {
         Optional<Stock> stockOptional = stockRepository.findById(code);
         if (stockOptional.isPresent()) {
             Stock stock = stockOptional.get();
-            Long currentPrice = kisService.getCurrentPrice(stock.getCode());
-            String previousPrice = kisService.getPreviousPrice(stock.getCode());
-            String previousRate = kisService.getPreviousRate(stock.getCode());
 
-            Double availableAmount = memberStockRepository.findAvailableAmountByMemberIdAndStockCode(memberId, stock.getCode()).orElse(0.0);
-            return new StockDetailDTO(stock.getName(), stock.getCode(), currentPrice.intValue(), availableAmount, previousPrice, previousRate);
+            SearchResponseDto searchResponseDto = kisService.getCurrentPrice(stock.getCode());
+
+            Double availableAmount = memberStockRepository.findAvailableAmountByMemberIdAndStockCode(memberId,
+                    stock.getCode()).orElse(0.0);
+            return new StockDetailDTO(stock.getName(), stock.getCode(), searchResponseDto.getCurrentPrice().intValue(),
+                    availableAmount,
+                    searchResponseDto.getPreviousPrice(), searchResponseDto.getPreviousRate());
         } else {
             return null;
         }
     }
 
     public StockPriceListDTO getStockPriceList(String code, String period) {
-        List<DailyStockPriceDTO> stockPriceList = kisService.getStockPriceList(code, period);
+        List<DailyStockPriceDTO> stockPriceList = kisService.getStockChartList(code, period);
         return new StockPriceListDTO(stockPriceList);
     }
 

@@ -2,19 +2,19 @@ package com.example.Search.Search.Api;
 
 import com.example.Search.Search.SearchDTO.CurrentPriceDTO;
 import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
+import com.example.Search.Search.SearchDTO.SearchResponseDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -25,7 +25,7 @@ public class KisService {
 
     public static final String REST_BASE_URL = "https://openapi.koreainvestment.com:9443";
 
-    WebClient webClient=WebClient.create(REST_BASE_URL);
+    WebClient webClient = WebClient.create(REST_BASE_URL);
 
     @Value("${app.key}")
     private String apiKey;
@@ -33,40 +33,7 @@ public class KisService {
     @Value("${app.secret}")
     private String apiSecret;
 
-
-
-    public Long getCurrentPrice(String stockCode) {
-        try {
-            CurrentPriceDTO response = webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/uapi/domestic-stock/v1/quotations/inquire-price")
-                            .queryParam("FID_COND_MRKT_DIV_CODE", "J")
-                            .queryParam("FID_INPUT_ISCD", stockCode)
-                            .build())
-                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
-                    .header("appkey", apiKey)
-                    .header("appsecret", apiSecret)
-                    .header("tr_id", "FHKST01010100")
-                    .retrieve()
-                    .bodyToMono(CurrentPriceDTO.class)
-                    .block();
-            System.out.println("@@@@@@@@@@@@@@@@@@@@apikey " + apiKey);
-            System.out.println("@@@@@@@@@@@@@@@@@@@@apisecret " + apiSecret);
-            System.out.println("@@@@@@@@@@@@@@@@@@@@token " + generatedToken.getAccessToken());
-            System.out.println("response ::: " + response.getOutput());
-            if (response != null && response.getOutput() != null) {
-                return Long.parseLong(response.getOutput().getStck_prpr());
-            } else {
-                log.error("API response is null or doesn't contain expected data for stock code: {}", stockCode);
-                return 0L;
-            }
-        } catch (Exception e) {
-            log.error("Error getting stock price for code {}: {}", stockCode, e.getMessage());
-            return 0L;
-        }
-    }
-
-    public String getPreviousPrice(String stockCode) {
+    public SearchResponseDto getCurrentPrice(String stockCode) {
         try {
             CurrentPriceDTO response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
@@ -82,49 +49,23 @@ public class KisService {
                     .bodyToMono(CurrentPriceDTO.class)
                     .block();
 
-            System.out.println("response ::: " + response.getOutput());
             if (response != null && response.getOutput() != null) {
-                return response.getOutput().getPrdy_vrss();
+                return SearchResponseDto.builder()
+                        .previousPrice(response.getOutput().getPrdy_vrss())
+                        .currentPrice(Long.parseLong(response.getOutput().getStck_prpr()))
+                        .previousRate(response.getOutput().getPrdy_ctrt())
+                        .build();
             } else {
                 log.error("API response is null or doesn't contain expected data for stock code: {}", stockCode);
-                return "";
+                return null;
             }
         } catch (Exception e) {
             log.error("Error getting stock price for code {}: {}", stockCode, e.getMessage());
-            return "";
+            return null;
         }
     }
 
-    public String getPreviousRate(String stockCode) {
-        try {
-            CurrentPriceDTO response = webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/uapi/domestic-stock/v1/quotations/inquire-price")
-                            .queryParam("FID_COND_MRKT_DIV_CODE", "J")
-                            .queryParam("FID_INPUT_ISCD", stockCode)
-                            .build())
-                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
-                    .header("appkey", apiKey)
-                    .header("appsecret", apiSecret)
-                    .header("tr_id", "FHKST01010100")
-                    .retrieve()
-                    .bodyToMono(CurrentPriceDTO.class)
-                    .block();
-
-            System.out.println("response ::: " + response.getOutput());
-            if (response != null && response.getOutput() != null) {
-                return response.getOutput().getPrdy_ctrt();
-            } else {
-                log.error("API response is null or doesn't contain expected data for stock code: {}", stockCode);
-                return "";
-            }
-        } catch (Exception e) {
-            log.error("Error getting stock price for code {}: {}", stockCode, e.getMessage());
-            return "";
-        }
-    }
-
-    public List<DailyStockPriceDTO> getStockPriceList(String stockCode, String period) {
+    public List<DailyStockPriceDTO> getStockChartList(String stockCode, String period) {
         try {
             LocalDate endDate = LocalDate.now();
             LocalDate startDate;
@@ -142,7 +83,6 @@ public class KisService {
                 default:
                     startDate = endDate.minusMonths(1);  // 기본값은 1달
             }
-
 
             ResponseEntity<String> response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
