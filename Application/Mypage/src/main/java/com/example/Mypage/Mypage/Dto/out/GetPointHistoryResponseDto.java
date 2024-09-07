@@ -16,5 +16,4 @@ public class GetPointHistoryResponseDto {
     private Integer resultPoint;
     private String type;
     private String date;
-
 }

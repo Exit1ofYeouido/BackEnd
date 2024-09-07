@@ -13,6 +13,7 @@ import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
+import com.example.Mypage.Mypage.Dto.Other.PointHistoryResponsesDto;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
@@ -73,12 +74,16 @@ public class AccountService {
         }
     }
 
-    public List<GetPointHistoryResponseDto> getPointHistory(Long memberId, int index, int limit) {
+    public PointHistoryResponsesDto getPointHistory(Long memberId, int index, int limit) {
         Pageable pageable = PageRequest.of(index, limit);
         Page<AccountHistory> accountHistoryPage = accountHistoryRepository.findByMemberId(memberId, pageable);
         List<AccountHistory> accountHistoryList = accountHistoryPage.getContent();
 
-        return getPointHistoryResponseDtos(accountHistoryList);
+        Long size = accountHistoryPage.getTotalElements();
+
+        return PointHistoryResponsesDto.builder()
+                .pointHistory(getPointHistoryResponseDtos(accountHistoryList))
+                .size(size.intValue()).build();
     }
 
     public List<MyStocksResponseDto> getAllMyStocks(Long memberId) {
