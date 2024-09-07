@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,7 @@ public class SearchService {
             }
         }
 
-        int targetCount = memberStocks.isEmpty() ? 5 : 10;
+        int targetCount = 5;
         int remainingCount = targetCount - result.size();
 
         if (remainingCount > 0) {
@@ -57,7 +58,6 @@ public class SearchService {
             if (memberStockCodes.isEmpty()) {
                 randomStocks = stockRepository.findRandomStocks(PageRequest.of(0, remainingCount));
             } else {
-
                 randomStocks = stockRepository.findRandomStocksExcluding(memberStockCodes, remainingCount);
             }
             for (Stock stock : randomStocks) {
@@ -107,7 +107,7 @@ public class SearchService {
 
     public List<StocksDTO> searchSimilarStocks(String keyword) {
         PageRequest pageRequest = PageRequest.of(0, 5);
-        List<Stock> similarStocks = stockRepository.findSimilarStocks(keyword, pageRequest);
+        Page<Stock> similarStocks = stockRepository.findSimilarStocks(keyword, pageRequest);
 
         return similarStocks.stream()
                 .map(this::createStocksDTO)

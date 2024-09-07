@@ -1,5 +1,7 @@
 package com.example.Search.Search.Api;
 
+import com.example.Search.Common.Entity.TokenInfo;
+import com.example.Search.Common.Repository.TokenInfoRepository;
 import com.example.Search.Search.SearchDTO.CurrentPriceDTO;
 import com.example.Search.Search.SearchDTO.DailyStockPriceDTO;
 import com.example.Search.Search.SearchDTO.SearchResponseDto;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -22,6 +25,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class KisService {
 
     private final GeneratedToken generatedToken;
+    private final TokenInfoRepository tokenInfoRepository;
 
     public static final String REST_BASE_URL = "https://openapi.koreainvestment.com:9443";
 
@@ -33,6 +37,12 @@ public class KisService {
     @Value("${app.secret}")
     private String apiSecret;
 
+    @Value("${app.fourth-key}")
+    private String FOURTH_API_KEY;
+
+    @Value("${app.fourth-secret}")
+    private String FOURTH_API_SECRET;
+
     public SearchResponseDto getCurrentPrice(String stockCode) {
         try {
             CurrentPriceDTO response = webClient.get()
@@ -41,7 +51,7 @@ public class KisService {
                             .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                             .queryParam("FID_INPUT_ISCD", stockCode)
                             .build())
-                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken(1L))
                     .header("appkey", apiKey)
                     .header("appsecret", apiSecret)
                     .header("tr_id", "FHKST01010100")
@@ -95,9 +105,9 @@ public class KisService {
                             .queryParam("FID_ORG_ADJ_PRC", "0")
                             .build())
                     .header("content-type", "application/json; charset=utf-8")
-                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
-                    .header("appkey", apiKey)
-                    .header("appsecret", apiSecret)
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken(4L))
+                    .header("appkey", FOURTH_API_KEY)
+                    .header("appsecret", FOURTH_API_SECRET)
                     .header("tr_id", "FHKST03010100")
                     .retrieve()
                     .toEntity(String.class)
@@ -128,6 +138,17 @@ public class KisService {
         } catch (Exception e) {
             log.error("Error getting stock price list for code {}: {}", stockCode, e.getMessage());
             return new ArrayList<>();
+        }
+    }
+
+    @Scheduled(cron = "0 0 1 * * * ")
+    private void updateAccessToken() {
+        TokenInfo fourthTokenInfo = tokenInfoRepository.findById(4L).orElse(null);
+
+        if (fourthTokenInfo != null) {
+            String newFourthToken = generatedToken.generateFourthAccessToken();
+            fourthTokenInfo.setAccessToken(newFourthToken);
+            tokenInfoRepository.save(fourthTokenInfo);
         }
     }
 

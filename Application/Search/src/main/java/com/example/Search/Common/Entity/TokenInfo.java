@@ -1,13 +1,14 @@
 package com.example.Search.Common.Entity;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -17,10 +18,11 @@ import java.time.LocalDateTime;
 public class TokenInfo {
 
     @Id
-    @Column(name="type_number")
+    @Column(name = "type_number")
     private Long id;
 
-    @Column(name="token_value",columnDefinition = "TEXT")
+    @Setter
+    @Column(name = "token_value", columnDefinition = "TEXT")
     private String accessToken;
 
 }

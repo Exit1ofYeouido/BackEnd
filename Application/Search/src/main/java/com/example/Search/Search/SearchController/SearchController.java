@@ -1,7 +1,6 @@
 package com.example.Search.Search.SearchController;
 
 
-
 import com.example.Search.Log.Service.LogService;
 import com.example.Search.Search.Api.KisService;
 import com.example.Search.Search.SearchDTO.StockDetailDTO;
@@ -9,12 +8,15 @@ import com.example.Search.Search.SearchDTO.StockPriceListDTO;
 import com.example.Search.Search.SearchDTO.StocksDTO;
 import com.example.Search.Search.SearchService.SearchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name="서치 API")
+@Tag(name = "서치 API")
 public class SearchController {
 
     private final SearchService searchService;
@@ -48,7 +50,6 @@ public class SearchController {
 
     @GetMapping("/stocks/keyword")
     public List<StocksDTO> searchStocks(@RequestParam String query) {
-        System.out.println("query === " + query);
         return searchService.searchSimilarStocks(query);
     }
 }
