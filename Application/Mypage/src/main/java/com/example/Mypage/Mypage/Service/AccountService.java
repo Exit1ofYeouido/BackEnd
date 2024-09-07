@@ -13,15 +13,22 @@ import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
+import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
+import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
+import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.BadRequestException;
+import com.example.Mypage.Mypage.Exception.InValidStockCodeException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +46,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AccountService {
+
+    public static final int PENDING_TABLE_ID = 1;
+    public static final int MARKET_TABLE_ID = 2;
+    public static final double MIN_SALE_PRICE = 1000;
 
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
@@ -86,6 +97,22 @@ public class AccountService {
         return myStocks;
     }
 
+    @Transactional
+    public StockSaleConditionResponseDto getCurrentStocksSellCondition(Long memberId, String stockCode) {
+        int curStockPrice = apiService.getPrice(stockCode);
+
+        if (curStockPrice == 0) {
+            log.error("주식 코드 {} 조회 요청 , 현재가를 판단할 수 없음", stockCode);
+            throw new InValidStockCodeException("해당 주식은 저희 서비스에서 제공하지 않습니다.");
+        }
+
+        double minSaleAmount = MIN_SALE_PRICE / (double) curStockPrice;
+
+        MemberStock memberStock = memberStockRepository.findByMemberIdAndStockCode(memberId, stockCode).orElse(null);
+
+        return createResponseDto(memberStock, minSaleAmount);
+    }
+
     public List<MyStocksHistoryResponseDto> getMyStocksHistory(Long memberId, int index, int limit) {
         Pageable pageable = PageRequest.of(index, limit);
         Page<StockTradeHistory> myStockHistoyPage = tradeRepository.findByMemberId(memberId, pageable);
@@ -103,7 +130,7 @@ public class AccountService {
     }
 
     public MyStockSaleRequestsResponseDto getMyStocksSaleRequests(Long memberId) {
-        SaleInfo saleInfo = saleInfoRepository.findById(1)
+        SaleInfo saleInfo = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
         int index = (saleInfo.getIdx() + 1) % 2;
 
@@ -122,13 +149,13 @@ public class AccountService {
     }
 
     @Transactional
-    public boolean deleteMyStocksSaleRequest(Long saleId, Long memberId) {
-        SaleInfo saleInfo = saleInfoRepository.findById(1)
+    public void deleteMyStocksSaleRequest(Long saleId, Long memberId) {
+        SaleInfo saleInfo = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
 
         StockSaleRequest stockSaleRequest;
 
-        int index = (saleInfo.getIdx() + 1) % 2;
+        int index = saleInfo.getIdx();
 
         if (index == 0) {
             stockSaleRequest = stockSaleRequestARepository.findById(saleId)
@@ -145,7 +172,45 @@ public class AccountService {
                 .orElseThrow(() -> new NoSuchElementException("판매를 취소과정에서 오류가 발생했습니다."));
 
         memberStock.setAvailableAmount(memberStock.getAvailableAmount() + stockSaleRequest.getAmount());
-        return true;
+    }
+
+    public PreWithdrawalResponseDto preWithdrawal(Long memberId) {
+        Account account = accountRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new AccountNotFoundException("계좌개설을 진행하세요."));
+
+        return PreWithdrawalResponseDto.builder()
+                .accountNumber(account.getAccountNumber())
+                .totalPoint(account.getPoint())
+                .build();
+    }
+
+    @Transactional
+    public WithdrawalResponseDto withdrawalPoint(Long memberId, WithdrawalRequestDto withdrawalRequestDto) {
+        Account account = accountRepository.findByAccountNumber(withdrawalRequestDto.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌개설을 진행하세요."));
+
+        int myPoint = account.getPoint();
+        int requestPoint = withdrawalRequestDto.getWithdrawalAmount();
+
+        if (requestPoint > myPoint) {
+            throw new BadRequestException("보유 포인트를 초과하여 출금할 수 없습니다.");
+        }
+
+        int resultPoint = myPoint - requestPoint;
+        account.setPoint(resultPoint);
+        accountRepository.save(account);
+
+        AccountHistory accountHistory = AccountHistory.builder()
+                .account(account)
+                .member(account.getMember())
+                .requestPoint(requestPoint)
+                .resultPoint(resultPoint)
+                .type("out")
+                .createdAt(LocalDateTime.now())
+                .build();
+        accountHistoryRepository.save(accountHistory);
+
+        return WithdrawalResponseDto.builder().remainPoint(account.getPoint()).build();
     }
 
     private String getEarningRate(MemberStock memberStock) {
@@ -156,9 +221,10 @@ public class AccountService {
 
         if (resultPrice < 1) {
             earningRate = (1 - resultPrice) * 100;
+            return String.format("%.2f", earningRate);
         }
 
-        return String.format("%.2f", earningRate);
+        return String.format("%.2f", -earningRate);
     }
 
     private static List<GetPointHistoryResponseDto> getPointHistoryResponseDtos(
@@ -173,5 +239,24 @@ public class AccountService {
                                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private StockSaleConditionResponseDto createResponseDto(MemberStock memberStock, double minSaleAmount) {
+        String holdingAmount = memberStock != null ? formatSellAmount(memberStock.getAvailableAmount()) : "0";
+
+        boolean isSellable = memberStock != null;
+        if (isSellable) {
+            isSellable = memberStock.getAvailableAmount() > minSaleAmount;
+        }
+        return StockSaleConditionResponseDto.builder()
+                .holdingAmount(holdingAmount)
+                .minSaleAmount(formatSellAmount(minSaleAmount))
+                .isSellable(isSellable)
+                .build();
+    }
+
+    private String formatSellAmount(double amount) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.######");
+        return decimalFormat.format(amount);
     }
 }

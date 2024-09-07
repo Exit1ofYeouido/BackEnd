@@ -1,5 +1,8 @@
 package com.example.Mypage.Mypage.Service;
 
+import static com.example.Mypage.Mypage.Service.AccountService.MARKET_TABLE_ID;
+import static com.example.Mypage.Mypage.Service.AccountService.PENDING_TABLE_ID;
+
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.AccountHistory;
 import com.example.Mypage.Common.Entity.CompletedStockSale;
@@ -99,9 +102,9 @@ public class SellService {
     @Scheduled(cron = "0 0 10,15 * * mon-fri")
     @Transactional
     public void processSellRequest() {
-        SaleInfo marketInfo = saleInfoRepository.findById(2)
+        SaleInfo marketInfo = saleInfoRepository.findById(MARKET_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("영업 여부 판단 불가"));
-        SaleInfo pendingTable = saleInfoRepository.findById(1)
+        SaleInfo pendingTable = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("판매대기 테이블 확인 불가"));
 
         if ((marketInfo.getIdx()) == CLOSE) {
@@ -149,7 +152,7 @@ public class SellService {
             connectionManager.start();
         }
 
-        SaleInfo saleInfo = saleInfoRepository.findById(2)
+        SaleInfo saleInfo = saleInfoRepository.findById(MARKET_TABLE_ID)
                 .orElseThrow(() -> new IllegalStateException("SaleInfo Table 상태를 확인하세요."));
         if (isOpenStockMarket()) {
             saleInfo.setIdx(1);
@@ -163,8 +166,8 @@ public class SellService {
     @Scheduled(cron = "0 30 9,14 * * mon-fri")
     @Transactional
     public void changeSaleTableIdx() {
-        int todayMarketStatus = saleInfoRepository.findById(2).get().getIdx();
-        SaleInfo saleInfo = saleInfoRepository.findById(1).get();
+        int todayMarketStatus = saleInfoRepository.findById(MARKET_TABLE_ID).get().getIdx();
+        SaleInfo saleInfo = saleInfoRepository.findById(PENDING_TABLE_ID).get();
 
         if (todayMarketStatus == OPEN) {
             saleInfo.setIdx((saleInfo.getIdx() + 1) % 2);
@@ -175,7 +178,6 @@ public class SellService {
 
     private boolean isOpenStockMarket() {
         try {
-            //TODO : 장 여부 확인에서 오류가 안발생하는지 추가 테스트 진행하기
             for (int i = 0; i < 3; i++) {
                 Thread.sleep(TEN_SECOND);
                 String response = stockPriceSocketHandler.getLatestMessage();
@@ -198,7 +200,7 @@ public class SellService {
     }
 
     private void saveSellRequest(StockSellRequestDto stockSellRequestDto, Member member) {
-        SaleInfo pendingTable = saleInfoRepository.findById(1)
+        SaleInfo pendingTable = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("판매대기 테이블 확인 불가"));
 
         if (pendingTable.getIdx() == SALE_TABLE_A) {
@@ -249,7 +251,7 @@ public class SellService {
                     .orElseThrow(() -> new AccountNotFoundException("포인트를 지급할 계좌 탐색과정에서 오류 발생"));
             int sellPrice = getSellPrice(sellRequest, curStockPrice);
             int afterHoldPoint = memberAccount.getPoint() + sellPrice;
-            
+
             memberAccount.setPoint(afterHoldPoint);
             accountRepository.save(memberAccount);
             accountHistoryRepository.save(newAccountHistory(sellRequest, sellPrice, afterHoldPoint, memberAccount));
