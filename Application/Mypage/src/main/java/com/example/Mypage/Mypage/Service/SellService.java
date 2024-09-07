@@ -25,11 +25,15 @@ import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import com.example.Mypage.Mypage.Webclient.handler.StockPriceSocketHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -50,6 +54,7 @@ public class SellService {
     public static final int CLOSE = 0;
     public static final int SALE_TABLE_A = 0;
     public static final String OPEN_STATUS = "005930";
+    private static final String SALE_MESSAGE_TEMPLATE = "[StockCraft] 체결 알리미 \n 종목명 : %s\n 매도수량 : %s\n 판매금액 : %s원";
 
     private final StockSaleRequestARepository stockSaleRequestARepository;
     private final StockSaleRequestBRepository stockSaleRequestBRepository;
@@ -227,6 +232,7 @@ public class SellService {
             String curStockCode = sellRequest.getStockCode();
             CompletedStockSale completedStockSale = completedStockSaleRepository.findByStockCodeAndSoldTime(
                     curStockCode, soldTime);
+
             int curStockPrice = 0;
 
             if (completedStockSale == null) {
@@ -243,15 +249,30 @@ public class SellService {
                     .orElseThrow(() -> new AccountNotFoundException("포인트를 지급할 계좌 탐색과정에서 오류 발생"));
             int sellPrice = getSellPrice(sellRequest, curStockPrice);
             int afterHoldPoint = memberAccount.getPoint() + sellPrice;
+            
             memberAccount.setPoint(afterHoldPoint);
             accountRepository.save(memberAccount);
-
             accountHistoryRepository.save(newAccountHistory(sellRequest, sellPrice, afterHoldPoint, memberAccount));
-            messageUtil.sendMessage(
-                    "[StockCraft] 체결 알리미 \n 종목명 : " + sellRequest.getEnterpriseName() + "\n 판매금액 : " + sellPrice,
-                    sellRequest.getMember().getPhoneNumber() + "원");
+
             updateMemberStockInfo(memberId, sellRequest);
+
+            String message = String.format(
+                    SALE_MESSAGE_TEMPLATE,
+                    sellRequest.getEnterpriseName(),
+                    formatSellAmount(sellRequest.getAmount()),
+                    formatSellPrice(sellPrice)
+            );
+
+            messageUtil.sendMessage(
+                    message,
+                    sellRequest.getMember().getPhoneNumber());
+
         }
+    }
+
+    private static @NotNull String formatSellPrice(int sellPrice) {
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.KOREA);
+        return numberFormat.format(sellPrice);
     }
 
     private static <T extends StockSaleRequest> AccountHistory newAccountHistory(T sellRequest, int sellPrice,
@@ -305,4 +326,10 @@ public class SellService {
         completedStockSale.setAmount(completedStockSale.getAmount() + additionalAmount);
         completedStockSaleRepository.save(completedStockSale);
     }
+
+    private String formatSellAmount(double amount) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.######");
+        return decimalFormat.format(amount);
+    }
 }
+

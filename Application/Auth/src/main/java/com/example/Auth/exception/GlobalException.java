@@ -32,7 +32,7 @@ public class GlobalException {
                 .message(e.getMessage())
                 .build();
 
-        return new ResponseEntity<>(errorResult, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MembernameNotValidException.class)
