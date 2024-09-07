@@ -4,10 +4,10 @@ import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.SellService;
@@ -75,9 +75,9 @@ public class AccountController {
 
     @GetMapping("/stocks-history")
     @Operation(description = "나의 주식 거래내역 조회")
-    public ResponseEntity<List<MyStocksHistoryResponseDto>> getMyStocksHistory(@RequestHeader("memberId") Long memberId,
-                                                                               @RequestParam(defaultValue = "0") int index,
-                                                                               @RequestParam(defaultValue = "5") int size) {
+    public ResponseEntity<StocksHistoryResponseDto> getMyStocksHistory(@RequestHeader("memberId") Long memberId,
+                                                                       @RequestParam(defaultValue = "0") int index,
+                                                                       @RequestParam(defaultValue = "5") int size) {
 
         return ResponseEntity.ok(accountService.getMyStocksHistory(memberId, index, size));
     }

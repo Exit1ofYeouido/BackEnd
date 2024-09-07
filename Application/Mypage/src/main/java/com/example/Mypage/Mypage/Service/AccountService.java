@@ -13,7 +13,6 @@ import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
-import com.example.Mypage.Mypage.Dto.Other.PointHistoryResponsesDto;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
@@ -21,8 +20,10 @@ import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
+import com.example.Mypage.Mypage.Dto.out.PointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.BadRequestException;
@@ -74,16 +75,16 @@ public class AccountService {
         }
     }
 
-    public PointHistoryResponsesDto getPointHistory(Long memberId, int index, int limit) {
+    public PointHistoryResponseDto getPointHistory(Long memberId, int index, int limit) {
         Pageable pageable = PageRequest.of(index, limit);
         Page<AccountHistory> accountHistoryPage = accountHistoryRepository.findByMemberId(memberId, pageable);
         List<AccountHistory> accountHistoryList = accountHistoryPage.getContent();
 
-        Long size = accountHistoryPage.getTotalElements();
+        int size = (int) accountHistoryPage.getTotalElements();
 
-        return PointHistoryResponsesDto.builder()
+        return PointHistoryResponseDto.builder()
                 .pointHistory(getPointHistoryResponseDtos(accountHistoryList))
-                .size(size.intValue()).build();
+                .size(size).build();
     }
 
     public List<MyStocksResponseDto> getAllMyStocks(Long memberId) {
@@ -118,20 +119,23 @@ public class AccountService {
         return createResponseDto(memberStock, minSaleAmount);
     }
 
-    public List<MyStocksHistoryResponseDto> getMyStocksHistory(Long memberId, int index, int limit) {
+    public StocksHistoryResponseDto getMyStocksHistory(Long memberId, int index, int limit) {
         Pageable pageable = PageRequest.of(index, limit);
         Page<StockTradeHistory> myStockHistoyPage = tradeRepository.findByMemberId(memberId, pageable);
         List<StockTradeHistory> stockTradeHistories = myStockHistoyPage.getContent();
 
-        return stockTradeHistories.stream()
-                .map(stockTradeHistory -> MyStocksHistoryResponseDto.builder()
-                        .name(stockTradeHistory.getStockName())
-                        .type(stockTradeHistory.getTradeType())
-                        .amount(String.format("%.6f", stockTradeHistory.getAmount()))
-                        .date(stockTradeHistory.getCreatedAt()
-                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
-                        .build())
-                .toList();
+        int size = (int) myStockHistoyPage.getTotalElements();
+
+        return StocksHistoryResponseDto.builder().stocksHistory(stockTradeHistories.stream()
+                        .map(stockTradeHistory -> MyStocksHistoryResponseDto.builder()
+                                .name(stockTradeHistory.getStockName())
+                                .type(stockTradeHistory.getTradeType())
+                                .amount(String.format("%.6f", stockTradeHistory.getAmount()))
+                                .date(stockTradeHistory.getCreatedAt()
+                                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
+                                .build())
+                        .toList())
+                .size(size).build();
     }
 
     public MyStockSaleRequestsResponseDto getMyStocksSaleRequests(Long memberId) {

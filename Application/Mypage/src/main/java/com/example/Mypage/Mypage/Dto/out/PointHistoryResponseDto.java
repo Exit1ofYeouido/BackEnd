@@ -1,6 +1,5 @@
-package com.example.Mypage.Mypage.Dto.Other;
+package com.example.Mypage.Mypage.Dto.out;
 
-import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PointHistoryResponsesDto {
+public class PointHistoryResponseDto {
 
     private int size;
 
