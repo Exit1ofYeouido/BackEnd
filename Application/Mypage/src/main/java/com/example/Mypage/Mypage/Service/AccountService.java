@@ -40,6 +40,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AccountService {
 
+    public static final int PENDING_TABLE_ID = 1;
+    public static final int MARKET_TABLE_ID = 2;
+
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
     private final ApiService apiService;
@@ -103,7 +106,7 @@ public class AccountService {
     }
 
     public MyStockSaleRequestsResponseDto getMyStocksSaleRequests(Long memberId) {
-        SaleInfo saleInfo = saleInfoRepository.findById(1)
+        SaleInfo saleInfo = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
         int index = (saleInfo.getIdx() + 1) % 2;
 
@@ -123,12 +126,12 @@ public class AccountService {
 
     @Transactional
     public boolean deleteMyStocksSaleRequest(Long saleId, Long memberId) {
-        SaleInfo saleInfo = saleInfoRepository.findById(1)
+        SaleInfo saleInfo = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
 
         StockSaleRequest stockSaleRequest;
 
-        int index = (saleInfo.getIdx() + 1) % 2;
+        int index = saleInfo.getIdx();
 
         if (index == 0) {
             stockSaleRequest = stockSaleRequestARepository.findById(saleId)
