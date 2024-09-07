@@ -1,11 +1,14 @@
 package com.example.Mypage.Mypage.Controller;
 
 import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
+import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
+import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
+import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.SellService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +36,6 @@ public class AccountController {
     @GetMapping("/point")
     @Operation(description = "나의 현재 포인트 조회")
     public ResponseEntity<GetPointResponseDto> getPoint(@RequestHeader("memberId") Long memberId) {
-        //TODO : Long Type으로 매핑되지 않은 경우에 대한 Exception Handler 만들기
         GetPointResponseDto getPointResponseDto = accountService.getPoint(memberId);
         return ResponseEntity.ok(getPointResponseDto);
     }
@@ -45,6 +47,24 @@ public class AccountController {
                                              @RequestParam(defaultValue = "5") int size) {
 
         return ResponseEntity.ok(accountService.getPointHistory(memberId, index, size));
+    }
+
+    @GetMapping("/pre-withdrawal")
+    @Operation(description = "출금금액 요청단계에서 계좌상태 확인 API")
+    public ResponseEntity<PreWithdrawalResponseDto> preWithdrawalRequest(@RequestHeader("memberId") Long memberId) {
+        PreWithdrawalResponseDto preWithdrawal = accountService.preWithdrawal(memberId);
+
+        return ResponseEntity.ok(preWithdrawal);
+    }
+
+    @PostMapping("/withdrawal")
+    @Operation(description = "포인트 출금 API")
+    public ResponseEntity<WithdrawalResponseDto> withdrawalRequest(@RequestHeader("memberId") Long memberId,
+                                                                   @RequestBody
+                                                                   WithdrawalRequestDto withdrawalRequestDto) {
+
+        WithdrawalResponseDto withdrawalResponseDto = accountService.withdrawalPoint(memberId, withdrawalRequestDto);
+        return ResponseEntity.ok(withdrawalResponseDto);
     }
 
     @GetMapping("/stocks")

@@ -13,18 +13,22 @@ import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
+import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
+import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
+import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.BadRequestException;
 import com.example.Mypage.Mypage.Exception.InValidStockCodeException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,7 +149,7 @@ public class AccountService {
     }
 
     @Transactional
-    public boolean deleteMyStocksSaleRequest(Long saleId, Long memberId) {
+    public void deleteMyStocksSaleRequest(Long saleId, Long memberId) {
         SaleInfo saleInfo = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
 
@@ -168,7 +172,45 @@ public class AccountService {
                 .orElseThrow(() -> new NoSuchElementException("판매를 취소과정에서 오류가 발생했습니다."));
 
         memberStock.setAvailableAmount(memberStock.getAvailableAmount() + stockSaleRequest.getAmount());
-        return true;
+    }
+
+    public PreWithdrawalResponseDto preWithdrawal(Long memberId) {
+        Account account = accountRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new AccountNotFoundException("계좌개설을 진행하세요."));
+
+        return PreWithdrawalResponseDto.builder()
+                .accountNumber(account.getAccountNumber())
+                .totalPoint(account.getPoint())
+                .build();
+    }
+
+    @Transactional
+    public WithdrawalResponseDto withdrawalPoint(Long memberId, WithdrawalRequestDto withdrawalRequestDto) {
+        Account account = accountRepository.findByAccountNumber(withdrawalRequestDto.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌개설을 진행하세요."));
+
+        int myPoint = account.getPoint();
+        int requestPoint = withdrawalRequestDto.getWithdrawalAmount();
+
+        if (requestPoint > myPoint) {
+            throw new BadRequestException("보유 포인트를 초과하여 출금할 수 없습니다.");
+        }
+
+        int resultPoint = myPoint - requestPoint;
+        account.setPoint(resultPoint);
+        accountRepository.save(account);
+
+        AccountHistory accountHistory = AccountHistory.builder()
+                .account(account)
+                .member(account.getMember())
+                .requestPoint(requestPoint)
+                .resultPoint(resultPoint)
+                .type("out")
+                .createdAt(LocalDateTime.now())
+                .build();
+        accountHistoryRepository.save(accountHistory);
+
+        return WithdrawalResponseDto.builder().remainPoint(account.getPoint()).build();
     }
 
     private String getEarningRate(MemberStock memberStock) {
@@ -179,9 +221,10 @@ public class AccountService {
 
         if (resultPrice < 1) {
             earningRate = (1 - resultPrice) * 100;
+            return String.format("%.2f", earningRate);
         }
 
-        return String.format("%.2f", earningRate);
+        return String.format("%.2f", -earningRate);
     }
 
     private static List<GetPointHistoryResponseDto> getPointHistoryResponseDtos(
