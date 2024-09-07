@@ -1,6 +1,10 @@
-project(":application:api-gateway") {
-    bootJar { enabled = true }
-    jar { enabled = false }
+
+    plugins{
+        id 'java'
+    }
+
+
+    group = 'com.stockcraft'
 
     ext {
         set('springCloudVersion', "2023.0.2")
@@ -22,4 +26,3 @@ project(":application:api-gateway") {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
     }
-}
