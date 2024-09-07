@@ -6,6 +6,12 @@
 
     group = 'com.stockcraft'
 
+    group 'org.ofz'
+
+    repositories {
+        mavenCentral()
+    }
+
     ext {
         set('springCloudVersion', "2023.0.2")
     }
