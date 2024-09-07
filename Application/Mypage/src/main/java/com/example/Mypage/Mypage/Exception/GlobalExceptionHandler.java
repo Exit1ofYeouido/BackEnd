@@ -39,9 +39,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<String> handleAccountNotFoundException(AccountNotFoundException e) {
+    public ResponseEntity<ErrorResponseDto> handleAccountNotFoundException(AccountNotFoundException e) {
         log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .message(e.getMessage())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponseDto);
     }
 
     @ExceptionHandler(MemberNotFoundException.class)
