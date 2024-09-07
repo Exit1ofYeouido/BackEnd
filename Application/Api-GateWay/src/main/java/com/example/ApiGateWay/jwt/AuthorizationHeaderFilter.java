@@ -40,16 +40,14 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
 
-
             String path = exchange.getRequest().getURI().getPath();
             System.out.println(path);
             if (path.contains("/v3/api-docs")) {
                 return chain.filter(exchange);
             }
-            if (path.contains("/signup")){
+            if (path.contains("/signup")) {
                 return chain.filter(exchange);
             }
-
 
             if (!request.getHeaders().containsKey("Authorization")) {
                 return onError(exchange, "No authorization Header", HttpStatus.UNAUTHORIZED);
@@ -69,7 +67,11 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             String memberId = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(jwt).getPayload()
                     .get("memberId", String.class);
 
+            String role = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(jwt).getPayload()
+                    .get("role", String.class);
+
             exchange.getRequest().mutate().header("memberId", memberId).build();
+            exchange.getRequest().mutate().header("role", role).build();
             return chain.filter(exchange);
         };
     }
@@ -79,7 +81,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         response.setStatusCode(httpStatus);
         log.error(error);
 
-        // 응답 본문에 오류 메시지 추가
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         String responseBody = String.format("{\"error\": \"%s\"}", error);
 
@@ -106,7 +107,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(jwt).getPayload().getExpiration()
                     .before(new Date());
         } catch (Exception e) {
-            log.error("Error checking JWT expiration: " + e.getMessage());
+            log.error("Error checking JWT expiration: {} " + e.getMessage());
             return true;
         }
     }
