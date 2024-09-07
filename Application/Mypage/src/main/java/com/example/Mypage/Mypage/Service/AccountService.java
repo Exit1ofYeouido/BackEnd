@@ -221,10 +221,9 @@ public class AccountService {
 
         if (resultPrice < 1) {
             earningRate = (1 - resultPrice) * 100;
-            return String.format("%.2f", earningRate);
+            return String.format("%.2f", -earningRate);
         }
-
-        return String.format("%.2f", -earningRate);
+        return String.format("%.2f", earningRate);
     }
 
     private static List<GetPointHistoryResponseDto> getPointHistoryResponseDtos(
