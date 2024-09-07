@@ -36,14 +36,14 @@ public class GeneratedToken {
     @Transactional
     public String getAccessToken() {
 
-        Optional<TokenInfo> tokenInfos=tokenInfoRepository.findById(1L);
+        Optional<TokenInfo> tokenInfos=tokenInfoRepository.findById(5L);
 
 
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
             TokenInfo tokenInfo = TokenInfo
                     .builder()
-                    .typeNumber(1L)
+                    .typeNumber(5L)
                     .accessToken(ACCESS_TOKEN)
                     .build();
             tokenInfoRepository.save(tokenInfo);
