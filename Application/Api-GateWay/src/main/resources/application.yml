@@ -57,13 +57,13 @@ spring:
             - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
         - id: auth
-          uri: ${AUTH_URL}
+          uri: ${AUTH-URL}
           predicates:
             - Path= ${service-url}/auth/**
           filters:
               - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
         - id: home
-          uri: ${HOME_URL}
+          uri: ${HOME-URL}
           predicates:
             - Path= ${service-url}/home/**
           filters:
