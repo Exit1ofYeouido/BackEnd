@@ -200,8 +200,11 @@ public class AccountService {
 
     private StockSaleConditionResponseDto createResponseDto(MemberStock memberStock, double minSaleAmount) {
         String holdingAmount = memberStock != null ? formatSellAmount(memberStock.getAvailableAmount()) : "0";
-        boolean isSellable = memberStock != null;
 
+        boolean isSellable = memberStock != null;
+        if (isSellable) {
+            isSellable = memberStock.getAvailableAmount() > minSaleAmount;
+        }
         return StockSaleConditionResponseDto.builder()
                 .holdingAmount(holdingAmount)
                 .minSaleAmount(formatSellAmount(minSaleAmount))
