@@ -1,16 +1,15 @@
 
-    plugins{
-        id 'java'
-    }
+plugins{
+     id 'java'
+}
 
 
-    group = 'com.stockcraft'
+group = 'com.stockcraft'
 
-    group 'org.ofz'
 
-    repositories {
-        mavenCentral()
-    }
+repositories {
+    mavenCentral()
+}
 
     ext {
         set('springCloudVersion', "2023.0.2")

@@ -1,6 +1,6 @@
 rootProject.name = 'StockCraft'
 include 'application'
-include 'application:api-gateway'
+include 'api-gateway'
 include 'application:basic'
 include 'application:reward'
 include 'application:mypage'
