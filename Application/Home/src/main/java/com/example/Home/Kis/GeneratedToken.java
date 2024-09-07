@@ -31,14 +31,14 @@ public class GeneratedToken {
 
     public String getAccessToken() {
 
-        Optional<TokenInfo> tokenInfos=tokenInfoRepository.findById(3L);
+        Optional<TokenInfo> tokenInfos=tokenInfoRepository.findById(6L);
 
         if (tokenInfos.isEmpty()) {
             ACCESS_TOKEN = generateAccessToken();
             System.out.println(ACCESS_TOKEN);
             TokenInfo tokenInfo = TokenInfo
                     .builder()
-                    .typeNumber(3L)
+                    .typeNumber(6L)
                     .tokenValue(ACCESS_TOKEN)
                     .build();
             tokenInfoRepository.save(tokenInfo);
