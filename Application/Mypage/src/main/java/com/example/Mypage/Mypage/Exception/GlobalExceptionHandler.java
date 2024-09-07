@@ -79,4 +79,14 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
     }
+
+    @ExceptionHandler(InValidStockCodeException.class)
+    public ResponseEntity<ErrorResponseDto> handleInValidStockCodeException(InValidStockCodeException e) {
+        log.error(e.getMessage());
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .message(e.getMessage())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
+    }
 }

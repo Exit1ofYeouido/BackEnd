@@ -22,6 +22,7 @@ import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.BadRequestException;
+import com.example.Mypage.Mypage.Exception.InValidStockCodeException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
@@ -95,6 +96,12 @@ public class AccountService {
     @Transactional
     public StockSaleConditionResponseDto getCurrentStocksSellCondition(Long memberId, String stockCode) {
         int curStockPrice = apiService.getPrice(stockCode);
+
+        if (curStockPrice == 0) {
+            log.error("주식 코드 {} 조회 요청 , 현재가를 판단할 수 없음", stockCode);
+            throw new InValidStockCodeException("해당 주식은 저희 서비스에서 제공하지 않습니다.");
+        }
+
         double minSaleAmount = MIN_SALE_PRICE / (double) curStockPrice;
 
         MemberStock memberStock = memberStockRepository.findByMemberIdAndStockCode(memberId, stockCode).orElse(null);
