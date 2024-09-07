@@ -1,8 +1,8 @@
 package com.example.Mypage.Mypage.Dto.out;
 
 import com.example.Mypage.Common.Entity.StockSaleRequest;
+import java.time.format.DateTimeFormatter;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public class MyStockSaleRequestResponseDto {
@@ -12,6 +12,7 @@ public class MyStockSaleRequestResponseDto {
     private String enterpriseName;
     private String stockCode;
     private double amount;
+    private String date;
 
     public MyStockSaleRequestResponseDto(StockSaleRequest stockSaleRequest) {
         this.saleId = stockSaleRequest.getId();
@@ -19,5 +20,6 @@ public class MyStockSaleRequestResponseDto {
         this.enterpriseName = stockSaleRequest.getEnterpriseName();
         this.stockCode = stockSaleRequest.getStockCode();
         this.amount = stockSaleRequest.getAmount();
+        this.date = stockSaleRequest.getSaleDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
     }
 }
