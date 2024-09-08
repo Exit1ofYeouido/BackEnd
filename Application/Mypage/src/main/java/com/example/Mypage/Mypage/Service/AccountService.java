@@ -24,6 +24,7 @@ import com.example.Mypage.Mypage.Dto.out.PointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StocksValueResponseDto;
 import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.BadRequestException;
@@ -85,6 +86,36 @@ public class AccountService {
         return PointHistoryResponseDto.builder()
                 .pointHistory(getPointHistoryResponseDtos(accountHistoryList))
                 .size(size).build();
+    }
+
+    public StocksValueResponseDto getCurrentStocksValue(Long memberId) {
+        List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
+
+        if (memberStocks.isEmpty()) {
+            return StocksValueResponseDto.builder()
+                    .stocksValue(0)
+                    .earningRate("0")
+                    .build();
+        }
+
+        double preValue = 0;
+        double currentValue = 0;
+
+        for (MemberStock memberStock : memberStocks) {
+            double stockAmount = memberStock.getAmount();
+            double stockAveragePrice = memberStock.getAveragePrice();
+            double currentPrice = apiService.getPrice(memberStock.getStockCode());
+
+            preValue += stockAveragePrice * stockAmount;
+            currentValue += currentPrice * stockAmount;
+        }
+
+        double earningRate = (currentValue - preValue) / preValue * 100;
+
+        return StocksValueResponseDto.builder()
+                .stocksValue((int) currentValue)
+                .earningRate(formatEarningRate(earningRate))
+                .build();
     }
 
     public List<MyStocksResponseDto> getAllMyStocks(Long memberId) {
@@ -226,6 +257,10 @@ public class AccountService {
         int curPrice = apiService.getPrice(memberStock.getStockCode());
         double resultPrice = (double) curPrice / (double) memberStock.getAveragePrice();
 
+        if (resultPrice == 0) {
+            return "0";
+        }
+
         double earningRate = (resultPrice - 1) * 100;
 
         if (resultPrice < 1) {
@@ -265,6 +300,11 @@ public class AccountService {
 
     private String formatSellAmount(double amount) {
         DecimalFormat decimalFormat = new DecimalFormat("#.######");
+        return decimalFormat.format(amount);
+    }
+
+    private String formatEarningRate(double amount) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
         return decimalFormat.format(amount);
     }
 }
