@@ -49,30 +49,36 @@ public class MyService {
                 () -> new AccountNotFoundException("계좌가 존재하지않습니다.")
         );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
-        String calcAssetsEarningRate = CalcAllAssets(memberStock);
+        String calcAssetsEarningRate = CalcAllAssets(memberStock,0);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
-        int allCost = AllAssetsCount(memberStock);
+        String allCost = CalcAllAssets(memberStock,1);
 
-        return GetAllMyPageResponseDto.of(account.getPoint(), calcAssetsEarningRate, earningRates, allCost);
+        return GetAllMyPageResponseDto.of(account.getPoint(), calcAssetsEarningRate, earningRates,Integer.valueOf(allCost));
     }
 
-    private String CalcAllAssets(List<MemberStock> memberStocks) {
+    private String CalcAllAssets(List<MemberStock> memberStocks,Integer section) {
 
         double allCost = 0;
         double currentAllCost = 0;
+        Integer finalAllCost=0;
+        
         if (memberStocks.isEmpty()) {
             return "0";
         }
 
         for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getAmount();
-            double stockprice = memberStock.getAveragePrice();
+            double stockCount = memberStock.getAmount();
+            double stockPrice = memberStock.getAveragePrice();
 
-            double currentprice = apiService.getPrice(memberStock.getStockCode());
+            double currentPrice = apiService.getPrice(memberStock.getStockCode());
 
-            allCost = allCost + (stockprice * stockcount);
-            currentAllCost = currentAllCost + (currentprice * stockcount);
+            allCost = allCost + (stockPrice * stockCount);
+            currentAllCost = currentAllCost + (currentPrice * stockCount);
+            finalAllCost= (int) (finalAllCost+ (currentPrice *stockCount));
+        }
 
+        if (section==1){
+            return String.valueOf(finalAllCost);
         }
 
         if (allCost==currentAllCost){
@@ -82,20 +88,8 @@ public class MyService {
         double value = (currentAllCost -allCost)/allCost * 100;
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(value);
-
     }
 
-    private int AllAssetsCount(List<MemberStock> memberStocks) {
-        int allCost = 0;
-
-        for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getAmount();
-            int stockprice = apiService.getPrice(memberStock.getStockCode());
-            allCost = (int) (allCost + (stockprice * stockcount));
-
-        }
-        return allCost;
-    }
 
     private List<EarningRate> Top3EarningRateAssets(List<MemberStock> memberStocks) {
 
