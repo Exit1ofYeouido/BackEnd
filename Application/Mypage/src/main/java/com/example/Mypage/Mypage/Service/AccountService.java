@@ -257,6 +257,10 @@ public class AccountService {
         int curPrice = apiService.getPrice(memberStock.getStockCode());
         double resultPrice = (double) curPrice / (double) memberStock.getAveragePrice();
 
+        if (resultPrice == 0) {
+            return "0";
+        }
+
         double earningRate = (resultPrice - 1) * 100;
 
         if (resultPrice < 1) {
