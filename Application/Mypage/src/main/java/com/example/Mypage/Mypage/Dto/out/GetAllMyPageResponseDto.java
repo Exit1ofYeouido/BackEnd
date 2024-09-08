@@ -2,10 +2,9 @@ package com.example.Mypage.Mypage.Dto.out;
 
 
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @Builder
@@ -19,14 +18,14 @@ public class GetAllMyPageResponseDto {
 
     private String accountId;
 
-    private Long totalPoint;
+    private Integer totalPoint;
 
     private List<EarningRate> earningRates;
 
 
-
-    public static GetAllMyPageResponseDto of(Long totalPoint, String calcAssetsEarningRate, List<EarningRate> earningRates, int allCost){
-        GetAccountResponseDto getAccountResponseDto=new GetAccountResponseDto();
+    public static GetAllMyPageResponseDto of(Integer totalPoint, String calcAssetsEarningRate,
+                                             List<EarningRate> earningRates, int allCost) {
+        GetAccountResponseDto getAccountResponseDto = new GetAccountResponseDto();
 
         return GetAllMyPageResponseDto.builder()
                 .allCost(allCost)

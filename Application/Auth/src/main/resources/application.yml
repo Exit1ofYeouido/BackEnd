@@ -39,7 +39,7 @@ spring:
     defer-datasource-initialization: true
 
   kafka:
-    bootstrap-servers: ${BOOTSTRAP_SEVER}
+    bootstrap-servers: ${BOOTSTRAP_SERVER}
     consumer:
       auto-offset-reset: ${OFFSET_TYPE}
 

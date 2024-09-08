@@ -17,7 +17,10 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: 'http://localhost:5173'
+            allowedOrigins:
+              - 'http://3.36.196.194:5173'
+              - 'http://localhost:5173'
+              - 'http://stock-craft.kro.kr'
             allow-credentials: true
             allowedHeaders: '*'
             allowedMethods:
@@ -31,43 +34,41 @@ spring:
       httpserver:
         wiretap: true
       routes:
-        - id: basic
-          uri: http://localhost:8081
-          predicates:
-            - Path= ${service-url}/basic/**
-          filters:
-            - RewritePath=${service-url}/basic/(?<path>.*),/$\{path}
-            - AuthorizationHeaderFilter
-            
         - id: mypage
-          uri: http://localhost:8082
+          uri: ${MYPAGE-URL}
           predicates:
-            - Path= ${service-url}/mypage/**
+            - Path= ${service-url}/my/**
           filters:
-            - RewritePath=${service-url}/mypage/(?<path>.*),/$\{path}
+            - RewritePath=${service-url}/my/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
-            
+            - RewritePath=${service-url}/my/(?<path>.*),/$\{path}
         - id: reward
-          uri: http://localhost:8083
+          uri: ${REWARD-URL}
           predicates:
             - Path= ${service-url}/reward/**
           filters:
             - RewritePath=${service-url}/reward/(?<path>.*),/$\{path}
             - AuthorizationHeaderFilter
-            
         - id: search
-          uri: http://localhost:8084
+          uri: ${SEARCH-URL}
           predicates:
             - Path= ${service-url}/search/**
           filters:
-            - RewritePath=${service-url}/search/(?<path>.*),/$\{path}    
-            
+            - RewritePath=${service-url}/search/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
         - id: auth
-          uri: http://localhost:8085
+          uri: ${AUTH-URL}
           predicates:
             - Path= ${service-url}/auth/**
           filters:
-            - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
+              - RewritePath=${service-url}/auth/(?<path>.*),/$\{path}
+        - id: home
+          uri: ${HOME-URL}
+          predicates:
+            - Path= ${service-url}/home/**
+          filters:
+            - RewritePath=${service-url}/home/(?<path>.*),/$\{path}
+            - AuthorizationHeaderFilter
 
 
 
@@ -86,16 +87,14 @@ springdoc:
         name: API Gateway Service
       - url: ${service-url}/basic/v3/api-docs
         name: Basic
-      - url: ${service-url}/mypage/v3/api-docs
+      - url: ${service-url}/auth/v3/api-docs
+        name: Auth
+      - url: ${service-url}/my/v3/api-docs
         name: Mypage
       - url: ${service-url}/reward/v3/api-docs
         name: Reward
-      - url: ${service-url}/auth/v3/api-docs
-        name: Auth
       - url: ${service-url}/search/v3/api-docs
         name: Search
-
-
-
-
+      - url: ${service-url}/home/v3/api-docs
+        name: Home
 

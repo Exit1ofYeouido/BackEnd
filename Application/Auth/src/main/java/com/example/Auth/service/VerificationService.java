@@ -4,9 +4,11 @@ import com.example.Auth.dto.PhoneVerificationRequestDTO;
 import com.example.Auth.dto.PhoneVerificationVerifyRequestDTO;
 import com.example.Auth.entity.PhoneVerification;
 import com.example.Auth.exception.VerificationCodeRequestException;
+import com.example.Auth.repository.AuthRepository;
 import com.example.Auth.repository.VerificationRepository;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -14,15 +16,22 @@ import org.springframework.stereotype.Service;
 public class VerificationService {
 
     private final VerificationRepository verificationRepository;
+    private final AuthRepository authRepository;
 
-    public VerificationService(VerificationRepository verificationRepository) {
+    @Autowired
+    public VerificationService(VerificationRepository verificationRepository, AuthRepository authRepository) {
         this.verificationRepository = verificationRepository;
+        this.authRepository = authRepository;
     }
 
     public String makeVerificationCode(PhoneVerificationRequestDTO phoneVerificationRequestDTO) {
 
         String phoneNumber = phoneVerificationRequestDTO.getPhoneNumber();
         String randomCode = createRandomNumber();
+
+        if (authRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new VerificationCodeRequestException("이미 가입된 핸드폰 번호입니다.");
+        }
 
         PhoneVerification savedPhoneVerification = verificationRepository.findByPhoneNumber(
                 phoneNumber);

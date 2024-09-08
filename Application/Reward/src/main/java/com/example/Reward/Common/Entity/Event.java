@@ -12,15 +12,16 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="event_id")
     private Long id;
 
     private String stockCode;
 
     private String enterpriseName;
 
-    private LocalDateTime create_at;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime update_at;
+    private LocalDateTime updatedAt;
 
     private Double rewardAmount;
 

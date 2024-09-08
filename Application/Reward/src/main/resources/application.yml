@@ -25,6 +25,9 @@ spring:
         use_sql_comments: true
         format_sql: true
     defer-datasource-initialization: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
@@ -41,11 +44,9 @@ cloud:
       s3:
         bucket: ${CLOUD_AWS_S3_BUCKET}
 
-authorization: ${AUTHORIZATION}
-
 bootstrap:
   server: ${BOOTSTRAP_SERVER}
 app:
   key: ${APP_KEY}
-  secretkey: ${APP_SECRETKEY}
+  secretkey: ${APP_SECRET}
 
