@@ -141,7 +141,7 @@ public class AccountService {
     public MyStockSaleRequestsResponseDto getMyStocksSaleRequests(Long memberId) {
         SaleInfo saleInfo = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
-        int index = (saleInfo.getIdx() + 1) % 2;
+        int index = saleInfo.getIdx();
 
         List<? extends StockSaleRequest> stockSaleRequests;
 
