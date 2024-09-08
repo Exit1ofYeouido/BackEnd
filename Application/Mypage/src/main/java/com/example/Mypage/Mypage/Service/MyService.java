@@ -11,6 +11,7 @@ import com.example.Mypage.Common.Repository.MemberStockRepository;
 import com.example.Mypage.Common.Repository.PopupCheckRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
+import com.example.Mypage.Mypage.Dto.out.AllAssetDto;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
@@ -49,53 +50,52 @@ public class MyService {
                 () -> new AccountNotFoundException("계좌가 존재하지않습니다.")
         );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
-        String calcAssetsEarningRate = CalcAllAssets(memberStock);
+        AllAssetDto AllAsset = CalcAllAssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
-        int allCost = AllAssetsCount(memberStock);
 
-        return GetAllMyPageResponseDto.of(account.getPoint(), calcAssetsEarningRate, earningRates, allCost);
+        return GetAllMyPageResponseDto.of(account.getPoint(), AllAsset.getCalcAssetsEarningRate(), earningRates,account.getAccountNumber(),AllAsset.getAllCost());
     }
 
-    private String CalcAllAssets(List<MemberStock> memberStocks) {
+    private AllAssetDto CalcAllAssets(List<MemberStock> memberStocks) {
 
         double allCost = 0;
         double currentAllCost = 0;
+
+        
         if (memberStocks.isEmpty()) {
-            return "0";
+            return AllAssetDto.builder()
+                    .calcAssetsEarningRate("0")
+                    .allCost(0)
+                    .build();
         }
 
         for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getAmount();
-            double stockprice = memberStock.getAveragePrice();
+            double stockCount = memberStock.getAmount();
+            double stockPrice = memberStock.getAveragePrice();
 
-            double currentprice = apiService.getPrice(memberStock.getStockCode());
+            double currentPrice = apiService.getPrice(memberStock.getStockCode());
 
-            allCost = allCost + (stockprice * stockcount);
-            currentAllCost = currentAllCost + (currentprice * stockcount);
-
+            allCost = allCost + (stockPrice * stockCount);
+            currentAllCost = currentAllCost + (currentPrice * stockCount);
         }
 
+
         if (allCost==currentAllCost){
-            return "0";
+            return AllAssetDto.builder()
+                    .calcAssetsEarningRate("0")
+                    .allCost((int) currentAllCost)
+                    .build();
         }
 
         double value = (currentAllCost -allCost)/allCost * 100;
         DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(value);
 
+        return AllAssetDto.builder()
+                .calcAssetsEarningRate(df.format(value))
+                .allCost((int) currentAllCost)
+                .build();
     }
 
-    private int AllAssetsCount(List<MemberStock> memberStocks) {
-        int allCost = 0;
-
-        for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getAmount();
-            int stockprice = apiService.getPrice(memberStock.getStockCode());
-            allCost = (int) (allCost + (stockprice * stockcount));
-
-        }
-        return allCost;
-    }
 
     private List<EarningRate> Top3EarningRateAssets(List<MemberStock> memberStocks) {
 
