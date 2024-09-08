@@ -1,20 +1,19 @@
 package com.example.Home.HomeService;
 
-import com.example.Home.HomeDTO.HomeResponseDTO;
-import com.example.Home.Kis.KoreaInvestmentApiService;
-import com.example.Home.Common.Entity.Member;
 import com.example.Home.Common.Entity.Account;
+import com.example.Home.Common.Entity.Member;
 import com.example.Home.Common.Entity.MemberStock;
 import com.example.Home.Common.Repository.AccountRepository;
 import com.example.Home.Common.Repository.MemberRepository;
 import com.example.Home.Common.Repository.MemberStockRepository;
+import com.example.Home.HomeDTO.HomeResponseDTO;
+import com.example.Home.Kis.KoreaInvestmentApiService;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -25,7 +24,8 @@ public class HomeService {
     private final AccountRepository accountRepository;
     private final KoreaInvestmentApiService koreaInvestmentApiService;
 
-    public HomeService(MemberRepository memberRepository, MemberStockRepository memberStockRepository, AccountRepository accountRepository, KoreaInvestmentApiService koreaInvestmentApiService) {
+    public HomeService(MemberRepository memberRepository, MemberStockRepository memberStockRepository,
+                       AccountRepository accountRepository, KoreaInvestmentApiService koreaInvestmentApiService) {
         this.memberRepository = memberRepository;
         this.memberStockRepository = memberStockRepository;
         this.accountRepository = accountRepository;
@@ -58,9 +58,15 @@ public class HomeService {
                 .map(MemberStock::getCode)
                 .collect(Collectors.toList()));
 
-        return memberStocks.stream()
-                .mapToInt(stock -> (int) (stock.getAmount() * stockPrices.getOrDefault(stock.getCode(), 0L)))
-                .sum();
+        double totalStockValue = 0;
+
+        for (MemberStock memberStock : memberStocks) {
+            double stockAmount = memberStock.getAmount();
+            double stockPrice = stockPrices.getOrDefault(memberStock.getCode(), 0L);
+            totalStockValue += stockAmount * stockPrice;
+        }
+
+        return (int) totalStockValue;
     }
 
     private Map<String, Long> getStockPrices(List<String> stockCodes) {
@@ -76,9 +82,12 @@ public class HomeService {
     }
 
     private double calculateEarningRate(List<MemberStock> memberStocks) {
-        if(memberStocks.isEmpty()) {return 0.0;}
+        if (memberStocks.isEmpty()) {
+            return 0.0;
+        }
 
-        Map<String,Long> currentPrices = getStockPrices(memberStocks.stream().map(MemberStock::getCode).collect(Collectors.toList()));
+        Map<String, Long> currentPrices = getStockPrices(
+                memberStocks.stream().map(MemberStock::getCode).collect(Collectors.toList()));
         System.out.println("current prices" + currentPrices);
 
         double totalCurrentValue = 0.0;
@@ -97,11 +106,11 @@ public class HomeService {
             totalCurrentValue += currentValue;
             System.out.println("api로 불러온 현재가 : " + totalCurrentValue);
             totalPurchaseValue += purchaseValue;
-            System.out.println("내가 샀을 때 평균가 : "+ totalPurchaseValue);
+            System.out.println("내가 샀을 때 평균가 : " + totalPurchaseValue);
         }
         double earningRate = ((totalCurrentValue - totalPurchaseValue) / totalPurchaseValue) * 100;
 
-        return Math.round(earningRate*100.0) / 100.0;
+        return Math.round(earningRate * 100.0) / 100.0;
     }
 
     @Transactional
