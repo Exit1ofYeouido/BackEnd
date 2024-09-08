@@ -16,6 +16,7 @@ import com.example.Mypage.Common.Entity.StockTradeHistory;
 import com.example.Mypage.Common.Repository.AccountHistoryRepository;
 import com.example.Mypage.Common.Repository.AccountRepository;
 import com.example.Mypage.Common.Repository.CompletedStockSaleRepository;
+import com.example.Mypage.Common.Repository.MemberRepository;
 import com.example.Mypage.Common.Repository.MemberStockRepository;
 import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
@@ -23,7 +24,9 @@ import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Common.Sms.MessageUtil;
 import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
+import com.example.Mypage.Mypage.Dto.out.StocksSellResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
+import com.example.Mypage.Mypage.Exception.ExceedSaleAmountException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import com.example.Mypage.Mypage.Webclient.handler.StockPriceSocketHandler;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -76,27 +79,37 @@ public class SellService {
 
     @Autowired
     private StockPriceSocketHandler stockPriceSocketHandler;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Transactional
-    public boolean saveStockSellRequest(Long memberId, StockSellRequestDto stockSellRequestDto) {
+    public StocksSellResponseDto saveStockSellRequest(Long memberId, StockSellRequestDto stockSellRequestDto) {
 
         String enterpriseName = stockSellRequestDto.getStockName();
 
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(enterpriseName, memberId);
-        Member member = memberStock.getMember();
 
         if (memberStock == null) {
             throw new NoSuchElementException("보유한 주식만 판매가능합니다.");
         }
 
+        Member member = memberStock.getMember();
+
         double canSellAmount = memberStock.getAvailableAmount() - stockSellRequestDto.getSellAmount();
         if (canSellAmount < 0) {
-            throw new IllegalStateException("보유한 주식을 초과하여 판매할 수 없습니다.");
+            throw new ExceedSaleAmountException("보유한 주식을 초과하여 판매할 수 없습니다.");
         }
 
-        //TODO : 예외처리 추가하기
+        memberStock.setAvailableAmount(canSellAmount);
+        memberStockRepository.save(memberStock);
+        DecimalFormat decimalFormat = new DecimalFormat("#.######");
+
         saveSellRequest(stockSellRequestDto, member);
-        return true;
+
+        return StocksSellResponseDto.builder()
+                .requestAmount(stockSellRequestDto.getSellAmount())
+                .remainAmount(decimalFormat.format(memberStock.getAvailableAmount()))
+                .build();
     }
 
     @Scheduled(cron = "0 0 10,15 * * mon-fri")

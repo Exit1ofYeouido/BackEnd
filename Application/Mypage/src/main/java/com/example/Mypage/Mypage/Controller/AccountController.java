@@ -4,10 +4,11 @@ import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StocksSellResponseDto;
 import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.SellService;
@@ -75,9 +76,9 @@ public class AccountController {
 
     @GetMapping("/stocks-history")
     @Operation(description = "나의 주식 거래내역 조회")
-    public ResponseEntity<List<MyStocksHistoryResponseDto>> getMyStocksHistory(@RequestHeader("memberId") Long memberId,
-                                                                               @RequestParam(defaultValue = "0") int index,
-                                                                               @RequestParam(defaultValue = "5") int size) {
+    public ResponseEntity<StocksHistoryResponseDto> getMyStocksHistory(@RequestHeader("memberId") Long memberId,
+                                                                       @RequestParam(defaultValue = "0") int index,
+                                                                       @RequestParam(defaultValue = "5") int size) {
 
         return ResponseEntity.ok(accountService.getMyStocksHistory(memberId, index, size));
     }
@@ -93,14 +94,11 @@ public class AccountController {
 
     @PostMapping("/stocks/sell")
     @Operation(description = "나의 주식 판매하기")
-    public ResponseEntity<String> sellMyStock(@RequestHeader("memberId") Long memberId,
-                                              @RequestBody StockSellRequestDto stockSellRequestDto) {
-        if (sellService.saveStockSellRequest(memberId, stockSellRequestDto)) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(stockSellRequestDto.getStockName() + "주식 " + stockSellRequestDto.getSellAmount()
-                            + "개 판매등록을 하였습니다.");
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("판매 요청에 실패했습니다.");
+    public ResponseEntity<StocksSellResponseDto> sellMyStock(@RequestHeader("memberId") Long memberId,
+                                                             @RequestBody StockSellRequestDto stockSellRequestDto) {
+        StocksSellResponseDto stocksSellResponseDto = sellService.saveStockSellRequest(memberId, stockSellRequestDto);
+
+        return new ResponseEntity<>(stocksSellResponseDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/stocks/pending")

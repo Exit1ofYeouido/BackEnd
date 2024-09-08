@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetPointHistoryResponseDto {
+public class StocksSellResponseDto {
 
-    private Long memberId;
-    private Integer requestPoint;
-    private Integer resultPoint;
-    private String type;
-    private String date;
+    private double requestAmount;
+
+    private String remainAmount;
+
 }

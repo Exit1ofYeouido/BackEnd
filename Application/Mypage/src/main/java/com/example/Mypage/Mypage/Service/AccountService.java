@@ -20,8 +20,10 @@ import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
+import com.example.Mypage.Mypage.Dto.out.PointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.BadRequestException;
@@ -73,12 +75,16 @@ public class AccountService {
         }
     }
 
-    public List<GetPointHistoryResponseDto> getPointHistory(Long memberId, int index, int limit) {
+    public PointHistoryResponseDto getPointHistory(Long memberId, int index, int limit) {
         Pageable pageable = PageRequest.of(index, limit);
         Page<AccountHistory> accountHistoryPage = accountHistoryRepository.findByMemberId(memberId, pageable);
         List<AccountHistory> accountHistoryList = accountHistoryPage.getContent();
 
-        return getPointHistoryResponseDtos(accountHistoryList);
+        int size = (int) accountHistoryPage.getTotalElements();
+
+        return PointHistoryResponseDto.builder()
+                .pointHistory(getPointHistoryResponseDtos(accountHistoryList))
+                .size(size).build();
     }
 
     public List<MyStocksResponseDto> getAllMyStocks(Long memberId) {
@@ -113,26 +119,29 @@ public class AccountService {
         return createResponseDto(memberStock, minSaleAmount);
     }
 
-    public List<MyStocksHistoryResponseDto> getMyStocksHistory(Long memberId, int index, int limit) {
+    public StocksHistoryResponseDto getMyStocksHistory(Long memberId, int index, int limit) {
         Pageable pageable = PageRequest.of(index, limit);
         Page<StockTradeHistory> myStockHistoyPage = tradeRepository.findByMemberId(memberId, pageable);
         List<StockTradeHistory> stockTradeHistories = myStockHistoyPage.getContent();
 
-        return stockTradeHistories.stream()
-                .map(stockTradeHistory -> MyStocksHistoryResponseDto.builder()
-                        .name(stockTradeHistory.getStockName())
-                        .type(stockTradeHistory.getTradeType())
-                        .amount(String.format("%.6f", stockTradeHistory.getAmount()))
-                        .date(stockTradeHistory.getCreatedAt()
-                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
-                        .build())
-                .toList();
+        int size = (int) myStockHistoyPage.getTotalElements();
+
+        return StocksHistoryResponseDto.builder().stocksHistory(stockTradeHistories.stream()
+                        .map(stockTradeHistory -> MyStocksHistoryResponseDto.builder()
+                                .name(stockTradeHistory.getStockName())
+                                .type(stockTradeHistory.getTradeType())
+                                .amount(String.format("%.6f", stockTradeHistory.getAmount()))
+                                .date(stockTradeHistory.getCreatedAt()
+                                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
+                                .build())
+                        .toList())
+                .size(size).build();
     }
 
     public MyStockSaleRequestsResponseDto getMyStocksSaleRequests(Long memberId) {
         SaleInfo saleInfo = saleInfoRepository.findById(PENDING_TABLE_ID)
                 .orElseThrow(() -> new NoSuchElementException("pending table idx를 찾을 수 없습니다."));
-        int index = (saleInfo.getIdx() + 1) % 2;
+        int index = saleInfo.getIdx();
 
         List<? extends StockSaleRequest> stockSaleRequests;
 

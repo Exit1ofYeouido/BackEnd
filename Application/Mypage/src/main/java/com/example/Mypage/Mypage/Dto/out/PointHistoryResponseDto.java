@@ -1,19 +1,18 @@
 package com.example.Mypage.Mypage.Dto.out;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetPointHistoryResponseDto {
+@Builder
+public class PointHistoryResponseDto {
 
-    private Long memberId;
-    private Integer requestPoint;
-    private Integer resultPoint;
-    private String type;
-    private String date;
+    private int size;
+
+    private List<GetPointHistoryResponseDto> pointHistory;
 }
