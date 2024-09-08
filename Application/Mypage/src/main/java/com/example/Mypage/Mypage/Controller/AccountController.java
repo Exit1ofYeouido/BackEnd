@@ -9,6 +9,7 @@ import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StocksSellResponseDto;
+import com.example.Mypage.Mypage.Dto.out.StocksValueResponseDto;
 import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.SellService;
@@ -66,6 +67,13 @@ public class AccountController {
 
         WithdrawalResponseDto withdrawalResponseDto = accountService.withdrawalPoint(memberId, withdrawalRequestDto);
         return ResponseEntity.ok(withdrawalResponseDto);
+    }
+
+    @GetMapping("/stocks-value")
+    @Operation(description = "나의 주식가치 조회")
+    public ResponseEntity<StocksValueResponseDto> getStocksValue(@RequestHeader("memberId") Long memberId) {
+        StocksValueResponseDto stocksValueResponseDto = accountService.getCurrentStocksValue(memberId);
+        return ResponseEntity.ok(stocksValueResponseDto);
     }
 
     @GetMapping("/stocks")
