@@ -87,6 +87,10 @@ public class SellService {
 
         String enterpriseName = stockSellRequestDto.getStockName();
 
+        if (stockSellRequestDto.getSellAmount() <= 0) {
+            throw new ExceedSaleAmountException("보유한 주식을 초과하여 판매할 수 없습니다.");
+        }
+
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(enterpriseName, memberId);
 
         if (memberStock == null) {
