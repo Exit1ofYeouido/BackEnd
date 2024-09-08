@@ -43,7 +43,7 @@ public class MyService {
     private final AccountRepository accountRepository;
     private final TradeRepository tradeRepository;
 
-    @Transactional(readOnly = true)
+
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
 
         Account account = accountRepository.findByMemberId(memId).orElseThrow(
