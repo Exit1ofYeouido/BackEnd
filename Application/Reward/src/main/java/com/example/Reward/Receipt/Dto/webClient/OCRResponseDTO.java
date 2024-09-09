@@ -1,11 +1,8 @@
-package com.example.Reward.Receipt.Dto.out;
+package com.example.Reward.Receipt.Dto.webClient;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.lang.module.Configuration;
 
 @Getter
 @Builder
