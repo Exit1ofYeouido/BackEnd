@@ -13,6 +13,7 @@ import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
+import com.example.Mypage.Common.Sms.MessageUtil;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
@@ -32,14 +33,17 @@ import com.example.Mypage.Mypage.Exception.BadRequestException;
 import com.example.Mypage.Mypage.Exception.InValidStockCodeException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +58,8 @@ public class AccountService {
     public static final int PENDING_TABLE_ID = 1;
     public static final int MARKET_TABLE_ID = 2;
     public static final double MIN_SALE_PRICE = 1000;
+    private static final String WITHDRAWAL_MESSAGE_TEMPLATE = "[StockCraft] 출금 알리미 \n 계좌번호 : %s \n 출금금액 : %s원 "
+            + "\n 최종잔액 : %s원";
 
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
@@ -63,6 +69,7 @@ public class AccountService {
     private final StockSaleRequestARepository stockSaleRequestARepository;
     private final StockSaleRequestBRepository stockSaleRequestBRepository;
     private final SaleInfoRepository saleInfoRepository;
+    private final MessageUtil messageUtil;
 
     public GetPointResponseDto getPoint(Long memberId) {
         try {
@@ -269,6 +276,12 @@ public class AccountService {
                 .createdAt(LocalDateTime.now())
                 .build();
         accountHistoryRepository.save(accountHistory);
+        messageUtil.sendMessage(String.format(
+                WITHDRAWAL_MESSAGE_TEMPLATE,
+                accountHistory.getAccount().getAccountNumber(),
+                formatPrice(accountHistory.getRequestPoint()),
+                formatPrice(accountHistory.getResultPoint())
+        ), accountHistory.getMember().getPhoneNumber());
 
         return WithdrawalResponseDto.builder().remainPoint(account.getPoint()).build();
     }
@@ -325,5 +338,10 @@ public class AccountService {
     private String formatEarningRate(double amount) {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         return decimalFormat.format(amount);
+    }
+
+    private static @NotNull String formatPrice(int sellPrice) {
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.KOREA);
+        return numberFormat.format(sellPrice);
     }
 }
