@@ -6,14 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MyStocksResponseDto {
+@Builder
+public class StocksValueResponseDto {
 
-    private String name;
-    private Double holdStockCount;
-    private int averagePrice;
-    private String stockCode;
     private String earningRate;
+
+    private int stocksValue;
 }

@@ -181,9 +181,10 @@ public class ReceiptService {
     @Transactional
     public String checkEnterpriseName(List<String> enterprises, String storeName, String receiptURL) {
         String longest = "";
+        if(storeName.equals("STARBUCKS")) return "이마트";
         for(String name : enterprises) {
             String detected = getLongestCommonSubstring.getlongestCommonSubstring(name, storeName);
-            if(detected.length()>longest.length()) {
+            if(detected.length()>longest.length() && detected.length()>name.length()/2) {
                 longest = detected;
             }
         }
