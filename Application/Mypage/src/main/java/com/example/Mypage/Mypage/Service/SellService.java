@@ -321,6 +321,7 @@ public class SellService {
                 .member(sellRequest.getMember())
                 .stockName(sellRequest.getEnterpriseName())
                 .amount(sellRequest.getAmount())
+                .createdAt(LocalDateTime.now())
                 .tradeType("out")
                 .build()
         );
