@@ -122,6 +122,7 @@ public class MyService {
             EarningRate earningRate = EarningRate.builder()
                     .earningRate(finalEarningRate)
                     .enterpriseName(memberStock.getStockName())
+                    .stockCode(memberStock.getStockCode())
                     .build();
             top3EarningRates.add(earningRate);
         }
