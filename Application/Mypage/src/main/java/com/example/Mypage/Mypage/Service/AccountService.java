@@ -60,6 +60,7 @@ public class AccountService {
     public static final double MIN_SALE_PRICE = 1000;
     private static final String WITHDRAWAL_MESSAGE_TEMPLATE = "[StockCraft] 출금 알리미 \n 계좌번호 : %s \n 출금금액 : %s원 "
             + "\n 최종잔액 : %s원";
+    public static final int MIN_WITHDRAWAL_POINT = 100;
 
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
@@ -253,6 +254,10 @@ public class AccountService {
 
     @Transactional
     public WithdrawalResponseDto withdrawalPoint(Long memberId, WithdrawalRequestDto withdrawalRequestDto) {
+        if (withdrawalRequestDto.getWithdrawalAmount() < MIN_WITHDRAWAL_POINT) {
+            throw new BadRequestException("최소 출금 포인트는 100원 입니다.");
+        }
+
         Account account = accountRepository.findByAccountNumber(withdrawalRequestDto.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌개설을 진행하세요."));
 
