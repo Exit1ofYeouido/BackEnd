@@ -6,13 +6,13 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetSearchLogMemberDto {
+public class MemberCountDto {
     private String enterpriseName;
     @Setter
     private boolean isHolding;
     private Long totalCount;
 
-    public GetSearchLogMemberDto(String enterpriseName, Long totalCount) {
+    public MemberCountDto(String enterpriseName, Long totalCount) {
         this.enterpriseName = enterpriseName;
         this.totalCount = totalCount;
     }

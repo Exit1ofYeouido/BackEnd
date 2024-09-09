@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -24,17 +23,6 @@ public class LogController {
 
     private final LogService logService;
 
-    @GetMapping("/search-history/stock")
-    @Operation(description = "주식 종목별 검색량 조회")
-    public ResponseEntity<?> gethistoryStock(@RequestParam("enterpriseName") String enterpriseName,@RequestParam("year") String year
-            ,@RequestParam("month") String month) throws ParseException {
-
-
-        List<GetHistoryStockResponseDto> getHistoryStockResponseDtos=logService.gethistoryStock(enterpriseName,year,month);
-
-        return ResponseEntity.ok(getHistoryStockResponseDtos);
-    }
-
     @GetMapping("/search-history/member-stock")
     @Operation(description = "주식 종목, 회원 지정하여 검색량 조회")
     public ResponseEntity<GetSearchLogMemberStockDto> getSearchLogMemberStock(@RequestParam("memberId") String memberId, @RequestParam("enterpriseName") String enterpriseName, @RequestParam("year") String year, @RequestParam("month") String month) {
@@ -44,9 +32,15 @@ public class LogController {
 
     @GetMapping("/search-history/member")
     @Operation(description = "회원 지정하여 주식별 검색량 조회")
-    public ResponseEntity<List<GetSearchLogMemberDto>> getSearchLogMember(@RequestParam("memberId") String memberId, @RequestParam("year") String year, @RequestParam("month") String month) {
-        List<GetSearchLogMemberDto> getSearchLogMemberDtos = logService.getLogMember(Long.valueOf(memberId), Integer.parseInt(year), Integer.parseInt(month));
-        return ResponseEntity.ok(getSearchLogMemberDtos);
+    public ResponseEntity<List<MemberCountDto>> getSearchLogMember(@RequestParam("memberId") String memberId, @RequestParam("year") String year, @RequestParam("month") String month) {
+        List<MemberCountDto> memberCountDtos = logService.getLogMember(Long.valueOf(memberId), Integer.parseInt(year), Integer.parseInt(month));
+        return ResponseEntity.ok(memberCountDtos);
     }
 
+    @GetMapping("/search-history/stock")
+    @Operation(description = "주식 지정하여 날짜별, 월별 검색량 조회")
+    public ResponseEntity<StockCountResponseDto> getSearchLogStock(@RequestParam("enterpriseName") String enterpriseName, @RequestParam("year") String year, @RequestParam("month") String month) {
+        StockCountResponseDto stockCountResponseDto = logService.getLogStock(enterpriseName, Integer.parseInt(year), Integer.parseInt(month));
+        return ResponseEntity.ok(stockCountResponseDto);
+    }
 }
