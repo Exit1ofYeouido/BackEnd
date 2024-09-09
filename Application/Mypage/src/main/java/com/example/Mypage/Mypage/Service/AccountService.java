@@ -19,6 +19,7 @@ import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStocksPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
 import com.example.Mypage.Mypage.Dto.out.PointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
@@ -118,21 +119,39 @@ public class AccountService {
                 .build();
     }
 
-    public List<MyStocksResponseDto> getAllMyStocks(Long memberId) {
+    public MyStocksPageResponseDto getAllMyStocks(Long memberId) {
         log.info("MemberId : {} 의 보유주식 조회", memberId);
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
         List<MyStocksResponseDto> myStocks = new ArrayList<>();
 
+        double preValue = 0;
+        double currentValue = 0;
+
         for (MemberStock memberStock : memberStocks) {
+            double currentPrice = apiService.getPrice(memberStock.getStockCode());
+            double stockAmount = memberStock.getAmount();
+            double stockAveragePrice = memberStock.getAveragePrice();
+
+            preValue += stockAveragePrice * stockAmount;
+            currentValue += currentPrice * stockAmount;
+
             myStocks.add(MyStocksResponseDto.builder()
                     .name(memberStock.getStockName())
-                    .earningRate(getEarningRate(memberStock))
+                    .earningRate(getEarningRate(memberStock, (int) currentPrice))
                     .stockCode(memberStock.getStockCode())
                     .averagePrice(memberStock.getAveragePrice())
                     .holdStockCount(memberStock.getAmount())
                     .build());
         }
-        return myStocks;
+
+        double earningRate = (currentValue - preValue) / preValue * 100;
+
+        return MyStocksPageResponseDto.builder()
+                .myStocksResponse(myStocks)
+                .stocksValueResponseDto(StocksValueResponseDto.builder()
+                        .stocksValue((int) currentValue)
+                        .earningRate(formatEarningRate(earningRate))
+                        .build()).build();
     }
 
     @Transactional
@@ -254,9 +273,8 @@ public class AccountService {
         return WithdrawalResponseDto.builder().remainPoint(account.getPoint()).build();
     }
 
-    private String getEarningRate(MemberStock memberStock) {
-        int curPrice = apiService.getPrice(memberStock.getStockCode());
-        double resultPrice = (double) curPrice / (double) memberStock.getAveragePrice();
+    private String getEarningRate(MemberStock memberStock, int currentPrice) {
+        double resultPrice = (double) currentPrice / (double) memberStock.getAveragePrice();
 
         if (resultPrice == 0) {
             return "0";

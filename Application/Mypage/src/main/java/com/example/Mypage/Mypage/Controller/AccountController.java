@@ -4,7 +4,7 @@ import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
 import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
+import com.example.Mypage.Mypage.Dto.out.MyStocksPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
 import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
@@ -14,7 +14,6 @@ import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
 import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.SellService;
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -78,7 +77,7 @@ public class AccountController {
 
     @GetMapping("/stocks")
     @Operation(description = "나의 보유주식 조회")
-    public ResponseEntity<List<MyStocksResponseDto>> getMyStocks(@RequestHeader("memberId") Long memberId) {
+    public ResponseEntity<MyStocksPageResponseDto> getMyStocks(@RequestHeader("memberId") Long memberId) {
         return ResponseEntity.ok(accountService.getAllMyStocks(memberId));
     }
 

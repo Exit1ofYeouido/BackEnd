@@ -211,7 +211,6 @@ public class MyService {
 
     }
 
-    @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
         return memberStocks;
