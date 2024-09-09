@@ -53,7 +53,8 @@ public class MyService {
         AllAssetDto AllAsset = CalcAllAssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
 
-        return GetAllMyPageResponseDto.of(account.getPoint(), AllAsset.getCalcAssetsEarningRate(), earningRates,account.getAccountNumber(),AllAsset.getAllCost());
+        return GetAllMyPageResponseDto.of(account.getPoint(), AllAsset.getCalcAssetsEarningRate(), earningRates,
+                account.getAccountNumber(), AllAsset.getAllCost());
     }
 
     private AllAssetDto CalcAllAssets(List<MemberStock> memberStocks) {
@@ -61,7 +62,6 @@ public class MyService {
         double allCost = 0;
         double currentAllCost = 0;
 
-        
         if (memberStocks.isEmpty()) {
             return AllAssetDto.builder()
                     .calcAssetsEarningRate("0")
@@ -79,15 +79,14 @@ public class MyService {
             currentAllCost = currentAllCost + (currentPrice * stockCount);
         }
 
-
-        if (allCost==currentAllCost){
+        if (allCost == currentAllCost) {
             return AllAssetDto.builder()
                     .calcAssetsEarningRate("0")
                     .allCost((int) currentAllCost)
                     .build();
         }
 
-        double value = (currentAllCost -allCost)/allCost * 100;
+        double value = (currentAllCost - allCost) / allCost * 100;
         DecimalFormat df = new DecimalFormat("#.##");
 
         return AllAssetDto.builder()
@@ -104,27 +103,24 @@ public class MyService {
         for (MemberStock memberStock : memberStocks) {
             double stockCount = memberStock.getAmount();
 
-
-            if (stockCount ==0){
+            if (stockCount == 0) {
                 continue;
             }
-            
 
             int stockPrice = memberStock.getAveragePrice();
             int currentPrice = apiService.getPrice(memberStock.getStockCode());
 
             double stock = stockCount * stockPrice;
             double currentStock = stockCount * currentPrice;
-            String finalEarningRate ;
+            String finalEarningRate;
 
-            if (currentStock==stock){
-                finalEarningRate="0";
+            if (currentStock == stock) {
+                finalEarningRate = "0";
             }
-            
-            double value = (currentStock-stock)/stock * 100;
+
+            double value = (currentStock - stock) / stock * 100;
             DecimalFormat df = new DecimalFormat("#.##");
             finalEarningRate = df.format(value);
-
 
             EarningRate earningRate = EarningRate.builder()
                     .earningRate(finalEarningRate)
@@ -215,14 +211,12 @@ public class MyService {
 
     }
 
-    @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
         return memberStocks;
 
     }
 
-    // 주식 거래내역 추가
 
     private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
         StockTradeHistory stockTradeHistory = StockTradeHistory.builder()
