@@ -103,6 +103,11 @@ public class MyService {
 
         for (MemberStock memberStock : memberStocks) {
             double stockCount = memberStock.getAmount();
+
+            if (stockCount ==0){
+                continue;
+            }
+            
             int stockPrice = memberStock.getAveragePrice();
             int currentPrice = apiService.getPrice(memberStock.getStockCode());
 
