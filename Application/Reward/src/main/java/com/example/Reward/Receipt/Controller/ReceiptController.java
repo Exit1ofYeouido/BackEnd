@@ -6,6 +6,7 @@ import com.example.Reward.Receipt.Dto.out.AnalyzeReceiptDTO;
 import com.example.Reward.Receipt.Dto.out.CheckReceiptResponseDTO;
 import com.example.Reward.Receipt.Dto.out.GetEnterpriseListDTO;
 import com.example.Reward.Receipt.Dto.out.RewardResponseDTO;
+import com.example.Reward.Receipt.Service.OcrService;
 import com.example.Reward.Receipt.Service.ReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/receipt")
@@ -22,10 +22,12 @@ import java.math.BigDecimal;
 public class ReceiptController {
     private final ReceiptService receiptService;
     private final GiveStockService giveStockService;
+    private final OcrService ocrService;
 
-    public ReceiptController(ReceiptService receiptService, GiveStockService giveStockService) {
+    public ReceiptController(ReceiptService receiptService, GiveStockService giveStockService, OcrService ocrService) {
         this.receiptService = receiptService;
         this.giveStockService = giveStockService;
+        this.ocrService = ocrService;
     }
 
     @GetMapping("/enterprise")
@@ -41,7 +43,7 @@ public class ReceiptController {
         String extension = receiptService.getExtension(receiptImg);
         String receiptURL = receiptService.uploadReceiptToS3(receiptImg);
         String receiptData = receiptService.convertImage(receiptImg);
-        AnalyzeReceiptDTO analyzeReceiptDTO = receiptService.analyzeReceipt(receiptURL, receiptData, extension);
+        AnalyzeReceiptDTO analyzeReceiptDTO = ocrService.getReceiptInfo(receiptURL, receiptData, extension);
         GetEnterpriseListDTO getEnterpriseListDTO = receiptService.getEnterpriseList();
         String checkedEnterpriseName = receiptService.checkEnterpriseName(getEnterpriseListDTO.getEnterprises(), analyzeReceiptDTO.getStoreName(), receiptURL);
         CheckReceiptResponseDTO checkReceiptResponseDTO = CheckReceiptResponseDTO.builder()
