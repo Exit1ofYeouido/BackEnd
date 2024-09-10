@@ -19,21 +19,56 @@ public class KoreaInvestmentApiService {
     @Value("${app.secretkey}")
     private String apiSecret;
 
+    @Value("${app.fourth-key}")
+    private String FOURTH_API_KEY;
 
-    WebClient webClient=WebClient.create("https://openapi.koreainvestment.com:9443");
+    @Value("${app.fourth-secret}")
+    private String FOURTH_API_SECRET;
 
-    public Long getCurrentPrice(String stockCode) {
+
+    WebClient webClient = WebClient.create("https://openapi.koreainvestment.com:9443");
+
+    public Long getCurrentAPrice(String stockCode) {
         try {
             ApiResponseDTO response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/uapi/domestic-stock/v1/quotations/inquire-time-itemconclusion")
                             .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                             .queryParam("FID_INPUT_ISCD", stockCode)
-                            .queryParam("FID_INPUT_HOUR_1","160000")
+                            .queryParam("FID_INPUT_HOUR_1", "160000")
                             .build())
-                    .header("authorization", "Bearer " + generatedToken.getAccessToken())
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken(6L))
                     .header("appkey", apiKey)
                     .header("appsecret", apiSecret)
+                    .header("tr_id", "FHPST01060000")
+                    .retrieve()
+                    .bodyToMono(ApiResponseDTO.class)
+                    .block();
+
+            if (response != null && response.getOutput1() != null) {
+                return Long.parseLong(response.getOutput1().getStck_prpr());
+            } else {
+                log.error("API response is null or doesn't contain expected data for stock code: {}", stockCode);
+                return 0L;
+            }
+        } catch (Exception e) {
+            log.error("Error getting stock price for code {}: {}", stockCode, e.getMessage());
+            return 0L;
+        }
+    }
+
+    public Long getCurrentBPrice(String stockCode) {
+        try {
+            ApiResponseDTO response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/uapi/domestic-stock/v1/quotations/inquire-time-itemconclusion")
+                            .queryParam("FID_COND_MRKT_DIV_CODE", "J")
+                            .queryParam("FID_INPUT_ISCD", stockCode)
+                            .queryParam("FID_INPUT_HOUR_1", "160000")
+                            .build())
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken(4L))
+                    .header("appkey", FOURTH_API_KEY)
+                    .header("appsecret", FOURTH_API_SECRET)
                     .header("tr_id", "FHPST01060000")
                     .retrieve()
                     .bodyToMono(ApiResponseDTO.class)
@@ -49,7 +84,5 @@ public class KoreaInvestmentApiService {
             log.error("Error getting stock price for code {}: {}", stockCode, e.getMessage());
             return 0L; // 또는 다른 기본값
         }
-
-
     }
 }
