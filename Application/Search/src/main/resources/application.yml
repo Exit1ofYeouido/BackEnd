@@ -38,3 +38,6 @@ app:
   fourth-secret: ${APP_SECRET_KEY4}
   sixth-key: ${APP_KEY6}
   sixth-secret: ${APP_SECRET_KEY6}
+
+auth:
+  admin: ${ADMIN}
