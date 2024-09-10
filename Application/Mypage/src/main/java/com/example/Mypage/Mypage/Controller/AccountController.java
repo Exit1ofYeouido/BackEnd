@@ -2,18 +2,11 @@ package com.example.Mypage.Mypage.Controller;
 
 import com.example.Mypage.Mypage.Dto.in.StockSellRequestDto;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
-import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStocksPageResponseDto;
-import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
-import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
-import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
-import com.example.Mypage.Mypage.Dto.out.StocksSellResponseDto;
-import com.example.Mypage.Mypage.Dto.out.StocksValueResponseDto;
-import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
+import com.example.Mypage.Mypage.Dto.out.*;
 import com.example.Mypage.Mypage.Service.AccountService;
 import com.example.Mypage.Mypage.Service.SellService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -123,5 +116,15 @@ public class AccountController {
                                                             @PathVariable("saleId") Long saleId) {
         accountService.deleteMyStocksSaleRequest(saleId, memberId);
         return ResponseEntity.ok("return ResponseEntity.ok(\"정상적으로 주문 취소처리되었습니다.\");");
+    }
+
+    @PostMapping("/stocks/purchase")
+    @Operation(description = "구매하기 버튼 ")
+    public ResponseEntity<?> purchaseStocks(@RequestHeader("memberId") Long memberId, HttpServletRequest request){
+
+        String agent=request.getHeader("USER-AGENT");
+
+        GetPurchaseStocksResponseDto getpurcahseStocks=accountService.getPurcahseStocks(agent.toLowerCase());
+        return ResponseEntity.ok(getpurcahseStocks);
     }
 }

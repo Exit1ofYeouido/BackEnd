@@ -15,19 +15,7 @@ import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Common.Sms.MessageUtil;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
-import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
-import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStockSaleRequestsResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStocksHistoryResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStocksPageResponseDto;
-import com.example.Mypage.Mypage.Dto.out.MyStocksResponseDto;
-import com.example.Mypage.Mypage.Dto.out.PointHistoryResponseDto;
-import com.example.Mypage.Mypage.Dto.out.PreWithdrawalResponseDto;
-import com.example.Mypage.Mypage.Dto.out.StockSaleConditionResponseDto;
-import com.example.Mypage.Mypage.Dto.out.StocksHistoryResponseDto;
-import com.example.Mypage.Mypage.Dto.out.StocksValueResponseDto;
-import com.example.Mypage.Mypage.Dto.out.WithdrawalResponseDto;
+import com.example.Mypage.Mypage.Dto.out.*;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
 import com.example.Mypage.Mypage.Exception.BadRequestException;
 import com.example.Mypage.Mypage.Exception.InValidStockCodeException;
@@ -358,6 +346,28 @@ public class AccountService {
         return decimalFormat.format(amount);
     }
 
+
+    public GetPurchaseStocksResponseDto getPurcahseStocks(String agent) {
+
+        if (agent.contains("android")) {
+            return GetPurchaseStocksResponseDto
+                    .builder()
+                    .url("https://play.google.com/store/apps/details?id=com.shinhaninvest.nsmts")
+                    .build();
+        } else if (agent.contains("iphone") || agent.contains("ipad")) {
+            return GetPurchaseStocksResponseDto
+                    .builder()
+                    .url("https://apps.apple.com/kr/app/%EC%8B%A0%ED%95%9C-sol%EC%A6%9D%EA%B6%8C-%EB%8C%80%ED%91%9Cmts/id1168512940")
+                    .build();
+
+        }
+
+        return GetPurchaseStocksResponseDto
+                .builder()
+                .url("https://www.shinhansec.com/WEB-APP/wts/main/index.cmd?screen=1402")
+                .build();
+    }
+
     private static @NotNull String formatPrice(int sellPrice) {
         NumberFormat numberFormat = NumberFormat.getInstance(Locale.KOREA);
         return numberFormat.format(sellPrice);
@@ -367,5 +377,6 @@ public class AccountService {
         String maskedAccountNumber = accountNumber.substring(0, 7) + accountNumber.substring(7).replaceAll(".", "*");
 
         return maskedAccountNumber;
+
     }
 }
