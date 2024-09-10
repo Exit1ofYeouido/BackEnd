@@ -322,7 +322,7 @@ public class AccountService {
     }
 
     private StockSaleConditionResponseDto createResponseDto(MemberStock memberStock, double minSaleAmount) {
-        String holdingAmount = memberStock != null ? formatSellAmount(memberStock.getAvailableAmount()) : "0";
+        String holdingAmount = memberStock != null ? formatAmount(memberStock.getAvailableAmount()) : "0";
 
         boolean isSellable = memberStock != null;
         if (isSellable) {
@@ -330,14 +330,18 @@ public class AccountService {
         }
         return StockSaleConditionResponseDto.builder()
                 .holdingAmount(holdingAmount)
-                .minSaleAmount(formatSellAmount(minSaleAmount))
+                .minSaleAmount(formatAmount(minSaleAmount))
                 .isSellable(isSellable)
                 .build();
     }
 
-    private String formatSellAmount(double amount) {
+    public static String formatAmount(double amount) {
         DecimalFormat decimalFormat = new DecimalFormat("#.######");
         return decimalFormat.format(amount);
+    }
+
+    public static double formatDoubleAmount(double amount) {
+        return Double.parseDouble(formatAmount(amount));
     }
 
     private String formatEarningRate(double amount) {

@@ -1,5 +1,7 @@
 package com.example.Mypage.Mypage.Service;
 
+import static com.example.Mypage.Mypage.Service.AccountService.formatDoubleAmount;
+
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
@@ -149,14 +151,16 @@ public class MyService {
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
                 , giveStockDto.getMemId());
 
+        double formattedAmount = formatDoubleAmount(giveStockDto.getAmount());
+
         if (memberStock != null) {
             int avgPrice = (int) ((memberStock.getAmount() * memberStock.getAveragePrice() +
                     giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getAmount()
                     + giveStockDto.getAmount()));
 
-            double sumAvailableAmount = calcAvailableAmount(memberStock.getAvailableAmount(), giveStockDto.getAmount());
+            double sumAvailableAmount = calcAvailableAmount(memberStock.getAvailableAmount(), formattedAmount);
 
-            memberStock.setAmount(memberStock.getAmount() + giveStockDto.getAmount());
+            memberStock.setAmount(memberStock.getAmount() + formattedAmount);
             memberStock.setAvailableAmount(sumAvailableAmount);
             memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdatedAt(LocalDateTime.now());
@@ -166,8 +170,8 @@ public class MyService {
             memberStock = MemberStock.builder()
                     .member(member)
                     .stockName(giveStockDto.getEnterpriseName())
-                    .amount(giveStockDto.getAmount())
-                    .availableAmount(giveStockDto.getAmount())
+                    .amount(formattedAmount)
+                    .availableAmount(formattedAmount)
                     .stockCode(giveStockDto.getCode())
                     .averagePrice(giveStockDto.getPrice())
                     .createdAt(LocalDateTime.now())
@@ -223,7 +227,7 @@ public class MyService {
                 .stockName(giveStockDto.getEnterpriseName())
                 .tradeType("in")
                 .member(member)
-                .amount(giveStockDto.getAmount())
+                .amount(formatDoubleAmount(giveStockDto.getAmount()))
                 .createdAt(LocalDateTime.now())
                 .memberStock(memberStock)
                 .build();
