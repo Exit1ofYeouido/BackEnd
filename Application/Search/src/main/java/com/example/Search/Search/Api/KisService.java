@@ -43,7 +43,13 @@ public class KisService {
     @Value("${app.fourth-secret}")
     private String FOURTH_API_SECRET;
 
-    public SearchResponseDto getCurrentPrice(String stockCode) {
+    @Value("${app.sixth-key}")
+    private String SIXTH_API_KEY;
+
+    @Value("${app.sixth-secret}")
+    private String SIXTH_API_SECRET;
+
+    public SearchResponseDto getCurrentAPrice(String stockCode) {
         try {
             CurrentPriceDTO response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
@@ -54,6 +60,38 @@ public class KisService {
                     .header("authorization", "Bearer " + generatedToken.getAccessToken(1L))
                     .header("appkey", apiKey)
                     .header("appsecret", apiSecret)
+                    .header("tr_id", "FHKST01010100")
+                    .retrieve()
+                    .bodyToMono(CurrentPriceDTO.class)
+                    .block();
+
+            if (response != null && response.getOutput() != null) {
+                return SearchResponseDto.builder()
+                        .previousPrice(response.getOutput().getPrdy_vrss())
+                        .currentPrice(Long.parseLong(response.getOutput().getStck_prpr()))
+                        .previousRate(response.getOutput().getPrdy_ctrt())
+                        .build();
+            } else {
+                log.error("API response is null or doesn't contain expected data for stock code: {}", stockCode);
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("Error getting stock price for code {}: {}", stockCode, e.getMessage());
+            return null;
+        }
+    }
+
+    public SearchResponseDto getCurrentBPrice(String stockCode) {
+        try {
+            CurrentPriceDTO response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/uapi/domestic-stock/v1/quotations/inquire-price")
+                            .queryParam("FID_COND_MRKT_DIV_CODE", "J")
+                            .queryParam("FID_INPUT_ISCD", stockCode)
+                            .build())
+                    .header("authorization", "Bearer " + generatedToken.getAccessToken(6L))
+                    .header("appkey", SIXTH_API_KEY)
+                    .header("appsecret", SIXTH_API_SECRET)
                     .header("tr_id", "FHKST01010100")
                     .retrieve()
                     .bodyToMono(CurrentPriceDTO.class)
@@ -96,7 +134,7 @@ public class KisService {
                     type = "W";
                     break;
                 default:
-                    startDate = endDate.minusMonths(1);  // 기본값은 1달
+                    startDate = endDate.minusMonths(1);
             }
 
             final String PERIOD = type;

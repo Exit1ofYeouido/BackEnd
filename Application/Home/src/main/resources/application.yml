@@ -32,5 +32,7 @@ springdoc:
   packages-to-scan: com.example
 
 app:
-  key: ${APP_KEY}
-  secretkey: ${APP_SECRET}
+  key: ${APP_KEY6}
+  secret: ${APP_SECRET_KEY6}
+  fourth-key: ${APP_KEY4}
+  fourth-secret: ${APP_SECRET_KEY4}
