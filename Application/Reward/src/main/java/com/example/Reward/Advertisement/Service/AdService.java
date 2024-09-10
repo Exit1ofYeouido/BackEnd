@@ -102,7 +102,6 @@ public class AdService {
     @Transactional
     public GiveStockResponseDto giveStock(Long mediaId, GiveStockRequestDto giveStockRequestDto,Long memId) {
 
-
         Optional<MediaLink> mediaLink=mediaLinkRepository.findById(mediaId);
 
         MediaHistory mediaHistory=mediaHistoryRepository.findByMemberIdAndMediaLinkId(memId,mediaLink.get().getId());
@@ -133,7 +132,7 @@ public class AdService {
 
         giveStockService.giveAdStock(memId,resultDto.getAmount(),event.getStockCode(),event.getEnterpriseName(),resultDto.getCost());
 
-        return GiveStockResponseDto.givetostock(giveStockRequestDto.getEnterpriseName(),resultDto.getAmount());
+        return GiveStockResponseDto.givetostock(giveStockRequestDto.getEnterpriseName(),resultDto.getAmount(),event.getStockCode());
 
     }
 }

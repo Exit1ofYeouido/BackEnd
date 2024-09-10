@@ -149,6 +149,7 @@ public class ReceiptService {
             RewardResponseDTO rewardResponseDTO = RewardResponseDTO.builder()
                     .name(rewardRequestDTO.getEnterpriseName())
                     .amount(amountOfStock)
+                    .stockCode(event.getStockCode())
                     .build();
             return rewardResponseDTO;
         } catch (ExistingReceiptException e) {

@@ -8,13 +8,11 @@ import lombok.Getter;
 @Builder
 public class GiveStockResponseDto {
     private String name;
-
     private double amount;
+    private String stockCode;
 
-    public static GiveStockResponseDto givetostock(String enterprisename, double amount) {
-
-        return GiveStockResponseDto.builder().name(enterprisename).amount(amount).build();
-
+    public static GiveStockResponseDto givetostock(String enterprisename, double amount, String stockCode) {
+        return GiveStockResponseDto.builder().name(enterprisename).amount(amount).stockCode(stockCode).build();
 
     }
 }
