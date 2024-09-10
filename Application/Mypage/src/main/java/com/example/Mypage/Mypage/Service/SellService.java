@@ -60,7 +60,7 @@ public class SellService {
     public static final int CLOSE = 0;
     public static final int SALE_TABLE_A = 0;
     public static final String OPEN_STATUS = "005930";
-    private static final String SALE_MESSAGE_TEMPLATE = "[StockCraft] 체결 알리미 \n 종목명 : %s\n 매도수량 : %s\n 판매금액 : %s원";
+    private static final String SALE_MESSAGE_TEMPLATE = "[StockCraft] 체결 알리미 \n 종목명 : %s\n 매도수량 : %s주\n 판매금액 : %s원";
 
     private final StockSaleRequestARepository stockSaleRequestARepository;
     private final StockSaleRequestBRepository stockSaleRequestBRepository;
