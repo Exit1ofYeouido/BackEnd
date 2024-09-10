@@ -57,7 +57,9 @@ public class AttendanceService {
         Attendance attendance = attendanceRepository.findByMemberId(memberId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate recentAttendDate = LocalDate.parse(attendance.getLastAttendanceDate(), formatter);
-        LocalDate today = LocalDate.now();
+        ZoneId seoulZoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime seoulDateTime = ZonedDateTime.now(seoulZoneId);
+        LocalDate today = seoulDateTime.toLocalDate();
         if(recentAttendDate.equals(today)) {
             throw new AlreadyAttendedException();
         }

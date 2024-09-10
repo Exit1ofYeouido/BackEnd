@@ -128,6 +128,8 @@ public class ReceiptService {
         try {
             int existReceiptLogCount = receiptLogRepository.countByApprovalNumberAndDealTime(rewardRequestDTO.getApprovalNum(), rewardRequestDTO.getDealTime());
             if(existReceiptLogCount > 0) throw new ExistingReceiptException(rewardRequestDTO.getImgURL());
+            int existReceiptLogCountByPath = receiptLogRepository.countByImgPath(rewardRequestDTO.getImgURL());
+            if(existReceiptLogCountByPath > 0) throw new ExistingPathException();
             giveStockService.giveStock(memberId, rewardRequestDTO.getEnterpriseName(), 2L, priceOfStock, amountOfStock);
             Event event = eventRepository.findByEnterpriseNameContainingAndContentId(rewardRequestDTO.getEnterpriseName(), 2L);
             event.setRewardAmount(event.getRewardAmount() - amountOfStock);
@@ -152,9 +154,9 @@ public class ReceiptService {
                     .stockCode(event.getStockCode())
                     .build();
             return rewardResponseDTO;
-        } catch (ExistingReceiptException e) {
+        } catch (ExistingReceiptException | ExistingPathException e) {
             throw e;
-        } catch (GiveStockErrorException e) {
+        } catch (Exception e) {
             throw new GiveStockErrorException();
         }
     }

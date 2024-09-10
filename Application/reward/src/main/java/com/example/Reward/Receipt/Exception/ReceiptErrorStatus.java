@@ -12,7 +12,8 @@ public enum ReceiptErrorStatus {
     STOCK_NOT_FOUND(405, "받을 수 있는 주식이 없습니다!"),
     KIS_API(406, "한국투자증권 API 오류!"),
     GIVE_STOCK_ERROR(407, "주식 증정 로직 오류!"),
-    EXISTING_RECEIPT(408, "이미 사용된 영수증입니다!");
+    EXISTING_RECEIPT(408, "이미 사용된 영수증입니다!"),
+    EXISTING_PATH(409, "사진 이름 중복!");
 
     private final int status;
     private final String message;
