@@ -107,8 +107,14 @@ public class ReceiptService {
         if(storeName.equals("STARBUCKS")) return "이마트";
         for(String name : enterprises) {
             String detected = getLongestCommonSubstring.getlongestCommonSubstring(name, storeName);
-            if(detected.length()>longest.length() && detected.length()>=name.length()/2) {
-                longest = detected;
+            if(detected.length()>longest.length()) {
+                if(name.length()<=3) {
+                    if(detected.equals(name)) longest = detected;
+                }
+                else if(name.length()<=5) {
+                    if(detected.length()>=3) longest = detected;
+                }
+                else if(detected.length()>=name.length()/2) longest = detected;
             }
         }
         if(!longest.isEmpty()) {
