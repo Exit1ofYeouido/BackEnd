@@ -349,13 +349,12 @@ public class AccountService {
 
     public GetPurchaseStocksResponseDto getPurcahseStocks(String agent) {
 
-        if (agent.contains("android") ){
+        if (agent.contains("android")) {
             return GetPurchaseStocksResponseDto
                     .builder()
                     .url("https://play.google.com/store/apps/details?id=com.shinhaninvest.nsmts")
                     .build();
-        }
-        else if(agent.contains("iphone") || agent.contains("ipad") ){
+        } else if (agent.contains("iphone") || agent.contains("ipad")) {
             return GetPurchaseStocksResponseDto
                     .builder()
                     .url("https://apps.apple.com/kr/app/%EC%8B%A0%ED%95%9C-sol%EC%A6%9D%EA%B6%8C-%EB%8C%80%ED%91%9Cmts/id1168512940")
@@ -367,6 +366,7 @@ public class AccountService {
                 .builder()
                 .url("https://www.shinhansec.com/WEB-APP/wts/main/index.cmd?screen=1402")
                 .build();
+    }
 
     private static @NotNull String formatPrice(int sellPrice) {
         NumberFormat numberFormat = NumberFormat.getInstance(Locale.KOREA);
