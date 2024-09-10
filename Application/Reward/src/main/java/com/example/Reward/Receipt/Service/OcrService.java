@@ -156,7 +156,7 @@ public class OcrService {
             ArrayList<String> missingReceiptInfo = new ArrayList<>();
             missingReceiptInfo.add("approvalNum");
             throw new MissingOcrInfoException(receiptURL, missingReceiptInfo);
-        } catch (OcrErrorException e) {
+        } catch (Exception e) {
             throw new OcrErrorException(receiptURL);
         }
     }
