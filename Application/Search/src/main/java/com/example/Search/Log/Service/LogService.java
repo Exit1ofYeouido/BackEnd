@@ -7,13 +7,12 @@ import com.example.Search.Common.Repository.MemberStockHoldingRepository;
 import com.example.Search.Common.Repository.SearchLogRepository;
 import com.example.Search.Common.Repository.StockRepository;
 import com.example.Search.Exception.NotAdminException;
-import com.example.Search.Log.Dto.out.GetHistoryStockResponseDto;
-import com.example.Search.Log.Dto.out.GetSearchLogMemberDto;
-import com.example.Search.Log.Dto.out.GetSearchLogMemberStockDto;
-import com.example.Search.Log.Dto.out.MemberStockCountByYearDto;
-import com.example.Search.Log.Dto.out.MemberStockCountDto;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import com.example.Search.Log.Dto.out.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -159,27 +158,41 @@ public class LogService {
 
     }
 
-    public List<GetSearchLogMemberDto> getLogMember(String role, Long memberId, int year, int month) {
+
+    public List<MemberCountDto> getLogMember(String role, Long memberId, int year, int month) {
         isAdmin(role);
-        List<GetSearchLogMemberDto> getSearchLogMemberDtos;
-        if (month == 0) {
-            getSearchLogMemberDtos = searchLogRepository.findByMemberIdWithYear(memberId, year);
-        } else {
-            getSearchLogMemberDtos = searchLogRepository.findByMemberIdWithYearAndMonth(memberId, year, month);
+        List<MemberCountDto> memberCountDtos;
+        if(month==0) {
+            memberCountDtos = searchLogRepository.findByMemberIdWithYear(memberId, year);
         }
-        for (GetSearchLogMemberDto getSearchLogMemberDto : getSearchLogMemberDtos) {
-            String stockCode = stockRepository.findByName(getSearchLogMemberDto.getEnterpriseName()).getCode();
-            Optional<MemberStockHolding> memberStockHolding = memberStockHoldingRepository.findByMemberIdAndStockCode(
-                    memberId, stockCode);
-            getSearchLogMemberDto.setHolding(memberStockHolding.isPresent());
+        else {
+            memberCountDtos = searchLogRepository.findByMemberIdWithYearAndMonth(memberId, year, month);
         }
-        return getSearchLogMemberDtos;
+        for (MemberCountDto memberCountDto : memberCountDtos) {
+            String stockCode = stockRepository.findByName(memberCountDto.getEnterpriseName()).getCode();
+            Optional<MemberStockHolding> memberStockHolding = memberStockHoldingRepository.findByMemberIdAndStockCode(memberId, stockCode);
+            memberCountDto.setHolding(memberStockHolding.isPresent());
+        }
+        return memberCountDtos;
 
     }
+
 
     public void isAdmin(String role) {
         if (!role.equals("admin")) {
             throw new NotAdminException("인증된 사용자만 접근 가능합니다.");
+
+    public StockCountResponseDto getLogStock(String enterpriseName, int year, int month) {
+        if (month == 0) {
+            List<StockCountByYearDto> stockCountByYearDtos = searchLogRepository.findByEnterpriseNameWithYear(enterpriseName, year);
+            return StockCountResponseDto.builder()
+                    .countResults(stockCountByYearDtos)
+                    .build();
+        } else {
+            List<StockCountDto> stockCountDtos = searchLogRepository.findByEnterpriseNameWithYearAndMonth(enterpriseName, year, month);
+            return StockCountResponseDto.builder()
+                    .countResults(stockCountDtos)
+                    .build();
         }
     }
 }

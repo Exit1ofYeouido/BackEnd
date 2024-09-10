@@ -26,6 +26,7 @@ public class LogController {
 
     private final LogService logService;
 
+
     @GetMapping("")
     @Operation(description = "관리자페이지 권한 인증")
     public ResponseEntity<?> checkMyRole(@RequestHeader("role") String role) {
@@ -62,13 +63,16 @@ public class LogController {
 
     @GetMapping("/search-history/member")
     @Operation(description = "회원 지정하여 주식별 검색량 조회")
-    public ResponseEntity<List<GetSearchLogMemberDto>> getSearchLogMember(@RequestHeader("role") String role,
-                                                                          @RequestParam("memberId") String memberId,
-                                                                          @RequestParam("year") String year,
-                                                                          @RequestParam("month") String month) {
-        List<GetSearchLogMemberDto> getSearchLogMemberDtos = logService.getLogMember(role, Long.valueOf(memberId),
-                Integer.parseInt(year), Integer.parseInt(month));
-        return ResponseEntity.ok(getSearchLogMemberDtos);
+
+    public ResponseEntity<List<MemberCountDto>> getSearchLogMember(@RequestHeader("role") String role, @RequestParam("memberId") String memberId, @RequestParam("year") String year, @RequestParam("month") String month) {
+        List<MemberCountDto> memberCountDtos = logService.getLogMember(Long.valueOf(memberId), Integer.parseInt(year), Integer.parseInt(month));
+        return ResponseEntity.ok(memberCountDtos);
     }
 
+    @GetMapping("/search-history/stock")
+    @Operation(description = "주식 지정하여 날짜별, 월별 검색량 조회")
+    public ResponseEntity<StockCountResponseDto> getSearchLogStock(@RequestParam("enterpriseName") String enterpriseName, @RequestParam("year") String year, @RequestParam("month") String month) {
+        StockCountResponseDto stockCountResponseDto = logService.getLogStock(enterpriseName, Integer.parseInt(year), Integer.parseInt(month));
+        return ResponseEntity.ok(stockCountResponseDto);
+    }
 }

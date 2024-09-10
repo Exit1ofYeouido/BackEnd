@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
@@ -30,8 +32,12 @@ public class AttendanceService {
         Attendance attendance = attendanceRepository.findByMemberId(memberId);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate recentAttendDate = LocalDate.parse(attendance.getLastAttendanceDate(), formatter);
-        LocalDate today = LocalDate.now();
+        LocalDate recentAttendDate = LocalDate.parse(attendance.getLastAttendanceDate(), formatter);;
+
+        ZoneId seoulZoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime seoulDateTime = ZonedDateTime.now(seoulZoneId);
+        LocalDate today = seoulDateTime.toLocalDate();
+
         int currentMonth = today.getMonthValue();
         boolean isChecked = recentAttendDate.equals(today);
         int recentMonth = recentAttendDate.getMonthValue();
