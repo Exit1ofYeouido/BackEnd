@@ -16,7 +16,7 @@ public class KoreaInvestmentApiService {
     @Value("${app.key}")
     private String apiKey;
 
-    @Value("${app.secretkey}")
+    @Value("${app.secret}")
     private String apiSecret;
 
     @Value("${app.fourth-key}")

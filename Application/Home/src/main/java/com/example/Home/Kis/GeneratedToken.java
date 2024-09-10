@@ -20,7 +20,7 @@ public class GeneratedToken {
     @Value("${app.key}")
     private String APPKEY;
 
-    @Value("${app.secretkey}")
+    @Value("${app.secret}")
     private String APPSECRET;
 
     @Value("${app.fourth-key}")
