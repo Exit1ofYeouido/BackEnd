@@ -93,6 +93,7 @@ public class AttendanceService {
         Reward reward = Reward.builder()
                 .enterpriseName(stockInfoDTO.getEnterpriseName())
                 .amount(amountOfStock)
+                .stockCode(stockInfoDTO.getCode())
                 .build();
         AttendResponseDTO attendResponseDTO = AttendResponseDTO.builder()
                 .hasReward(true)
