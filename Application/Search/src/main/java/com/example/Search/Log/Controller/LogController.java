@@ -62,11 +62,12 @@ public class LogController {
     @Operation(description = "주식 지정하여 날짜별, 월별 검색량 조회")
     public ResponseEntity<StockCountResponseDto> getSearchLogStock(
             @RequestHeader("role") String role,
-            @RequestParam("enterpriseName") String enterpriseName, @RequestParam("year") String year,
+            @RequestParam("enterpriseInfo") String enterpriseInfo,
+            @RequestParam("year") String year,
             @RequestParam("month") String month) {
-        StockCountResponseDto stockCountResponseDto = logService.getLogStock(role, enterpriseName,
+        StockCountResponseDto stockCountResponseDto = logService.getLogStock(role, enterpriseInfo,
                 Integer.parseInt(year),
                 Integer.parseInt(month));
-        return ResponseEntity.ok(stockCountResponseDto);
+-        return ResponseEntity.ok(stockCountResponseDto);
     }
 }

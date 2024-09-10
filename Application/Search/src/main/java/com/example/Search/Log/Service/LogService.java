@@ -3,6 +3,7 @@ package com.example.Search.Log.Service;
 
 import com.example.Search.Common.Entity.MemberStockHolding;
 import com.example.Search.Common.Entity.SearchLog;
+import com.example.Search.Common.Entity.Stock;
 import com.example.Search.Common.Repository.MemberStockHoldingRepository;
 import com.example.Search.Common.Repository.SearchLogRepository;
 import com.example.Search.Common.Repository.StockRepository;
@@ -94,18 +95,25 @@ public class LogService {
 
     }
 
-    public StockCountResponseDto getLogStock(String role, String enterpriseName, int year, int month) {
+    public StockCountResponseDto getLogStock(String role, String enterpriseInfo, int year,
+                                             int month) {
         isAdmin(role);
+
+        Stock stock = stockRepository.findByCode(enterpriseInfo);
+        
+        if (stock != null) {
+            enterpriseInfo = stock.getName();
+        }
 
         if (month == 0) {
             List<StockCountByYearDto> stockCountByYearDtos = searchLogRepository.findByEnterpriseNameWithYear(
-                    enterpriseName, year);
+                    enterpriseInfo, year);
             return StockCountResponseDto.builder()
                     .countResults(stockCountByYearDtos)
                     .build();
         } else {
             List<StockCountDto> stockCountDtos = searchLogRepository.findByEnterpriseNameWithYearAndMonth(
-                    enterpriseName, year, month);
+                    enterpriseInfo, year, month);
             return StockCountResponseDto.builder()
                     .countResults(stockCountDtos)
                     .build();
