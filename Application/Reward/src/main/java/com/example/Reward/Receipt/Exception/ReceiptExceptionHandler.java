@@ -95,4 +95,12 @@ public class ReceiptExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(ExistingPathException.class)
+    private ResponseEntity<ReceiptErrorResponse> handler(ExistingPathException e) {
+        ReceiptErrorResponse response = ReceiptErrorResponse.builder()
+                .status(e.getStatus())
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.badRequest().body(response);
+    }
 }
