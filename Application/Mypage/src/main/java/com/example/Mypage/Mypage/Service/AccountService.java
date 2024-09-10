@@ -283,7 +283,7 @@ public class AccountService {
         accountHistoryRepository.save(accountHistory);
         messageUtil.sendMessage(String.format(
                 WITHDRAWAL_MESSAGE_TEMPLATE,
-                accountHistory.getAccount().getAccountNumber(),
+                hideAccountNumber(accountHistory.getAccount().getAccountNumber()),
                 formatPrice(accountHistory.getRequestPoint()),
                 formatPrice(accountHistory.getResultPoint())
         ), accountHistory.getMember().getPhoneNumber());
@@ -352,5 +352,11 @@ public class AccountService {
     private static @NotNull String formatPrice(int sellPrice) {
         NumberFormat numberFormat = NumberFormat.getInstance(Locale.KOREA);
         return numberFormat.format(sellPrice);
+    }
+
+    private String hideAccountNumber(String accountNumber) {
+        String maskedAccountNumber = accountNumber.substring(0, 7) + accountNumber.substring(7).replaceAll(".", "*");
+
+        return maskedAccountNumber;
     }
 }
