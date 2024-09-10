@@ -132,6 +132,15 @@ public class AccountService {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
         List<MyStocksResponseDto> myStocks = new ArrayList<>();
 
+        if (memberStocks.isEmpty()) {
+            return MyStocksPageResponseDto.builder()
+                    .myStocksResponse(myStocks)
+                    .stocksValueResponseDto(StocksValueResponseDto.builder()
+                            .stocksValue(0)
+                            .earningRate("0")
+                            .build()).build();
+        }
+
         double preValue = 0;
         double currentValue = 0;
 
