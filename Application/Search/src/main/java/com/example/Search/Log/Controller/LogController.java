@@ -68,6 +68,6 @@ public class LogController {
         StockCountResponseDto stockCountResponseDto = logService.getLogStock(role, enterpriseInfo,
                 Integer.parseInt(year),
                 Integer.parseInt(month));
--        return ResponseEntity.ok(stockCountResponseDto);
+        return ResponseEntity.ok(stockCountResponseDto);
     }
 }
