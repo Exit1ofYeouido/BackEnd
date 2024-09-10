@@ -1,12 +1,11 @@
 package com.example.Search.Log.Controller;
 
-import com.example.Search.Log.Dto.out.GetHistoryStockResponseDto;
-import com.example.Search.Log.Dto.out.GetSearchLogMemberDto;
 import com.example.Search.Log.Dto.out.GetSearchLogMemberStockDto;
+import com.example.Search.Log.Dto.out.MemberCountDto;
+import com.example.Search.Log.Dto.out.StockCountResponseDto;
 import com.example.Search.Log.Service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.text.ParseException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,26 +25,11 @@ public class LogController {
 
     private final LogService logService;
 
-
     @GetMapping("")
     @Operation(description = "관리자페이지 권한 인증")
     public ResponseEntity<?> checkMyRole(@RequestHeader("role") String role) {
         logService.isAdmin(role);
         return ResponseEntity.ok("인증된 사용자입니다.");
-    }
-
-    @GetMapping("/search-history/stock")
-    @Operation(description = "주식 종목별 검색량 조회")
-    public ResponseEntity<?> getHistoryStock(@RequestHeader("role") String role,
-                                             @RequestParam("enterpriseName") String enterpriseName,
-                                             @RequestParam("year") String year
-            , @RequestParam("month") String month) throws ParseException {
-
-        List<GetHistoryStockResponseDto> getHistoryStockResponseDtos = logService.gethistoryStock(role, enterpriseName,
-                year,
-                month);
-
-        return ResponseEntity.ok(getHistoryStockResponseDtos);
     }
 
     @GetMapping("/search-history/member-stock")
@@ -64,15 +48,25 @@ public class LogController {
     @GetMapping("/search-history/member")
     @Operation(description = "회원 지정하여 주식별 검색량 조회")
 
-    public ResponseEntity<List<MemberCountDto>> getSearchLogMember(@RequestHeader("role") String role, @RequestParam("memberId") String memberId, @RequestParam("year") String year, @RequestParam("month") String month) {
-        List<MemberCountDto> memberCountDtos = logService.getLogMember(Long.valueOf(memberId), Integer.parseInt(year), Integer.parseInt(month));
+    public ResponseEntity<List<MemberCountDto>> getSearchLogMember(@RequestHeader("role") String role,
+                                                                   @RequestParam("memberId") String memberId,
+                                                                   @RequestParam("year") String year,
+                                                                   @RequestParam("month") String month) {
+        List<MemberCountDto> memberCountDtos = logService.getLogMember(role, Long.valueOf(memberId),
+                Integer.parseInt(year),
+                Integer.parseInt(month));
         return ResponseEntity.ok(memberCountDtos);
     }
 
     @GetMapping("/search-history/stock")
     @Operation(description = "주식 지정하여 날짜별, 월별 검색량 조회")
-    public ResponseEntity<StockCountResponseDto> getSearchLogStock(@RequestParam("enterpriseName") String enterpriseName, @RequestParam("year") String year, @RequestParam("month") String month) {
-        StockCountResponseDto stockCountResponseDto = logService.getLogStock(enterpriseName, Integer.parseInt(year), Integer.parseInt(month));
+    public ResponseEntity<StockCountResponseDto> getSearchLogStock(
+            @RequestHeader("role") String role,
+            @RequestParam("enterpriseName") String enterpriseName, @RequestParam("year") String year,
+            @RequestParam("month") String month) {
+        StockCountResponseDto stockCountResponseDto = logService.getLogStock(role, enterpriseName,
+                Integer.parseInt(year),
+                Integer.parseInt(month));
         return ResponseEntity.ok(stockCountResponseDto);
     }
 }
