@@ -10,8 +10,9 @@ public class DetailEnterPriseResponseDto {
 
     private String name;
     private String comment;
+    private String stockCode;
 
     public static DetailEnterPriseResponseDto of(Event event) {
-        return DetailEnterPriseResponseDto.builder().name(event.getEnterpriseName()).comment(event.getComment()).build();
+        return DetailEnterPriseResponseDto.builder().name(event.getEnterpriseName()).comment(event.getComment()).stockCode(event.getStockCode()).build();
     }
 }
