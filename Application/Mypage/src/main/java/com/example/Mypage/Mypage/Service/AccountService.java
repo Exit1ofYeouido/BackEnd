@@ -13,6 +13,7 @@ import com.example.Mypage.Common.Repository.SaleInfoRepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestARepository;
 import com.example.Mypage.Common.Repository.StockSaleRequestBRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
+import com.example.Mypage.Common.Sms.MessageUtil;
 import com.example.Mypage.Mypage.Dto.in.WithdrawalRequestDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointHistoryResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetPointResponseDto;
@@ -32,14 +33,17 @@ import com.example.Mypage.Mypage.Exception.BadRequestException;
 import com.example.Mypage.Mypage.Exception.InValidStockCodeException;
 import com.example.Mypage.Mypage.Webclient.Service.ApiService;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +58,9 @@ public class AccountService {
     public static final int PENDING_TABLE_ID = 1;
     public static final int MARKET_TABLE_ID = 2;
     public static final double MIN_SALE_PRICE = 1000;
+    private static final String WITHDRAWAL_MESSAGE_TEMPLATE = "[StockCraft] 출금 알리미 \n 계좌번호 : %s \n 출금금액 : %s원 "
+            + "\n 최종잔액 : %s원";
+    public static final int MIN_WITHDRAWAL_POINT = 100;
 
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
@@ -63,6 +70,7 @@ public class AccountService {
     private final StockSaleRequestARepository stockSaleRequestARepository;
     private final StockSaleRequestBRepository stockSaleRequestBRepository;
     private final SaleInfoRepository saleInfoRepository;
+    private final MessageUtil messageUtil;
 
     public GetPointResponseDto getPoint(Long memberId) {
         try {
@@ -123,6 +131,15 @@ public class AccountService {
         log.info("MemberId : {} 의 보유주식 조회", memberId);
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memberId);
         List<MyStocksResponseDto> myStocks = new ArrayList<>();
+
+        if (memberStocks.isEmpty()) {
+            return MyStocksPageResponseDto.builder()
+                    .myStocksResponse(myStocks)
+                    .stocksValueResponseDto(StocksValueResponseDto.builder()
+                            .stocksValue(0)
+                            .earningRate("0")
+                            .build()).build();
+        }
 
         double preValue = 0;
         double currentValue = 0;
@@ -246,6 +263,10 @@ public class AccountService {
 
     @Transactional
     public WithdrawalResponseDto withdrawalPoint(Long memberId, WithdrawalRequestDto withdrawalRequestDto) {
+        if (withdrawalRequestDto.getWithdrawalAmount() < MIN_WITHDRAWAL_POINT) {
+            throw new BadRequestException("최소 출금 포인트는 100원 입니다.");
+        }
+
         Account account = accountRepository.findByAccountNumber(withdrawalRequestDto.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌개설을 진행하세요."));
 
@@ -269,6 +290,12 @@ public class AccountService {
                 .createdAt(LocalDateTime.now())
                 .build();
         accountHistoryRepository.save(accountHistory);
+        messageUtil.sendMessage(String.format(
+                WITHDRAWAL_MESSAGE_TEMPLATE,
+                hideAccountNumber(accountHistory.getAccount().getAccountNumber()),
+                formatPrice(accountHistory.getRequestPoint()),
+                formatPrice(accountHistory.getResultPoint())
+        ), accountHistory.getMember().getPhoneNumber());
 
         return WithdrawalResponseDto.builder().remainPoint(account.getPoint()).build();
     }
@@ -304,7 +331,7 @@ public class AccountService {
     }
 
     private StockSaleConditionResponseDto createResponseDto(MemberStock memberStock, double minSaleAmount) {
-        String holdingAmount = memberStock != null ? formatSellAmount(memberStock.getAvailableAmount()) : "0";
+        String holdingAmount = memberStock != null ? formatAmount(memberStock.getAvailableAmount()) : "0";
 
         boolean isSellable = memberStock != null;
         if (isSellable) {
@@ -312,18 +339,33 @@ public class AccountService {
         }
         return StockSaleConditionResponseDto.builder()
                 .holdingAmount(holdingAmount)
-                .minSaleAmount(formatSellAmount(minSaleAmount))
+                .minSaleAmount(formatAmount(minSaleAmount))
                 .isSellable(isSellable)
                 .build();
     }
 
-    private String formatSellAmount(double amount) {
+    public static String formatAmount(double amount) {
         DecimalFormat decimalFormat = new DecimalFormat("#.######");
         return decimalFormat.format(amount);
+    }
+
+    public static double formatDoubleAmount(double amount) {
+        return Double.parseDouble(formatAmount(amount));
     }
 
     private String formatEarningRate(double amount) {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         return decimalFormat.format(amount);
+    }
+
+    private static @NotNull String formatPrice(int sellPrice) {
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.KOREA);
+        return numberFormat.format(sellPrice);
+    }
+
+    private String hideAccountNumber(String accountNumber) {
+        String maskedAccountNumber = accountNumber.substring(0, 7) + accountNumber.substring(7).replaceAll(".", "*");
+
+        return maskedAccountNumber;
     }
 }
