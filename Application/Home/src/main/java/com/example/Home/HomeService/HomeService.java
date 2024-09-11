@@ -8,9 +8,11 @@ import com.example.Home.Common.Repository.MemberRepository;
 import com.example.Home.Common.Repository.MemberStockRepository;
 import com.example.Home.HomeDTO.HomeResponseDTO;
 import com.example.Home.Kis.KoreaInvestmentApiService;
-import jakarta.transaction.Transactional;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -70,14 +72,24 @@ public class HomeService {
     }
 
     private Map<String, Long> getStockPrices(List<String> stockCodes) {
-        Map<String, Long> stockPrices = stockCodes.stream()
-                .distinct()
-                .collect(Collectors.toMap(
-                        code -> code,
-                        koreaInvestmentApiService::getCurrentPrice
-                ));
-        log.debug("getStockPrices result: {}", stockPrices);
+        Map<String, Long> stockPrices = new HashMap<>();
 
+        Set<String> uniqueCodes = new HashSet<>(stockCodes);
+        int idx = 0;
+
+        for (String code : uniqueCodes) {
+            Long price = 0L;
+
+            if (idx++ % 2 == 0) {
+                price = koreaInvestmentApiService.getCurrentAPrice(code);
+            } else {
+                price = koreaInvestmentApiService.getCurrentBPrice(code);
+            }
+
+            stockPrices.put(code, price);
+        }
+
+        log.debug("getStockPrices result: {}", stockPrices);
         return stockPrices;
     }
 
@@ -95,31 +107,16 @@ public class HomeService {
 
         for (MemberStock memberStock : memberStocks) {
             long currentPrice = currentPrices.getOrDefault(memberStock.getCode(), 0L);
-            System.out.println("current price: " + currentPrice);
             long purchasePrice = memberStock.getAveragePrice();
-            System.out.println("average price: " + purchasePrice);
             double currentValue = memberStock.getAmount() * currentPrice;
-            System.out.println("current value: " + currentValue);
             double purchaseValue = memberStock.getAmount() * purchasePrice;
-            System.out.println("purchase value: " + purchaseValue);
 
             totalCurrentValue += currentValue;
-            System.out.println("api로 불러온 현재가 : " + totalCurrentValue);
             totalPurchaseValue += purchaseValue;
-            System.out.println("내가 샀을 때 평균가 : " + totalPurchaseValue);
         }
         double earningRate = ((totalCurrentValue - totalPurchaseValue) / totalPurchaseValue) * 100;
 
         return Math.round(earningRate * 100.0) / 100.0;
     }
 
-    @Transactional
-    public void updateCurrentPrices() {
-        List<MemberStock> stocks = memberStockRepository.findAll();
-        for (MemberStock stock : stocks) {
-            Long currentPrice = koreaInvestmentApiService.getCurrentPrice(stock.getCode());
-            stock.setAveragePrice(currentPrice);
-            memberStockRepository.save(stock);
-        }
-    }
 }

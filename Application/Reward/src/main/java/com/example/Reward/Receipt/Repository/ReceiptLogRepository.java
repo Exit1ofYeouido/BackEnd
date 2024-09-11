@@ -11,4 +11,7 @@ public interface ReceiptLogRepository extends JpaRepository<ReceiptLog, ReceiptL
     @Query("SELECT COUNT(R) FROM ReceiptLog R WHERE R.receiptLogKey.approvalNumber = :approvalNumber AND R.receiptLogKey.dealTime = :dealTime")
     int countByApprovalNumberAndDealTime(@Param("approvalNumber") String approvalNumber,
                                          @Param("dealTime") String dealTime);
+
+    @Query("SELECT COUNT(R) FROM ReceiptLog R WHERE R.imgPath = :imgURL")
+    int countByImgPath(String imgURL);
 }

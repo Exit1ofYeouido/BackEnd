@@ -1,5 +1,7 @@
 package com.example.Mypage.Mypage.Service;
 
+import static com.example.Mypage.Mypage.Service.AccountService.formatDoubleAmount;
+
 import com.example.Mypage.Common.Entity.Account;
 import com.example.Mypage.Common.Entity.Member;
 import com.example.Mypage.Common.Entity.MemberStock;
@@ -11,6 +13,7 @@ import com.example.Mypage.Common.Repository.MemberStockRepository;
 import com.example.Mypage.Common.Repository.PopupCheckRepository;
 import com.example.Mypage.Common.Repository.TradeRepository;
 import com.example.Mypage.Mypage.Dto.Other.EarningRate;
+import com.example.Mypage.Mypage.Dto.out.AllAssetDto;
 import com.example.Mypage.Mypage.Dto.out.GetAllMyPageResponseDto;
 import com.example.Mypage.Mypage.Dto.out.GetTutorialCheckResponseDto;
 import com.example.Mypage.Mypage.Exception.AccountNotFoundException;
@@ -42,60 +45,58 @@ public class MyService {
     private final AccountRepository accountRepository;
     private final TradeRepository tradeRepository;
 
-    @Transactional(readOnly = true)
+
     public GetAllMyPageResponseDto getAllMyPage(Long memId) {
 
         Account account = accountRepository.findByMemberId(memId).orElseThrow(
                 () -> new AccountNotFoundException("계좌가 존재하지않습니다.")
         );
         List<MemberStock> memberStock = memberStockRepository.findByMemberId(memId);
-        String calcAssetsEarningRate = CalcAllAssets(memberStock);
+        AllAssetDto AllAsset = CalcAllAssets(memberStock);
         List<EarningRate> earningRates = Top3EarningRateAssets(memberStock);
-        int allCost = AllAssetsCount(memberStock);
 
-        return GetAllMyPageResponseDto.of(account.getPoint(), calcAssetsEarningRate, earningRates, allCost);
+        return GetAllMyPageResponseDto.of(account.getPoint(), AllAsset.getCalcAssetsEarningRate(), earningRates,
+                account.getAccountNumber(), AllAsset.getAllCost());
     }
 
-    private String CalcAllAssets(List<MemberStock> memberStocks) {
+    private AllAssetDto CalcAllAssets(List<MemberStock> memberStocks) {
 
         double allCost = 0;
         double currentAllCost = 0;
+
         if (memberStocks.isEmpty()) {
-            return "0";
+            return AllAssetDto.builder()
+                    .calcAssetsEarningRate("0")
+                    .allCost(0)
+                    .build();
         }
 
         for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getAmount();
-            double stockprice = memberStock.getAveragePrice();
+            double stockCount = memberStock.getAmount();
+            double stockPrice = memberStock.getAveragePrice();
 
-            double currentprice = apiService.getPrice(memberStock.getStockCode());
+            double currentPrice = apiService.getPrice(memberStock.getStockCode());
 
-            allCost = allCost + (stockprice * stockcount);
-            currentAllCost = currentAllCost + (currentprice * stockcount);
-
+            allCost = allCost + (stockPrice * stockCount);
+            currentAllCost = currentAllCost + (currentPrice * stockCount);
         }
 
-        if (allCost==currentAllCost){
-            return "0";
+        if (allCost == currentAllCost) {
+            return AllAssetDto.builder()
+                    .calcAssetsEarningRate("0")
+                    .allCost((int) currentAllCost)
+                    .build();
         }
 
-        double value = (currentAllCost -allCost)/allCost * 100;
+        double value = (currentAllCost - allCost) / allCost * 100;
         DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(value);
 
+        return AllAssetDto.builder()
+                .calcAssetsEarningRate(df.format(value))
+                .allCost((int) currentAllCost)
+                .build();
     }
 
-    private int AllAssetsCount(List<MemberStock> memberStocks) {
-        int allCost = 0;
-
-        for (MemberStock memberStock : memberStocks) {
-            double stockcount = memberStock.getAmount();
-            int stockprice = apiService.getPrice(memberStock.getStockCode());
-            allCost = (int) (allCost + (stockprice * stockcount));
-
-        }
-        return allCost;
-    }
 
     private List<EarningRate> Top3EarningRateAssets(List<MemberStock> memberStocks) {
 
@@ -103,25 +104,30 @@ public class MyService {
 
         for (MemberStock memberStock : memberStocks) {
             double stockCount = memberStock.getAmount();
+
+            if (stockCount == 0) {
+                continue;
+            }
+
             int stockPrice = memberStock.getAveragePrice();
             int currentPrice = apiService.getPrice(memberStock.getStockCode());
 
             double stock = stockCount * stockPrice;
             double currentStock = stockCount * currentPrice;
-            String finalEarningRate ;
+            String finalEarningRate;
 
-            if (currentStock==stock){
-                finalEarningRate="0";
+            if (currentStock == stock) {
+                finalEarningRate = "0";
             }
-            
-            double value = (currentStock-stock)/stock * 100;
+
+            double value = (currentStock - stock) / stock * 100;
             DecimalFormat df = new DecimalFormat("#.##");
             finalEarningRate = df.format(value);
-
 
             EarningRate earningRate = EarningRate.builder()
                     .earningRate(finalEarningRate)
                     .enterpriseName(memberStock.getStockName())
+                    .stockCode(memberStock.getStockCode())
                     .build();
             top3EarningRates.add(earningRate);
         }
@@ -145,14 +151,16 @@ public class MyService {
         MemberStock memberStock = memberStockRepository.findByStockNameAndMember(giveStockDto.getEnterpriseName()
                 , giveStockDto.getMemId());
 
+        double formattedAmount = formatDoubleAmount(giveStockDto.getAmount());
+
         if (memberStock != null) {
             int avgPrice = (int) ((memberStock.getAmount() * memberStock.getAveragePrice() +
                     giveStockDto.getAmount() * giveStockDto.getPrice()) / (memberStock.getAmount()
                     + giveStockDto.getAmount()));
 
-            double sumAvailableAmount = calcAvailableAmount(memberStock.getAvailableAmount(), giveStockDto.getAmount());
+            double sumAvailableAmount = calcAvailableAmount(memberStock.getAvailableAmount(), formattedAmount);
 
-            memberStock.setAmount(memberStock.getAmount() + giveStockDto.getAmount());
+            memberStock.setAmount(memberStock.getAmount() + formattedAmount);
             memberStock.setAvailableAmount(sumAvailableAmount);
             memberStock.setAveragePrice(avgPrice);
             memberStock.setUpdatedAt(LocalDateTime.now());
@@ -162,8 +170,8 @@ public class MyService {
             memberStock = MemberStock.builder()
                     .member(member)
                     .stockName(giveStockDto.getEnterpriseName())
-                    .amount(giveStockDto.getAmount())
-                    .availableAmount(giveStockDto.getAmount())
+                    .amount(formattedAmount)
+                    .availableAmount(formattedAmount)
                     .stockCode(giveStockDto.getCode())
                     .averagePrice(giveStockDto.getPrice())
                     .createdAt(LocalDateTime.now())
@@ -207,21 +215,19 @@ public class MyService {
 
     }
 
-    @Transactional(readOnly = true)
     public List<MemberStock> getAllStock(Long memId) {
         List<MemberStock> memberStocks = memberStockRepository.findByMemberId(memId);
         return memberStocks;
 
     }
 
-    // 주식 거래내역 추가
 
     private void addStockTrade(GiveStockDto giveStockDto, Member member, MemberStock memberStock) {
         StockTradeHistory stockTradeHistory = StockTradeHistory.builder()
                 .stockName(giveStockDto.getEnterpriseName())
                 .tradeType("in")
                 .member(member)
-                .amount(giveStockDto.getAmount())
+                .amount(formatDoubleAmount(giveStockDto.getAmount()))
                 .createdAt(LocalDateTime.now())
                 .memberStock(memberStock)
                 .build();

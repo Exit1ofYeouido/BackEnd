@@ -14,7 +14,6 @@ public class GetAllMyPageResponseDto {
 
     private int allCost;
 
-    private String accountName;
 
     private String accountId;
 
@@ -24,14 +23,13 @@ public class GetAllMyPageResponseDto {
 
 
     public static GetAllMyPageResponseDto of(Integer totalPoint, String calcAssetsEarningRate,
-                                             List<EarningRate> earningRates, int allCost) {
+                                             List<EarningRate> earningRates,String accountId,int allCost) {
         GetAccountResponseDto getAccountResponseDto = new GetAccountResponseDto();
 
         return GetAllMyPageResponseDto.builder()
                 .allCost(allCost)
                 .earningRate(calcAssetsEarningRate)
-                .accountName(getAccountResponseDto.getAccountName())
-                .accountId(getAccountResponseDto.getAccountId())
+                .accountId(accountId)
                 .earningRates(earningRates)
                 .totalPoint(totalPoint).build();
 

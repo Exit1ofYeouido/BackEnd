@@ -6,8 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class RewardResponseDTO {
-
     private String name;
-
     private double amount;
+    private String stockCode;
 }

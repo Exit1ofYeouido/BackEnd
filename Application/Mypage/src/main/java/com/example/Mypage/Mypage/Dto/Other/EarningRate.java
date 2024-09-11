@@ -12,5 +12,7 @@ public class EarningRate {
 
     private String earningRate;
 
+    private String stockCode;
+
 
 }

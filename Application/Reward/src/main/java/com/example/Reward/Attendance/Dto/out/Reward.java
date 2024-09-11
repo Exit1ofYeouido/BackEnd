@@ -8,4 +8,5 @@ import lombok.Getter;
 public class Reward {
     private String enterpriseName;
     private double amount;
+    private String stockCode;
 }

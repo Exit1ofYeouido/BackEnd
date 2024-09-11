@@ -2,6 +2,7 @@ package com.example.Mypage.Mypage.Exception;
 
 import jakarta.persistence.PessimisticLockException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -96,6 +97,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExceedSaleAmountException.class)
     public ResponseEntity<ErrorResponseDto> handleExceedSaleAmountException(ExceedSaleAmountException e) {
+        log.error(e.getMessage());
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .message(e.getMessage())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ErrorResponseDto> handleDateTimeParseException(DateTimeParseException e) {
         log.error(e.getMessage());
         ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
                 .message(e.getMessage())

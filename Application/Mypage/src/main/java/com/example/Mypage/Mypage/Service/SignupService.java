@@ -13,6 +13,7 @@ import com.example.Mypage.Mypage.Kafka.ouput.AuthMessageProducer;
 import jakarta.persistence.PessimisticLockException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,8 @@ public class SignupService {
         } catch (PessimisticLockException e) {
             log.error("Lock Transaction 얻지 못 함 {} ", e.getMessage());
             throw new PessimisticLockException(e.getMessage());
+        } catch (DateTimeParseException e) {
+            throw new DateTimeParseException("입력하신 생년월일을 확인해주세요.", memberSignupRequestDTO.getBirth(), 0);
         } catch (Exception e) {
             log.error("회원가입 과정에서 예외 발생 {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
